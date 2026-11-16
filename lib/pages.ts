@@ -2,6 +2,7 @@
 // The preview and the live page are produced by two separate functions; the live one refuses every
 // status except "live", and nothing in a request (query, cookie, header) can change that.
 import type { Page, PageAsset } from '@prisma/client';
+import { after } from 'next/server';
 import { AppError, db } from './db';
 import { bookingUrl, config, ipHash, randomId, rateLimit } from './config';
 import { fillContent } from './ai';
@@ -18,6 +19,15 @@ export const MAX_REVISIONS = 3;
 export const PREVIEW_DAYS = 14;
 export const STAGES = ['read', 'write', 'photos', 'build'] as const;
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+
+/** Keeps a job alive after the response is sent. On Vercel a function is frozen once it answers, so the work is
+ *  registered with next/server `after`; outside a request (tests, seed, scripts) it simply keeps running. */
+function inBackground(job: Promise<unknown>) {
+  try { after(() => job); } catch { /* not inside a request */ }
+}
+
+/** A published page by its address name: the subdomain, or a customer's own domain (contains a dot). */
+const liveWhere = (slug: string) => (slug.includes('.') ? { customDomain: slug.toLowerCase().replace(/^www\./, '') } : { subdomain: slug });
 const notFound = () => new AppError('not_found', 404, sq.fg.notFoundTitle);
 
 export type CreatePageInput = {
@@ -156,7 +166,7 @@ export async function startGeneration(pageId: string, opts: GenerateOptions = {}
   });
   if (res.count === 0) throw new AppError('revisions_used', 429, sq.errors.revisions_used);
   const updated = await getPage(pageId);
-  void runGeneration(pageId, { ...opts, text }, origin).catch((e) => console.error('[faqja-gati] generation crashed', e));
+  inBackground(runGeneration(pageId, { ...opts, text }, origin).catch((e) => console.error('[faqja-gati] generation crashed', e)));
   return updated;
 }
 
@@ -243,19 +253,19 @@ export async function previewHtml(pageId: string): Promise<string> {
 
 /** The published page. Returns null unless the page is live: this is the payment gate. */
 export async function liveHtml(subdomain: string, origin?: string): Promise<string | null> {
-  const page = await db.page.findUnique({ where: { subdomain }, include: { business: true, assets: { orderBy: { sort: 'asc' } } } });
-  if (!page || page.status !== 'live' || !page.contentJson) return null;
+  const page = await db.page.findFirst({ where: { ...liveWhere(subdomain), status: 'live' }, include: { business: true, assets: { orderBy: { sort: 'asc' } } } });
+  if (!page || page.status !== 'live' || !page.contentJson || !page.subdomain) return null;
   const content = JSON.parse(page.contentJson) as Content;
   const b = page.business;
   content.booking = b && !b.bookingsPaused
     ? { enabled: true, url: `${bookingUrl(b.slug, origin)}?nga=faqja`, label: content.booking?.label || '' }
     : { enabled: false, url: '', label: content.booking?.label || '' };
-  return renderLive(assignPhotos(content, page.assets.map((a) => liveImageUrl(subdomain, a.id))));
+  return renderLive(assignPhotos(content, page.assets.map((a) => liveImageUrl(page.subdomain!, a.id))));
 }
 
 /** Full-quality photo of a live page; null for anything that is not live. */
 export async function liveAssetKey(subdomain: string, assetId: string): Promise<string | null> {
-  const page = await db.page.findUnique({ where: { subdomain }, select: { id: true, status: true } });
+  const page = await db.page.findFirst({ where: { ...liveWhere(subdomain), status: 'live' }, select: { id: true, status: true } });
   if (!page || page.status !== 'live') return null;
   const asset = await db.pageAsset.findFirst({ where: { id: assetId, pageId: page.id } });
   return asset?.storageKey || null;

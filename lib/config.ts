@@ -29,6 +29,13 @@ export const config = {
   payseraProjectId: () => env('PAYSERA_PROJECT_ID'),
   payseraPassword: () => env('PAYSERA_SIGN_PASSWORD'),
   payseraTest: () => env('PAYSERA_TEST', '1') === '1',
+  /** Paysera's public key (PEM). "\n" written as two characters is turned into real line breaks. */
+  payseraPublicKey: () => env('PAYSERA_PUBLIC_KEY').replace(/\\n/g, '\n'),
+  payseraPayUrl: () => env('PAYSERA_PAY_URL', 'https://www.paysera.com/pay/'),
+  /** Language of the Paysera payment page (three letters, e.g. ENG, ALB is not offered by Paysera). */
+  payseraLang: () => env('PAYSERA_LANG', 'ENG'),
+  /** Domain whose subdomains are Faqja Gati pages (emri.faqjagati.com). Empty = pages live at APP_URL/p/emri. */
+  pagesDomain: () => env('PAGES_DOMAIN').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, ''),
   bank: () => ({ iban: env('BANK_IBAN', 'XK05 0000 0000 0000 0000'), name: env('BANK_NAME', 'Banka'), holder: env('BANK_HOLDER', '') }),
   pagePriceCents: () => Number(env('PAGE_PRICE_CENTS', '10000')) || 10000,
   domainPriceCents: () => 1500,
@@ -57,7 +64,11 @@ export function displayLink(slug: string, origin?: string) {
 }
 export const bookingUrl = (slug: string, origin?: string) => `${origin || config.appUrl()}/b/${slug}`;
 export const bookingTokenUrl = (slug: string, token: string, origin?: string) => `${bookingUrl(slug, origin)}/t/${token}`;
-export const livePageUrl = (subdomain: string, origin?: string) => `${origin || config.appUrl()}/p/${subdomain}`;
+/** Public address of a published page: emri.<PAGES_DOMAIN> when the domain is set up, else APP_URL/p/emri. */
+export const livePageUrl = (subdomain: string, origin?: string) =>
+  config.pagesDomain() ? `https://${subdomain}.${config.pagesDomain()}` : `${origin || config.appUrl()}/p/${subdomain}`;
+/** What the payment screen shows after the name: ".faqjagati.com". */
+export const pagesHostSuffix = () => '.' + (config.pagesDomain() || 'faqjagati.com');
 
 /* ---- in-memory rate limiter (one process; move to Redis/Upstash with several instances) ---- */
 const hits = new Map<string, number[]>();

@@ -2,8 +2,9 @@
 //   · Paysera checkout (card / bank link): interface below, active only when the keys are in .env
 //   · bank transfer and cash: a pending payment with a reference code; an admin marks it paid in /admin
 //
-// TODO(production) Paysera: create a project at https://www.paysera.com, put PAYSERA_PROJECT_ID and
-// PAYSERA_SIGN_PASSWORD in .env, set PAYSERA_TEST=0, and test one real payment end to end.
+// Every Paysera setting is an environment variable (PAYSERA_PROJECT_ID, PAYSERA_SIGN_PASSWORD,
+// PAYSERA_PUBLIC_KEY, PAYSERA_TEST, PAYSERA_LANG, PAYSERA_PAY_URL): see .env.example and the
+// test-payment checklist in GO-ONLINE.md.
 // Docs: https://developers.paysera.com/en/checkout/basic  (request: data + sign; callback: data + ss1 + ss2).
 // The request/callback code follows the documented "data = base64url(query), sign = md5(data + password)"
 // scheme but has NOT been run against Paysera from this machine; verify it before taking money.
@@ -30,13 +31,13 @@ export const paysera: PaymentProvider = {
 
   createCheckout(req) {
     const query = new URLSearchParams({
-      projectid: config.payseraProjectId(), orderid: req.orderId, version: '1.6', lang: 'ENG',
+      projectid: config.payseraProjectId(), orderid: req.orderId, version: '1.6', lang: config.payseraLang(),
       amount: String(req.amountCents), currency: 'EUR', paytext: req.description,
       accepturl: req.acceptUrl, cancelurl: req.cancelUrl, callbackurl: req.callbackUrl,
       test: config.payseraTest() ? '1' : '0',
     }).toString();
     const data = b64url(query);
-    return { redirectUrl: `https://www.paysera.com/pay/?data=${data}&sign=${md5(data + config.payseraPassword())}` };
+    return { redirectUrl: `${config.payseraPayUrl()}?data=${data}&sign=${md5(data + config.payseraPassword())}` };
   },
 
   verifyCallback(params) {
@@ -45,7 +46,7 @@ export const paysera: PaymentProvider = {
     if (!this.configured() || !data || params.get('ss1') !== md5(data + config.payseraPassword())) return fail;
     // ss2 = RSA-SHA1 signature of `data` with Paysera's key (https://www.paysera.com/download/public.key).
     // Required in production: put the PEM in PAYSERA_PUBLIC_KEY.
-    const pem = (process.env.PAYSERA_PUBLIC_KEY || '').replace(/\\n/g, '\n');
+    const pem = config.payseraPublicKey();
     const prod = process.env.NODE_ENV === 'production';
     if (pem) {
       const ss2 = (params.get('ss2') || '').replace(/-/g, '+').replace(/_/g, '/');

@@ -5,7 +5,7 @@ import { rangeOnDate, workingOn } from '../availability';
 import { createManualBooking, displayStatus, ownerMessage, recordMessage, updateBooking } from '../booking';
 import { cleanService, createBusiness, deleteBusinessAndUser, hoursToRows, rowsToHours, slugCheck, type HoursDoc, type ServiceInput } from '../business';
 import { bookingUrl } from '../config';
-import { AppError, db } from '../db';
+import { AppError, containsText, db } from '../db';
 import { saveBusinessPhoto } from '../fg/images';
 import { route } from '../http';
 import { displayPhone, normalizePhone } from '../phone';
@@ -253,7 +253,7 @@ route('GET', '/customers', 'owner', async (c) => {
   const q = (c.query.get('q') || '').trim();
   const digits = q.replace(/\D/g, '').replace(/^0/, '');
   const rows = await db.customer.findMany({
-    where: { businessId: c.biz.id, ...(q ? { OR: [{ name: { contains: q } }, ...(digits.length >= 3 ? [{ phone: { contains: digits } }] : [])] } : {}) },
+    where: { businessId: c.biz.id, ...(q ? { OR: [{ name: containsText(q) }, ...(digits.length >= 3 ? [{ phone: { contains: digits } }] : [])] } : {}) },
     orderBy: [{ lastVisitAt: 'desc' }, { createdAt: 'desc' }], take: 200,
   });
   const total = q ? await db.customer.count({ where: { businessId: c.biz.id } }) : rows.length;

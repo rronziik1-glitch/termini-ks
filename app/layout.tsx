@@ -9,6 +9,8 @@ export const metadata: Metadata = {
   title: sq.home.title,
   description: sq.home.description,
   applicationName: 'Termini',
+  // Paysera checks that the site is yours by looking for this tag (value from Paysera → project settings).
+  ...(process.env.PAYSERA_VERIFY_CODE ? { other: { 'verify-paysera': process.env.PAYSERA_VERIFY_CODE } } : {}),
   appleWebApp: { capable: true, title: 'Termini', statusBarStyle: 'default' },
   icons: { icon: [{ url: '/icon.svg', type: 'image/svg+xml' }, { url: '/icon-192.png', sizes: '192x192', type: 'image/png' }], apple: '/icon-192.png' },
 };

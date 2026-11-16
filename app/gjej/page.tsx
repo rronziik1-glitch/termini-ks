@@ -35,11 +35,11 @@ export default async function FindPage({ searchParams }: { searchParams: Promise
 
           <div className="stack stack--3">
             <p className="label-caps">{t.city}</p>
-            <div className="chips">
+            <div className="chips chips--wide">
               <Link className={`chip${!city ? ' is-selected' : ''}`} href={href('', category)} aria-current={!city ? 'true' : undefined}>{t.all}</Link>
               {cities.map((c) => <Link key={c} className={`chip${city === c ? ' is-selected' : ''}`} href={href(c, category)} aria-current={city === c ? 'true' : undefined}>{c}</Link>)}
             </div>
-            <div className="chips">
+            <div className="chips chips--wide">
               <Link className={`chip${!category ? ' is-selected' : ''}`} href={href(city, '')} aria-current={!category ? 'true' : undefined}>{t.all}</Link>
               {CATS.map((c) => <Link key={c} className={`chip${category === c ? ' is-selected' : ''}`} href={href(city, c)} aria-current={category === c ? 'true' : undefined}>{sq.categoriesShort[c]}</Link>)}
             </div>

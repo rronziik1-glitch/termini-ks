@@ -1,9 +1,11 @@
-// Login for business owners: phone number + 6-digit code. No SMS provider yet, so in dev the code is
-// returned to the screen and logged (SHOW_LOGIN_CODES=1). Sessions are random tokens stored hashed.
+// Login for business owners: phone number + 6-digit code. The code is delivered by the provider chosen with
+// OTP_PROVIDER (lib/otp.ts): dev = shown on screen and logged, sms, or whatsapp. Sessions are random tokens stored hashed.
 import { randomInt } from 'node:crypto';
 import type { User } from '@prisma/client';
 import { AppError, db } from './db';
 import { config, randomId, rateLimit, sha } from './config';
+import { log, maskPhoneForLog } from './log';
+import { otpProviderId, sendLoginCode } from './otp';
 import { normalizePhone } from './phone';
 import { sq } from './sq';
 
@@ -22,10 +24,20 @@ export async function requestCode(phoneRaw: unknown, ip = 'local'): Promise<{ ph
   // Audit fix: also limit per IP, so one client cannot trigger SMS to thousands of numbers (SMS cost / pumping).
   if (!rateLimit(`codeip:${ip}`, 20, 3600e3)) throw new AppError('rate_limited', 429, sq.errors.rate_limited);
   const code = String(randomInt(0, 1_000_000)).padStart(6, '0');
-  await db.loginCode.create({ data: { phone, codeHash: codeHash(phone, code), expiresAt: new Date(Date.now() + CODE_MINUTES * 60e3) } });
-  // TODO(production): send `code` by SMS or WhatsApp here (see README, "What is missing for production").
-  if (config.showLoginCodes()) console.log(`[login] kodi për ${phone}: ${code}`);
-  return { phone, devCode: config.showLoginCodes() ? code : undefined };
+  const row = await db.loginCode.create({ data: { phone, codeHash: codeHash(phone, code), expiresAt: new Date(Date.now() + CODE_MINUTES * 60e3) } });
+  if (otpProviderId() !== 'dev') {
+    // A real provider: the code goes to the phone and is never returned to the browser.
+    try { await sendLoginCode(phone, code); }
+    catch {
+      await db.loginCode.delete({ where: { id: row.id } }).catch(() => undefined);
+      throw new AppError('code_not_sent', 502, sq.errors.code_not_sent);
+    }
+    return { phone };
+  }
+  const show = config.showLoginCodes();
+  if (show) console.log(`[login] kodi për ${phone}: ${code}`);
+  else log.warn('otp.not_delivered', { to: maskPhoneForLog(phone), reason: 'OTP_PROVIDER=dev and codes are hidden' });
+  return { phone, devCode: show ? code : undefined };
 }
 
 export async function verifyCode(phoneRaw: unknown, codeRaw: unknown, name?: string): Promise<{ user: User; token: string }> {

@@ -1,6 +1,6 @@
 // Bookings: create (customer and owner), cancel, status, move, WhatsApp links. Rules: 01-product-design.md §5.
 import type { Booking, Business, Customer, Prisma } from '@prisma/client';
-import { AppError, db, withLock } from './db';
+import { AppError, db, lockKey, withLock } from './db';
 import { bookingTokenUrl, bookingUrl, ipHash, randomId, rateLimit } from './config';
 import { freeStarts, loadCtx } from './availability';
 import { displayPhone, normalizePhone, waDigits } from './phone';
@@ -59,6 +59,7 @@ export async function createPublicBooking(business: Business, input: PublicBooki
 
   return withLock(`biz:${business.id}`, () =>
     db.$transaction(async (tx) => {
+      await lockKey(tx, `biz:${business.id}`);
       const existing = await tx.customer.findUnique({ where: { businessId_phone: { businessId: business.id, phone } } });
       if (existing?.blocked) throw new AppError('blocked', 403, sq.errors.blocked);
       if (existing) {
@@ -118,6 +119,7 @@ export async function createManualBooking(business: Business, input: ManualBooki
 
   return withLock(`biz:${business.id}`, () =>
     db.$transaction(async (tx) => {
+      await lockKey(tx, `biz:${business.id}`);
       if (!input.force) {
         const clash = await tx.booking.findFirst({
           where: { businessId: business.id, staffId: staff.id, status: 'confirmed', startsAt: { lt: endsAt }, endsAt: { gt: startsAt } },
@@ -196,6 +198,7 @@ export async function updateBooking(business: Business, id: string, patch: { sta
   const startsAt = (data.startsAt as Date | undefined) ?? b.startsAt;
   const endsAt = (data.endsAt as Date | undefined) ?? b.endsAt;
   return withLock(`biz:${business.id}`, () => db.$transaction(async (tx) => {
+    await lockKey(tx, `biz:${business.id}`);
     if (needsCheck) {
       const clash = await tx.booking.findFirst({
         where: { businessId: business.id, staffId: b.staffId, status: 'confirmed', id: { not: id }, startsAt: { lt: endsAt }, endsAt: { gt: startsAt } },

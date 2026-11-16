@@ -8,7 +8,7 @@ import { freeSlug, isValidSlug, slugify } from './slug';
 import { sq } from './sq';
 import { addDays, hmToMin, isTime, toLocal } from './time';
 
-export const CATEGORIES = ['berber', 'salon', 'dentist', 'klinike', 'bujtine', 'restorant', 'dyqan', 'dasma', 'autoshkolla', 'tjeter'];
+export const CATEGORIES = ['berber', 'salon', 'dentist', 'klinike', 'bujtine', 'restorant', 'dyqan', 'dasma', 'autoshkolla', 'lavazh', 'tjeter'];
 
 /* ---- weekly hours ----------------------------------------------------------- */
 export type HoursDay = { weekday: number; open: boolean; start: string; end: string };

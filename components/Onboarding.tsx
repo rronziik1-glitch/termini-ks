@@ -10,7 +10,7 @@ import { DAYS, DAYS_NAME, DAYS_SHORT, cap } from '@/lib/time';
 
 const t = sq.onboarding;
 const STORE = 'termini.onboarding.v1';
-const TYPES = ['berber', 'salon', 'dentist', 'klinike', 'bujtine', 'dasma', 'autoshkolla', 'tjeter'];
+const TYPES = ['berber', 'salon', 'dentist', 'klinike', 'bujtine', 'dasma', 'autoshkolla', 'lavazh', 'tjeter'];
 
 type Svc = { key: number; name: string; durationMin: string; price: string; priceFrom: boolean; active: boolean };
 type Day = { weekday: number; open: boolean; start: string; end: string };

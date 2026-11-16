@@ -23,7 +23,7 @@
       "additionalProperties": false,
       "required": ["template"],
       "properties": {
-        "template": { "type": "string", "enum": ["berber", "klinike-dentare", "restorant-kafe", "bujtine", "salon-bukurie", "dyqan", "sallon-dasmash", "autoshkolla"] },
+        "template": { "type": "string", "enum": ["berber", "klinike-dentare", "restorant-kafe", "bujtine", "salon-bukurie", "dyqan", "sallon-dasmash", "autoshkolla", "lavazh-servis"] },
         "lang": { "type": "string", "default": "sq" },
         "title": { "type": "string", "description": "Browser/Google title, max 60 characters. Example: 'Berberi Arti · Berber në Gjakovë'." },
         "description": { "type": "string", "description": "Google description, max 155 characters." }
@@ -95,7 +95,7 @@
       "type": "object",
       "additionalProperties": false,
       "required": ["groups"],
-      "description": "Services with prices. For restorant-kafe these are menu sections; for bujtine the rooms; for dyqan the products. sallon-dasmash: first group = the halls (capacity in tag, e.g. '250 – 600 mysafirë', image alt filled), next groups = menus and packages priced per person. autoshkolla: first group = licence categories (Kategoria B…), next groups = extra lessons and other services.",
+      "description": "Services with prices. For restorant-kafe these are menu sections; for bujtine the rooms; for dyqan the products. sallon-dasmash: first group = the halls (capacity in tag, e.g. '250 – 600 mysafirë', image alt filled), next groups = menus and packages priced per person. autoshkolla: first group = licence categories (Kategoria B…), next groups = extra lessons and other services. lavazh-servis: first group = wash packages (shown as cards), next groups = service work (oil, tyres, diagnostics); give duration in minutes.",
       "properties": {
         "title": { "type": "string", "description": "Section title, e.g. 'Shërbimet', 'Menyja', 'Dhomat', 'Produktet'." },
         "intro": { "type": "string" },
@@ -137,7 +137,7 @@
       "additionalProperties": false,
       "properties": {
         "title": { "type": "string" },
-        "images": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/image" } }
+        "images": { "type": "array", "maxItems": 8, "items": { "$ref": "#/$defs/image" }, "description": "lavazh-servis shows these as before/after pairs: 1 = before, 2 = after, 3 = before, 4 = after…" }
       }
     },
     "reviews": {
@@ -245,7 +245,7 @@
       "properties": {
         "enabled": { "type": "boolean", "description": "true when the business has a Termini link. false = the booking button opens WhatsApp with a booking message." },
         "url": { "type": "string", "description": "Termini link, e.g. 'https://termini.app/berberi-arti'. Set by the server." },
-        "label": { "type": "string", "description": "Button text. Default 'Rezervo termin'. bujtine: 'Rezervo qëndrimin'; restorant-kafe: 'Rezervo tavolinë'; dyqan: 'Porosit në WhatsApp'; sallon-dasmash: 'Rezervo datën'; autoshkolla: 'Rezervo orën'." }
+        "label": { "type": "string", "description": "Button text. Default 'Rezervo termin'. bujtine: 'Rezervo qëndrimin'; restorant-kafe: 'Rezervo tavolinë'; dyqan: 'Porosit në WhatsApp'; sallon-dasmash: 'Rezervo datën'; autoshkolla: 'Rezervo orën'; lavazh-servis: 'Rezervo terminin'." }
       }
     },
     "footer": {

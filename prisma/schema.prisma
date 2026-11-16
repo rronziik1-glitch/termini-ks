@@ -1,9 +1,10 @@
 // Termini + Faqja Gati data model (fable/01-product-design.md §7).
-// SQLite now; written to move to Postgres/Supabase: change `provider` to "postgresql",
-// set DATABASE_URL, run `prisma migrate dev`. Enumerations are kept as strings (SQLite has no enums),
-// JSON as text. Times are UTC; "local" fields are HH:MM in the business time zone. Money is EUR cents.
-// On Postgres also add the exclusion constraint from §5:
-//   EXCLUDE USING gist (staff_id WITH =, tstzrange(starts_at, ends_at) WITH &&) WHERE (status = 'confirmed')
+// This file is the single source of the data model. It targets SQLite (local development and tests).
+// The PostgreSQL version for production, prisma/postgres/schema.prisma, is generated from it
+// (npm run db:pg-schema) and is picked automatically when DATABASE_URL starts with postgresql://.
+// Enumerations are kept as strings (SQLite has no enums), JSON as text. Times are UTC; "local" fields are HH:MM in the business time zone. Money is EUR cents.
+// Double bookings are prevented in code: every booking write runs in a transaction that first takes a
+// per-business lock (lib/db.ts lockKey → pg_advisory_xact_lock on PostgreSQL).
 
 generator client {
   provider = "prisma-client-js"
@@ -59,7 +60,7 @@ model Business {
   ownerId         String
   slug            String    @unique
   name            String
-  category        String // berber | salon | dentist | klinike | bujtine | restorant | dyqan | dasma | autoshkolla | tjeter
+  category        String // berber | salon | dentist | klinike | bujtine | restorant | dyqan | dasma | autoshkolla | lavazh | tjeter
   city            String
   address         String    @default("")
   lat             Float?
@@ -246,7 +247,7 @@ model Page {
   businessId       String?
   ownerUserId      String?
   contactPhone     String    @default("")
-  template         String // berber | klinike-dentare | restorant-kafe | bujtine | salon-bukurie | dyqan | sallon-dasmash | autoshkolla
+  template         String // berber | klinike-dentare | restorant-kafe | bujtine | salon-bukurie | dyqan | sallon-dasmash | autoshkolla | lavazh-servis
   status           String    @default("draft") // draft | generating | preview | payment_pending | paid | live | failed | expired
   stage            String    @default("") // progress stage while generating
   inputName        String

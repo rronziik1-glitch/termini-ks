@@ -5,10 +5,33 @@
 
 Stack: Next.js 15 (App Router) + TypeScript, plain CSS with Fable's design tokens (`app/styles/`), SQLite through Prisma, PWA manifest. Everything runs locally **without any external account or key**.
 
+## v3: ready to go online
+
+This folder is `build/app-v3`. It runs locally exactly like before (`npm install`, `npm run dev`, no accounts needed), and it is prepared so that going online is only a matter of pasting keys. **The step-by-step guide for Roni is `F:\TERMINI\GO-ONLINE.md`.** Nothing real is switched on.
+
+| Topic | Where | How it is chosen |
+|---|---|---|
+| Database | `prisma/schema.prisma` (SQLite, source of truth) → `prisma/postgres/schema.prisma` (generated) + `prisma/postgres/migrations/` | `DATABASE_URL`: `file:` = SQLite, `postgresql://` = PostgreSQL. `npm run build` on PostgreSQL runs `prisma migrate deploy` and saves the category presets |
+| Photos | `lib/storage.ts` (drivers: `local`, `vercel-blob`, `supabase`, `s3`) | `STORAGE_DRIVER` |
+| Login codes | `lib/otp.ts` (providers: `dev`, `sms` with Twilio / Infobip / generic HTTP, `whatsapp` Cloud API) | `OTP_PROVIDER`, `SMS_STYLE` |
+| Paysera | `lib/payments.ts` | `PAYSERA_*` (all env) |
+| Addresses | `middleware.ts`, `lib/site-lock.ts` | `APP_URL`, `PAGES_DOMAIN` (`name.<domain>` → `/p/name`; `/p/name` always works; a customer's own domain is matched on `Page.customDomain`) |
+| Private launch | `middleware.ts`, `app/site-password/route.ts` | `SITE_PASSWORD` (the Paysera callback stays open) |
+| Startup check | `lib/env-check.ts`, `instrumentation.ts`, `npm run env:check` | refuses to start in production when a required value is missing |
+| Error pages, robots, sitemap, logs | `app/error.tsx`, `app/global-error.tsx`, `app/not-found.tsx`, `app/robots.ts`, `app/sitemap.ts`, `lib/log.ts` | `LOG_LEVEL` |
+
+New commands: `npm run env:check` (what is missing for production), `npm run db:migrate` (bring the database in `DATABASE_URL` up to date), `npm run db:pg-schema` (regenerate the PostgreSQL schema after changing a model).
+
+Honest limits (also listed in `GO-ONLINE.md`):
+- The cloud paths (PostgreSQL on Neon/Supabase, Vercel Blob / Supabase / S3 storage, SMS, WhatsApp, Paysera) were built from the providers' documentation and are covered by tests that check the requests, the S3 signature and the migration SQL (on PGlite). They have **not** been run against the real services, because no accounts exist yet. Each has a "how to check it works" step in `GO-ONLINE.md`.
+- Rate limits (`rateLimit` in `lib/config.ts`) are kept in memory per server instance. On Vercel several instances can run at once, so the limits are approximate. Good enough for a start; move to Upstash Redis when traffic grows.
+- Double bookings are prevented by a per-business lock inside the booking transaction (`lockKey` in `lib/db.ts`, a PostgreSQL advisory lock), which works across instances.
+- Page building continues after the response with `after()` from `next/server`; the API route allows 60 seconds (`maxDuration`).
+
 ## Run it
 
 ```bash
-cd F:\claude\work\kosovo-business\build\app
+cd F:\TERMINI\build\app-v3
 npm install
 npm run dev          # http://localhost:3000
 ```
@@ -19,7 +42,7 @@ Other commands:
 
 | Command | What it does |
 |---|---|
-| `npm test` | Vitest: slot calculation, double booking, booking rules, Faqja Gati filler and the preview/payment gate (39 tests, own `prisma/test.db`) |
+| `npm test` | Vitest: slot calculation, double booking, booking rules, Faqja Gati filler, the preview/payment gate and the online-ready parts (75 tests, own `prisma/test.db`) |
 | `npm run build` / `npm start` | Production build / server |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run smoke -- http://localhost:3000` | End-to-end check against a running server (48 checks: public pages, full Faqja Gati flow up to the live page, admin, owner settings) |
@@ -64,17 +87,11 @@ Customers book without an account (name + phone).
 - **Preview protection** (`lib/fg/render.ts`, `lib/pages.ts`): the preview is a separate render path with watermark CSS, masked phone numbers, every link set to `#`, no map and no booking link, `noindex` + `no-store` + `X-Frame-Options: SAMEORIGIN`, and images that are 800px JPEGs with the watermark burned into the pixels. The original photos and the live HTML are served only when `status = live`; no query, cookie or header changes that (covered by tests and the smoke script).
 - **Payments** (`lib/payments.ts`): a `PaymentProvider` interface with a Paysera implementation (checkout URL + signed callback). It is switched off until keys are in `.env`; bank transfer and cash create a pending payment with a reference code (`FG-XXXXXX`), and the admin marks it paid in `/admin`, which publishes the page at once.
 
-## What is missing for production
+## What is still missing for production
 
-1. **Hosting**: a Node host for the app (Railway, Render, Fly.io or a small VPS, ~€5–10/month). Static hosting of published pages on Cloudflare Pages/Netlify is free but needs an export step (not built; the pages are served by the app now).
-2. **Database**: switch `provider` in `prisma/schema.prisma` to `postgresql`, set `DATABASE_URL` (Supabase free tier, then ~$25/month), run `prisma migrate`. On Postgres add the exclusion constraint for overlapping bookings described in `fable/01-product-design.md` §5.
-3. **SMS login codes**: an SMS provider for the one-time codes (e.g. Twilio or a local gateway, ~€0.04–0.08 per SMS to Kosovo), then `SHOW_LOGIN_CODES=0`.
-4. **Paysera**: create a Paysera project, set `PAYSERA_PROJECT_ID`, `PAYSERA_SIGN_PASSWORD`, `PAYSERA_TEST=0`, and run one real payment end to end. The callback also needs the `ss2` RSA check (TODO in `lib/payments.ts`). Fees are about 1–3% per card payment.
-5. **Bank details**: real `BANK_IBAN`, `BANK_NAME`, `BANK_HOLDER`, `SUPPORT_WHATSAPP` in `.env`.
-6. **Domains**: e.g. `termini.app` / `faqjagati.com` (~€10–40/year each), wildcard DNS `*.faqjagati.com` pointing at the app, and routing of subdomains to `/p/<subdomain>` (a small Next.js middleware). Custom domains (€15/year to the customer) are registered by hand for now.
-7. **Claude API key** for better page text: `ANTHROPIC_API_KEY`. Cost per page is a few cents with Haiku.
-8. **Automatic reminders**: WhatsApp Business API (Meta, ~€0.03–0.06 per message to Kosovo) or SMS, plus a cron job that sends the reminder an hour before. Today the owner taps "Dërgo kujtesë" in the booking sheet.
-9. **File storage**: uploads are in `storage/` on disk; move them to S3/R2 (Cloudflare R2 has a free tier) when running more than one server. The in-memory rate limiter in `lib/config.ts` also needs Redis/Upstash then.
-10. **Staff calendars** (several barbers per salon) are in the data model but shown as "së shpejti" in the UI.
+The accounts, keys and step-by-step setup are in `F:\TERMINI\GO-ONLINE.md` (v3 already has the code for PostgreSQL, photo storage, SMS/WhatsApp codes, Paysera with the ss2 check, subdomains and the private-launch password). Not built yet:
 
-Rough monthly cost at the start: hosting €5–10 + database €0–25 + domains ~€5 + SMS/WhatsApp per use + Claude API cents per page ≈ **€10–40/month** before the first paying customers.
+1. **Automatic reminders**: WhatsApp Business API or SMS plus a cron job that sends the reminder an hour before. Today the owner taps "Dërgo kujtesë" in the booking sheet.
+2. **Shared rate limits**: move the in-memory limiter in `lib/config.ts` to Upstash Redis when traffic grows.
+3. **Staff calendars** (several barbers per salon) are in the data model but shown as "së shpejti" in the UI.
+4. **Customer custom domains** are matched on `Page.customDomain`, but each one is added in Vercel by hand.

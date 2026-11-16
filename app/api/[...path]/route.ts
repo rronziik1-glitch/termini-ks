@@ -7,6 +7,8 @@ import { dispatch } from '@/lib/http';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
+// Building a page (AI call + photos) runs after the response; give the function time on Vercel.
+export const maxDuration = 60;
 
 type Params = { params: Promise<{ path: string[] }> };
 const handle = async (req: Request, { params }: Params) => dispatch(req, (await params).path);

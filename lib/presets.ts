@@ -69,6 +69,16 @@ export const CATEGORY_PRESETS: Record<string, { services: PresetService[]; hours
     ],
     hours: week('08:00', '19:00', '15:00'),
   },
+  lavazh: {
+    services: [
+      { name: 'Larje e shpejtë', durationMin: 15, priceCents: 500 },
+      { name: 'Larje e plotë', durationMin: 40, priceCents: 1000 },
+      { name: 'Ndërrim vaji', durationMin: 30, priceCents: 4500, priceFrom: true },
+      { name: 'Ndërrim i gomave', durationMin: 40, priceCents: 2000 },
+      { name: 'Diagnostikë', durationMin: 20, priceCents: 1500 },
+    ],
+    hours: [1, 2, 3, 4, 5, 6, 7].map((weekday) => ({ weekday, start: '08:00', end: weekday === 7 ? '16:00' : '20:00' })),
+  },
   tjeter: {
     services: [{ name: 'Termin', durationMin: 30, priceCents: null }],
     hours: week('09:00', '17:00'),

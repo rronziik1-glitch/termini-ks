@@ -7,6 +7,9 @@ const nextConfig = {
   // No ESLint dependency in this project; `npm run typecheck` and the tests are the gate.
   eslint: { ignoreDuringBuilds: true },
   outputFileTracingRoot: import.meta.dirname,
+  // The Faqja Gati templates (HTML, fg.js, schema) are read from disk at request time, so they must be
+  // shipped with every server function when the app runs on Vercel.
+  outputFileTracingIncludes: { '/*': ['./templates/**/*'], '/**/*': ['./templates/**/*'] },
   async headers() {
     const base = [
       { key: 'X-Content-Type-Options', value: 'nosniff' },

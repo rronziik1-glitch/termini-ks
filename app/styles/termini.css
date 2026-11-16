@@ -152,6 +152,8 @@ button.row:active, a.row:active { background: var(--surface-2); }
 .chips { display: flex; gap: var(--space-2); overflow-x: auto; scroll-snap-type: x proximity; scroll-padding-inline: var(--page-gutter); padding: 2px var(--page-gutter); margin-inline: calc(var(--page-gutter) * -1); scrollbar-width: none; }
 .chips::-webkit-scrollbar { display: none; }
 .chips--wrap { flex-wrap: wrap; overflow: visible; margin-inline: 0; padding-inline: 0; }
+/* On a computer a mouse cannot swipe sideways: show every city/category on more lines. */
+@media (min-width: 768px) { .chips--wide { flex-wrap: wrap; overflow: visible; margin-inline: 0; padding-inline: 0; } }
 .chip { position: relative; flex: none; display: inline-flex; align-items: center; gap: 6px; height: 40px; padding: 0 var(--space-4); border-radius: var(--radius-full); background: var(--surface-2); font: 500 0.875rem/1 var(--font-sans); color: var(--text); white-space: nowrap; scroll-snap-align: start; transition: background-color var(--dur-fast), color var(--dur-fast), transform var(--dur-instant); }
 .chip::before { content: ""; position: absolute; inset: -2px 0; }          /* 44px touch area */
 .chip:active { transform: scale(0.97); }

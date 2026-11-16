@@ -2,7 +2,7 @@
 import Ajv2020 from 'ajv/dist/2020';
 import schema from '../../templates/schema.json';
 
-export const TEMPLATES = ['berber', 'klinike-dentare', 'restorant-kafe', 'bujtine', 'salon-bukurie', 'dyqan', 'sallon-dasmash', 'autoshkolla'] as const;
+export const TEMPLATES = ['berber', 'klinike-dentare', 'restorant-kafe', 'bujtine', 'salon-bukurie', 'dyqan', 'sallon-dasmash', 'autoshkolla', 'lavazh-servis'] as const;
 export type Template = (typeof TEMPLATES)[number];
 export const isTemplate = (s: unknown): s is Template => typeof s === 'string' && (TEMPLATES as readonly string[]).includes(s);
 export const VARIANTS = ['', 'a', 'b', 'c'];
@@ -45,5 +45,5 @@ export function toolSchema(): Record<string, unknown> {
 /** Which business category each template is offered for (Termini category → template). */
 export const CATEGORY_TEMPLATE: Record<string, Template | 'auto'> = {
   berber: 'berber', salon: 'salon-bukurie', dentist: 'klinike-dentare', klinike: 'klinike-dentare',
-  bujtine: 'bujtine', restorant: 'restorant-kafe', dyqan: 'dyqan', dasma: 'sallon-dasmash', autoshkolla: 'autoshkolla', tjeter: 'auto',
+  bujtine: 'bujtine', restorant: 'restorant-kafe', dyqan: 'dyqan', dasma: 'sallon-dasmash', autoshkolla: 'autoshkolla', lavazh: 'lavazh-servis', tjeter: 'auto',
 };

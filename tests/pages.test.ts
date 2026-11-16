@@ -178,6 +178,7 @@ describe('JOB A: wedding hall and driving school templates', () => {
     expect(guessTemplate('Sallon dasmash në Gjakovë, deri në 600 mysafirë')).toBe('sallon-dasmash');
     expect(guessTemplate('Autoshkollë në Prishtinë. Kategoria B 320 €')).toBe('autoshkolla');
     expect(guessTemplate('Berber në Gjakovë, qethje 5 €')).toBe('berber');
+    expect(guessTemplate('Lavazh në Ferizaj. Larje e plotë 10 €, ndërrim vaji nga 45 €')).toBe('lavazh-servis');
   });
   it('fills them locally with their own booking label', () => {
     const w = localFill({ template: 'sallon-dasmash', name: 'Salla Elita', city: 'Gjakovë', photoCount: 0, contactPhone: '+38349555120', text: 'Sallon dasmash në Gjakovë. Meny klasike 25 € për person, meny e plotë 32 € për person. Vizita 10–18.' });

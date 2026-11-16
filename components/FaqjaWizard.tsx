@@ -9,7 +9,7 @@ import { normalizePhone } from '@/lib/phone';
 import { sq } from '@/lib/sq';
 
 const t = sq.fg;
-const TYPES = ['berber', 'klinike-dentare', 'restorant-kafe', 'bujtine', 'salon-bukurie', 'dyqan', 'sallon-dasmash', 'autoshkolla', 'auto'];
+const TYPES = ['berber', 'klinike-dentare', 'restorant-kafe', 'bujtine', 'salon-bukurie', 'dyqan', 'sallon-dasmash', 'autoshkolla', 'lavazh-servis', 'auto'];
 const MAX = 10;
 type Photo = { key: number; file: File; url: string };
 type Prefill = { name: string; city: string; template: string; phone: string; text: string };

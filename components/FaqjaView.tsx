@@ -13,7 +13,7 @@ import { sq } from '@/lib/sq';
 const t = sq.fg;
 const STAGES = ['read', 'write', 'photos', 'build'];
 const VARIANTS = ['', 'a', 'b', 'c'];
-const TEMPLATE_CATEGORY: Record<string, string> = { berber: 'berber', 'salon-bukurie': 'salon', 'klinike-dentare': 'dentist', bujtine: 'bujtine', 'sallon-dasmash': 'dasma', autoshkolla: 'autoshkolla' };
+const TEMPLATE_CATEGORY: Record<string, string> = { berber: 'berber', 'salon-bukurie': 'salon', 'klinike-dentare': 'dentist', bujtine: 'bujtine', 'sallon-dasmash': 'dasma', autoshkolla: 'autoshkolla', 'lavazh-servis': 'lavazh' };
 
 type PageData = {
   id: string; status: string; name: string; city: string; template: string; text: string; themeVariant: string; revisionsLeft: number; notice: string;

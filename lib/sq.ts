@@ -23,13 +23,19 @@ export const sq = {
     yes: 'Po', no: 'Jo', open: 'Hap', loading: 'Po ngarkohet',
   },
 
+  /** Error pages (app/error.tsx, app/global-error.tsx). */
+  errorPage: {
+    title: 'Diçka shkoi keq', text: 'Nuk është faji yt. Provo përsëri; nëse vazhdon, na shkruaj në WhatsApp.',
+    retry: 'Provo përsëri', home: 'Kthehu në fillim', code: (d: string) => `Kodi i gabimit: ${d}`,
+  },
+
   categories: {
     berber: 'Berber', salon: 'Sallon bukurie', dentist: 'Dentist', klinike: 'Klinikë', bujtine: 'Bujtinë',
-    restorant: 'Restorant', dyqan: 'Dyqan', dasma: 'Sallon dasmash', autoshkolla: 'Autoshkollë', tjeter: 'Tjetër',
+    restorant: 'Restorant', dyqan: 'Dyqan', dasma: 'Sallon dasmash', autoshkolla: 'Autoshkollë', lavazh: 'Lavazh dhe servis', tjeter: 'Tjetër',
   } as Record<string, string>,
-  categoriesShort: { berber: 'Berber', salon: 'Sallon', dentist: 'Dentist', klinike: 'Klinikë', bujtine: 'Bujtinë', dasma: 'Sallon dasmash', autoshkolla: 'Autoshkollë', tjeter: 'Tjetër' } as Record<string, string>,
+  categoriesShort: { berber: 'Berber', salon: 'Sallon', dentist: 'Dentist', klinike: 'Klinikë', bujtine: 'Bujtinë', dasma: 'Sallon dasmash', autoshkolla: 'Autoshkollë', lavazh: 'Lavazh', tjeter: 'Tjetër' } as Record<string, string>,
   /** "I kemi shtuar shërbimet e zakonshme për {…}." */
-  categoriesFor: { berber: 'berberë', salon: 'sallone', dentist: 'dentistë', klinike: 'klinika', bujtine: 'bujtina', dasma: 'sallone dasmash', autoshkolla: 'autoshkolla', tjeter: 'biznesin tënd' } as Record<string, string>,
+  categoriesFor: { berber: 'berberë', salon: 'sallone', dentist: 'dentistë', klinike: 'klinika', bujtine: 'bujtina', dasma: 'sallone dasmash', autoshkolla: 'autoshkolla', lavazh: 'lavazhe dhe servise', tjeter: 'biznesin tënd' } as Record<string, string>,
   cities: ['Gjakovë', 'Prishtinë', 'Prizren', 'Pejë', 'Ferizaj', 'Gjilan', 'Mitrovicë', 'Tjetër'],
 
   /* ---- errors returned by the API (code → text) ------------------------- */
@@ -39,6 +45,8 @@ export const sq = {
     name_required: 'Shkruaj emrin.',
     too_many_active: 'Ke tashmë 3 termine aktive këtu. Anulo një për të rezervuar tjetër.',
     rate_limited: 'Shumë tentime. Provo përsëri pas pak minutash.',
+    code_not_sent: "S'e dërguam dot kodin. Provo përsëri pas pak ose na shkruaj në WhatsApp.",
+    storage_failed: "S'e ruajtëm dot foton. Provo përsëri pas pak.",
     daily_cap: 'Sot kemi shumë kërkesa. Na shkruaj në WhatsApp dhe ta bëjmë faqen ne.',
     too_many_new: (phone: string) => `Shumë rezervime të reja njëherësh. Provo pas pak ose thirr në ${phone}.`,
     blocked: "Rezervimi online s'është i mundur për këtë numër. Thirr në lokal.",
@@ -102,7 +110,7 @@ export const sq = {
     description: 'Rezervime online për berberë, sallone, dentistë dhe klinika në Kosovë. Falas për bizneset.',
     heroTitle: 'Më pak thirrje. Më shumë klientë.',
     heroText: 'Klientët e rezervojnë terminin vetë, në 20 sekonda. Ti e sheh ditën në telefon. Falas.',
-    cta: 'Merre linkun tënd falas', find: 'Gjej një termin', login: 'Hyr',
+    cta: 'Regjistro biznesin tënd falas', find: 'Gjej një termin', login: 'Hyr',
     stepsTitle: 'Gati në 2 minuta',
     steps: [
       { n: '01', title: 'Shkruaj biznesin', text: 'Emri, shërbimet me çmime dhe orari. I kemi mbushur vetë të zakonshmet.' },
@@ -322,7 +330,7 @@ export const sq = {
     templates: {
       berber: 'Berber', 'klinike-dentare': 'Klinikë dentare', 'restorant-kafe': 'Restorant / kafe',
       bujtine: 'Bujtinë', 'salon-bukurie': 'Sallon bukurie', dyqan: 'Dyqan',
-      'sallon-dasmash': 'Sallon dasmash', autoshkolla: 'Autoshkollë', auto: 'Tjetër',
+      'sallon-dasmash': 'Sallon dasmash', autoshkolla: 'Autoshkollë', 'lavazh-servis': 'Lavazh / servis', auto: 'Tjetër',
     } as Record<string, string>,
     // wizard
     w1: 'Çfarë biznesi ke?', w1Text: 'Zgjidh llojin. Secili ka stilin e vet.',
@@ -338,6 +346,7 @@ export const sq = {
       dyqan: 'Dyqan lulesh në Ferizaj, Rr. Dëshmorët e Kombit 41. Buqetë nga 15 €, bimë nga 8 €. Dërgesë brenda 60 minutave. Hapur 8–20. 049 123 456.',
       'sallon-dasmash': 'Sallon dasmash në Gjakovë, Rr. Tirana. Salla e madhe deri në 600 mysafirë, salla e vogël deri në 200. Meny klasike 25 € për person, meny e plotë 32 € për person. Parking për 300 vetura. Vizita në sallë 10–18. 049 123 456. Që nga 2006.',
       autoshkolla: 'Autoshkollë në Prishtinë, Rr. Enver Maloku 18. Kategoria B 320 €, kategoria A 220 €, kategoria C 480 €, orë shtesë 12 €. 6 instruktorë. Hapur 8–19, të shtunën 9–15. 044 123 456. Që nga 2009.',
+      'lavazh-servis': 'Lavazh dhe servis në Ferizaj, Rr. Rexhep Bislimi. Larje e shpejtë 5 €, larje e plotë 10 €, ndërrim vaji nga 45 €, ndërrim i gomave 20 €, diagnostikë 15 €. 4 kanale. Hapur 8–20 çdo ditë. 045 123 456. Që nga 2016.',
       auto: 'Çfarë bën, ku je, sa kushton, kur je hapur dhe numri i telefonit.',
     } as Record<string, string>,
     oldUrl: 'Ke faqe të vjetër? Ngjite linkun', oldUrlPh: 'https://',

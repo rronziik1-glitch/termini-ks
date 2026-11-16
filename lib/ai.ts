@@ -38,7 +38,7 @@ SHAPE
 - For every image slot write a short alt text describing what a suitable photo would show;
   leave src empty. The server assigns the photos.
 - meta.template: use the template id you are given. Only when it is "auto", pick the closest of:
-  berber, klinike-dentare, restorant-kafe, bujtine, salon-bukurie, dyqan, sallon-dasmash, autoshkolla.
+  berber, klinike-dentare, restorant-kafe, bujtine, salon-bukurie, dyqan, sallon-dasmash, autoshkolla, lavazh-servis.
 - Template sallon-dasmash (wedding hall): the FIRST services group lists the halls: name, a one-line
   description, the capacity in tag exactly as given (e.g. "250 – 600 mysafirë") and an image alt for
   each hall. The following groups are menus and packages with the price per person ("32 € / person")
@@ -49,6 +49,11 @@ SHAPE
   groups are extra lessons and other services, with the duration in minutes when given. Put the
   first-attempt pass rate as the first highlight ONLY if the owner stated it. team.members are the
   instructors, only if named. booking.label "Rezervo orën".
+- Template lavazh-servis (car wash + auto service): the FIRST services group lists the wash
+  packages, the following groups the service work (oil change, tyres, diagnostics). Give the
+  duration in minutes whenever the owner stated it. gallery.images are before/after pairs in
+  order (1 = before, 2 = after, 3 = before, 4 = after): write the alt texts as "Para: …" and
+  "Pas: …". booking.label "Rezervo terminin".
 - theme.accent: keep the template default (empty string) unless the owner named a brand colour.`;
 
 export function userMessage(i: FillInput): string {

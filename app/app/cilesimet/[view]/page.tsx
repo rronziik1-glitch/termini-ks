@@ -1,6 +1,6 @@
 // Settings sub-screens: /app/cilesimet/orari · /rezervimet · /profili
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import Settings, { type SettingsView } from '@/components/Settings';
 import { getOrigin, getSession } from '@/lib/session';
 import { settingsData } from '@/lib/settings-data';
@@ -19,5 +19,8 @@ export default async function SettingsSubPage({ params }: Props) {
   const view = (await params).view as SettingsView;
   if (!VIEWS.includes(view)) notFound();
   const [{ user, business }, origin] = await Promise.all([getSession(), getOrigin()]);
+  // The layout redirects too, but pages render in parallel with it: never touch a missing session here.
+  if (!user) redirect('/hyr?next=/app');
+  if (!business) redirect(user.role === 'admin' ? '/admin' : '/fillo');
   return <Settings view={view} data={await settingsData(user!, business!, origin)} />;
 }

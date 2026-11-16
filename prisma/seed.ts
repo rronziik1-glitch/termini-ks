@@ -50,13 +50,20 @@ async function addBookings(businessId: string, list: Seed[]) {
 }
 
 async function main() {
-  if (await db.user.count()) {
-    console.log('The database already has data. Run `npm run db:setup` to reset it.');
+  // 1. Category presets: needed by the app itself, safe to run again (also on the production database).
+  for (const [category, p] of Object.entries(CATEGORY_PRESETS)) {
+    const data = { servicesJson: JSON.stringify(p.services), hoursJson: JSON.stringify(p.hours) };
+    await db.categoryPreset.upsert({ where: { category }, create: { category, ...data }, update: data });
+  }
+  // 2. Example businesses: only for local development. On PostgreSQL (production) they are skipped
+  //    unless SEED_DEMO=1 is set on purpose.
+  if (/^postgres(ql)?:\/\//.test(process.env.DATABASE_URL || '') && process.env.SEED_DEMO !== '1') {
+    console.log('Category presets saved. Example businesses skipped on PostgreSQL (set SEED_DEMO=1 to add them).');
     return;
   }
-
-  for (const [category, p] of Object.entries(CATEGORY_PRESETS)) {
-    await db.categoryPreset.create({ data: { category, servicesJson: JSON.stringify(p.services), hoursJson: JSON.stringify(p.hours) } });
+  if (await db.user.count()) {
+    console.log('Category presets saved. The database already has users, so no example data was added. Run `npm run db:setup` to reset a local database.');
+    return;
   }
   const admin = await db.user.create({ data: { phone: ADMIN, name: 'Roni', role: 'admin' } });
 

@@ -9,6 +9,7 @@ import { cookieValue, route } from '../http';
 import {
   addAsset, checkout, createPage, deletePage, getPage, getStatus, markPaid, previewImageUrl, reorderAssets, saveContent, setPublished, startGeneration,
 } from '../pages';
+import { log } from '../log';
 import { paysera } from '../payments';
 import { displayPhone } from '../phone';
 import { sq } from '../sq';
@@ -56,6 +57,7 @@ route('POST', '/pages/:id/checkout', 'public', async (c) => {
 
 async function payseraCallback(params: URLSearchParams) {
   const r = paysera.verifyCallback(params);
+  log[r.ok ? 'info' : 'warn']('paysera.callback', { ok: r.ok, order: r.orderId, paid: r.paid, amountCents: r.amountCents, ref: r.providerRef });
   if (!r.ok) throw new AppError('forbidden', 403, sq.errors.forbidden);
   if (r.paid) {
     const pending = await db.payment.findFirst({ where: { pageId: r.orderId, status: 'pending', method: 'paysera' } });
