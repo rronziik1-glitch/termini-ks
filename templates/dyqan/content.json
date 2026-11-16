@@ -1,0 +1,110 @@
+{
+  "meta": {
+    "template": "dyqan",
+    "lang": "sq",
+    "title": "Lule Jeta · Lule dhe dhurata në Ferizaj",
+    "description": "Buqeta të freskëta, bimë dhe dhurata në Ferizaj. Porosit në WhatsApp dhe ta sjellim te dera brenda 60 minutave."
+  },
+  "theme": { "accent": "", "variant": "" },
+  "brand": { "name": "Lule Jeta", "category": "Lule dhe dhurata", "city": "Ferizaj", "since": "2016" },
+  "hero": {
+    "eyebrow": "Lule dhe dhurata · Ferizaj",
+    "title": "Lule të freskëta, te dera sot",
+    "subtitle": "Zgjidh buqetën, na shkruaj në WhatsApp dhe ta sjellim brenda 60 minutave kudo në Ferizaj.",
+    "image": { "src": "", "alt": "Buqetë e madhe me bozhure dhe trëndafila në duar, sfond i bardhë" },
+    "video": { "src": "", "poster": "" }
+  },
+  "highlights": [
+    { "value": "60 min", "label": "dërgesa në Ferizaj" },
+    { "value": "0 €", "label": "dërgesa mbi 25 €" },
+    { "value": "4.9", "label": "në Google" },
+    { "value": "7 ditë", "label": "hapur në javë" }
+  ],
+  "about": {
+    "title": "Lule që zgjasin",
+    "text": "Jeta e hapi dyqanin në vitin 2016. Lulet na vijnë të freskëta të hënën dhe të enjten, dhe çdo buqetë e lidhim me dorë pasi ta porositësh. Para se ta nisim, ta dërgojmë foton në WhatsApp.",
+    "points": ["Foto e buqetës para dërgesës", "Kartolinë me mesazhin tënd, falas", "Pagesë me para në dorë te dera", "Dërgesa në krejt Kosovën, 3 €"],
+    "image": { "src": "", "alt": "Jeta duke lidhur një buqetë në banakun e dyqanit" }
+  },
+  "services": {
+    "title": "Zgjidh dhe porosit",
+    "intro": "Shtyp «Porosit» te produkti. WhatsApp hapet me mesazhin gati.",
+    "groups": [
+      {
+        "name": "Buqeta",
+        "items": [
+          { "name": "Buqeta Pranvera", "description": "Bozhure, trëndafila dhe eukalipt", "price": "35 €", "duration": null, "tag": "Më e shitura", "image": { "src": "", "alt": "Buqetë me bozhure rozë dhe eukalipt" } },
+          { "name": "21 trëndafila të kuq", "description": "Të lidhur me letër kraft", "price": "30 €", "duration": null, "tag": "", "image": { "src": "", "alt": "Buqetë me 21 trëndafila të kuq" } },
+          { "name": "Buqeta e bardhë", "description": "Zambakë, trëndafila dhe gjelbërim", "price": "28 €", "duration": null, "tag": "", "image": { "src": "", "alt": "Buqetë e bardhë me zambakë" } },
+          { "name": "Buqetë e vogël", "description": "Lule sezoni, zgjedhja jonë", "price": "12 €", "duration": null, "tag": "", "image": { "src": "", "alt": "Buqetë e vogël me lule sezoni" } }
+        ]
+      },
+      {
+        "name": "Dhurata",
+        "items": [
+          { "name": "Kuti me trëndafila", "description": "Kuti e rrumbullakët, 15 trëndafila", "price": "40 €", "duration": null, "tag": "", "image": { "src": "", "alt": "Kuti e zezë e rrumbullakët me trëndafila rozë" } },
+          { "name": "Lule dhe çokollata", "description": "Buqetë e vogël me Ferrero Rocher", "price": "22 €", "duration": null, "tag": "", "image": { "src": "", "alt": "Buqetë e vogël pranë një kutie çokollatash" } },
+          { "name": "Shportë për lindje", "description": "Lule, balonë dhe lodër e butë", "price": "45 €", "duration": null, "tag": "E re", "image": { "src": "", "alt": "Shportë dhurate për foshnjë me lule dhe balonë" } },
+          { "name": "Balona me helium", "description": "Set me 7 balona, ngjyrat i zgjedh ti", "price": "10 €", "duration": null, "tag": "", "image": { "src": "", "alt": "Tufë balonash në ngjyra pastel" } }
+        ]
+      },
+      {
+        "name": "Bimë",
+        "items": [
+          { "name": "Orkide e bardhë", "description": "Me vazo qeramike", "price": "25 €", "duration": null, "tag": "", "image": { "src": "", "alt": "Orkide e bardhë në vazo qeramike" } },
+          { "name": "Monstera", "description": "60 cm, me vazo", "price": "30 €", "duration": null, "tag": "", "image": { "src": "", "alt": "Bimë monstera në vazo të bardhë" } },
+          { "name": "Sukulente, set me 3", "description": "Për tavolinë pune", "price": "12 €", "duration": null, "tag": "", "image": { "src": "", "alt": "Tri sukulente të vogla në vazo betoni" } }
+        ]
+      }
+    ]
+  },
+  "gallery": {
+    "title": "Nga dyqani",
+    "images": [
+      { "src": "", "alt": "Vitrina e dyqanit me lule të freskëta" },
+      { "src": "", "alt": "Dekorim tavoline për fejesë" },
+      { "src": "", "alt": "Buqetë nuseje me trëndafila të bardhë" },
+      { "src": "", "alt": "Korrieri duke dorëzuar një buqetë te dera" },
+      { "src": "", "alt": "Rafti me bimë shtëpie" }
+    ]
+  },
+  "reviews": {
+    "title": "Çfarë thonë blerësit",
+    "rating": "4.9",
+    "count": "158 vlerësime",
+    "source": "Google",
+    "items": [
+      { "name": "Ardit S.", "text": "E porosita nga Zvicra për ditëlindjen e nënës. Ma dërguan foton para se ta nisnin dhe arriti për 40 minuta.", "rating": 5 },
+      { "name": "Edona B.", "text": "Lulet zgjatën gati dy javë. Buqetat i bëjnë me shije dhe çmimet janë të drejta.", "rating": 5 },
+      { "name": "Valon M.", "text": "I shkrova në 8 të mbrëmjes dhe në 9 buqeta ishte te dera. Më shpëtuan përvjetorin.", "rating": 5 }
+    ]
+  },
+  "team": { "title": "", "members": [] },
+  "faq": [
+    { "q": "A mund të porosis nga jashtë vendit?", "a": "Po. Na shkruaj në WhatsApp, paguan me transfer bankar ose paguan dikush i familjes kur e merr porosinë." },
+    { "q": "Sa kushton dërgesa?", "a": "Në Ferizaj 1 €, falas për porosi mbi 25 €. Në qytetet tjera të Kosovës 3 €, të nesërmen." },
+    { "q": "A bëni dekorime për fejesa dhe dasma?", "a": "Po. Na shkruaj datën dhe vendin, dhe ta dërgojmë ofertën brenda ditës." }
+  ],
+  "location": {
+    "title": "Eja në dyqan",
+    "address": "Rr. Dëshmorët e Kombit 41",
+    "city": "Ferizaj",
+    "mapQuery": "Dëshmorët e Kombit, Ferizaj",
+    "note": "Përballë Teatrit të qytetit.",
+    "hours": [
+      { "days": "E hënë – E shtunë", "time": "08:00 – 21:00" },
+      { "days": "E diel", "time": "09:00 – 18:00" }
+    ]
+  },
+  "contact": {
+    "phone": "38348567890",
+    "phoneDisplay": "048 567 890",
+    "whatsapp": "",
+    "whatsappMessage": "Përshëndetje! Dua të bëj një porosi.",
+    "email": "",
+    "instagram": "lule.jeta",
+    "facebook": ""
+  },
+  "booking": { "enabled": false, "url": "", "label": "Porosit në WhatsApp" },
+  "footer": { "note": "Porositë për të njëjtën ditë pranohen deri në orën 19:00." }
+}
