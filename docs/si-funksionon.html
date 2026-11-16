@@ -1,0 +1,157 @@
+<title>How Termini Works</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;800&family=Geist+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one calm reading column; each topic is a flow of steps (real sequences), lime marks "the moment it happens" */
+:root{
+  --bg:#f6f6f3; --surface:#ffffff; --ink:#0c0c0d; --muted:#5d5f57; --line:#e2e3dc;
+  --lime:#c8f03c; --lime-soft:#eef9c6; --lime-text:#3f6600; --warn:#9a5b00; --warn-soft:#fff3dc;
+  --font:"Geist",ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  --mono:"Geist Mono",ui-monospace,"SF Mono",Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+  --bg:#0b0b0c; --surface:#151517; --ink:#f2f2ee; --muted:#a3a59b; --line:#2a2b27;
+  --lime:#c8f03c; --lime-soft:#232b0c; --lime-text:#c8f03c; --warn:#ffc266; --warn-soft:#2b2210; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0b0b0c; --surface:#151517; --ink:#f2f2ee; --muted:#a3a59b; --line:#2a2b27;
+  --lime:#c8f03c; --lime-soft:#232b0c; --lime-text:#c8f03c; --warn:#ffc266; --warn-soft:#2b2210; color-scheme:dark}
+body{background:var(--bg);color:var(--ink);font-family:var(--font);font-size:16px;line-height:1.6;
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));padding-block:40px 64px}
+.wrap{max-width:720px;margin:0 auto;display:flex;flex-direction:column;gap:56px}
+header{display:flex;flex-direction:column;gap:12px}
+.mark{font-weight:800;font-size:22px;letter-spacing:-.02em}.mark i{color:var(--lime);font-style:normal}
+:root:not([data-theme="dark"]) .mark i{color:var(--lime-text)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .mark i{color:var(--lime)}}
+h1{font-size:clamp(34px,7vw,52px);line-height:1.05;letter-spacing:-.035em;margin:0;font-weight:800;text-wrap:balance}
+.lede{color:var(--muted);font-size:18px;margin:0;max-width:60ch}
+nav{display:flex;flex-wrap:wrap;gap:8px}
+nav a{font-size:14px;color:var(--ink);text-decoration:none;border:1px solid var(--line);background:var(--surface);padding:6px 12px;border-radius:999px}
+nav a:hover,nav a:focus-visible{border-color:var(--ink);outline:none}
+section{display:flex;flex-direction:column;gap:16px;scroll-margin-top:24px}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2{font-size:28px;line-height:1.15;letter-spacing:-.02em;margin:0;text-wrap:balance}
+p{margin:0;max-width:65ch}
+.flow{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}
+.flow li{display:grid;grid-template-columns:36px 1fr;gap:12px;padding:14px 16px;border-top:1px solid var(--line)}
+.flow li:first-child{border-top:0}
+.flow .n{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;font-family:var(--mono);font-size:13px;border:1px solid var(--line);color:var(--muted)}
+.flow li.key{background:var(--lime-soft)}
+.flow li.key .n{background:var(--lime);border-color:var(--lime);color:#0c0c0d;font-weight:500}
+.flow b{font-weight:600}.flow span{min-width:0}
+.who{font-family:var(--mono);font-size:12px;color:var(--muted);display:block}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.fact{border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:var(--surface);display:flex;flex-direction:column;gap:4px;min-width:0}
+.fact .k{font-size:13px;color:var(--muted)}.fact .v{font-weight:600;font-variant-numeric:tabular-nums}
+.note{border-left:3px solid var(--lime);padding:10px 14px;background:var(--surface);border-radius:0 10px 10px 0}
+.warn{border-left-color:var(--warn);background:var(--warn-soft)}
+code{font-family:var(--mono);font-size:.9em;background:var(--surface);border:1px solid var(--line);padding:1px 6px;border-radius:6px;word-break:break-word}
+.table{overflow-x:auto;border:1px solid var(--line);border-radius:12px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;min-width:480px;font-size:15px}
+th,td{text-align:left;padding:10px 14px;border-top:1px solid var(--line);vertical-align:top}
+th{border-top:0;font-size:13px;color:var(--muted);font-weight:500}
+td:first-child{font-weight:600;white-space:nowrap}
+.yes{color:var(--lime-text);font-weight:600}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .yes{color:var(--lime)}}
+:root[data-theme="dark"] .yes{color:var(--lime)}
+footer{color:var(--muted);font-size:14px}
+</style>
+
+<div class="wrap">
+  <header>
+    <div class="mark">termini<i>.</i></div>
+    <h1>How the app works, in plain words</h1>
+    <p class="lede">For Roni: the login code, Paysera, what the Claude API is for, how to log in as a business, and that small "N" button. No programming knowledge needed.</p>
+    <nav aria-label="Topics">
+      <a href="#pieces">The 3 pieces</a><a href="#code">Phone code</a><a href="#paysera">Paysera</a>
+      <a href="#claude">Claude API</a><a href="#business">Log in as a business</a><a href="#n">The "N" button</a>
+    </nav>
+  </header>
+
+  <section id="pieces">
+    <span class="eyebrow">Start here</span>
+    <h2>The app is 3 pieces</h2>
+    <div class="facts">
+      <div class="fact"><span class="k">Frontend: the shop window</span><span class="v">The pages people see</span><span class="k">Calendar, booking screen, your /admin. Runs in the phone's browser.</span></div>
+      <div class="fact"><span class="k">Backend: the kitchen</span><span class="v">The brain behind the pages</span><span class="k">Checks free hours, logs people in, talks to Paysera and Claude.</span></div>
+      <div class="fact"><span class="k">Database: the notebook</span><span class="v">Where everything is saved</span><span class="k">Businesses, bookings, customers, payments.</span></div>
+    </div>
+    <p>Today all 3 run on your PC (that is "localhost"). On launch they move to the rented server in Frankfurt, and people reach them at terminiks.com.</p>
+  </section>
+
+  <section id="code">
+    <span class="eyebrow">Login</span>
+    <h2>How the code on the phone works</h2>
+    <p>Nobody has a password. A business logs in with its phone number and a 6-digit code, like WhatsApp does.</p>
+    <ol class="flow">
+      <li><span class="n">1</span><span><span class="who">Barber</span>Opens <code>/hyr</code>, types his number, for example 049 111 111.</span></li>
+      <li><span class="n">2</span><span><span class="who">Backend</span>Makes a random code (for example 482 913), saves only a scrambled copy, valid 10 minutes.</span></li>
+      <li class="key"><span class="n">3</span><span><span class="who">SMS company</span><b>Sends the code to his phone by SMS or WhatsApp.</b> Today this step is missing, so on your PC the code is shown on screen instead.</span></li>
+      <li><span class="n">4</span><span><span class="who">Barber</span>Types the code. 5 wrong tries and the code dies.</span></li>
+      <li><span class="n">5</span><span><span class="who">Backend</span>Logs him in for 60 days on that phone. He doesn't need the code again.</span></li>
+    </ol>
+    <div class="facts">
+      <div class="fact"><span class="k">What we need</span><span class="v">An SMS / WhatsApp company</span></div>
+      <div class="fact"><span class="k">Cost</span><span class="v">≈ €0.05 per code</span><span class="k">50 businesses ≈ €3–5 a month</span></div>
+      <div class="fact"><span class="k">You (admin)</span><span class="v">Code + admin password</span><span class="k">The second lock we added</span></div>
+    </div>
+    <p class="note">Customers who book a haircut never log in. They type name and phone, and that's it.</p>
+  </section>
+
+  <section id="paysera">
+    <span class="eyebrow">Money</span>
+    <h2>How Paysera connects</h2>
+    <p>Termini bookings are free, so no money moves there. Paysera is only for the €100 Faqja Gati page. The app never sees card numbers: Paysera handles the card on its own page.</p>
+    <ol class="flow">
+      <li><span class="n">1</span><span><span class="who">Business owner</span>Presses "Merre për 100 €".</span></li>
+      <li><span class="n">2</span><span><span class="who">Backend</span>Writes a payment order (amount, order number) and <b>signs it with your secret Paysera password</b>, so nobody can change €100 into €1.</span></li>
+      <li><span class="n">3</span><span><span class="who">Paysera</span>The owner lands on Paysera's own payment page and pays by card or bank.</span></li>
+      <li class="key"><span class="n">4</span><span><span class="who">Paysera → backend</span><b>Paysera calls our server: "order X is paid"</b>, with two signatures.</span></li>
+      <li><span class="n">5</span><span><span class="who">Backend</span>Checks both signatures, the amount and the currency (EUR). If all is right: page marked paid, watermark gone, page live.</span></li>
+    </ol>
+    <div class="facts">
+      <div class="fact"><span class="k">From your Paysera account</span><span class="v">Project ID</span></div>
+      <div class="fact"><span class="k">From your Paysera account</span><span class="v">Sign password</span></div>
+      <div class="fact"><span class="k">From Paysera's website</span><span class="v">Public key</span><span class="k">For the second signature</span></div>
+    </div>
+    <p>You give me those 3 things, I put them on the server (never in chat files), and we test with a real €1.</p>
+    <p class="note">Cash or bank transfer also works: the owner pays you, and you press "Shëno të paguar" in /admin.</p>
+  </section>
+
+  <section id="claude">
+    <span class="eyebrow">AI</span>
+    <h2>What the Claude API is for</h2>
+    <p>Only for Faqja Gati. When an owner writes "barber in Gjakova, 10 years, fades and beards", Claude writes the page's texts (title, services, FAQ, about) in good Albanian and fills Fable's design. Termini does not use it at all.</p>
+    <div class="table">
+      <table>
+        <thead><tr><th>Part</th><th>Needs Claude API?</th><th>Cost</th></tr></thead>
+        <tbody>
+          <tr><td>Termini (booking)</td><td class="yes">No</td><td>€0</td></tr>
+          <tr><td>Faqja Gati (page)</td><td>Yes</td><td>≈ €0.10–0.50 per page made</td></tr>
+          <tr><td>Without a key</td><td>Works, simpler texts</td><td>€0</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">If you launch with Termini only, you need no Anthropic key. I can add one switch that hides Faqja Gati until you turn it on.</p>
+    <p class="note warn">The API is a separate account from your Claude subscription, paid per use. Put a monthly spending limit on it (for example €20) so it can never surprise you.</p>
+  </section>
+
+  <section id="business">
+    <span class="eyebrow">Try it yourself</span>
+    <h2>Log in as a business</h2>
+    <ol class="flow">
+      <li><span class="n">1</span><span>If you're logged in as admin: open <code>localhost:3000/admin</code> and press <b>"Dil nga llogaria"</b> (top right). I just added that button; it was missing.</span></li>
+      <li class="key"><span class="n">2</span><span>Open <code>localhost:3000/hyr</code>, type <b>049 111 111</b>. That's Berberi Arti in Gjakova. Type the code shown on screen.</span></li>
+      <li><span class="n">3</span><span>You're the barber now: calendar, customers, services, settings. Log out from <b>Cilësimet</b> (settings) at the bottom.</span></li>
+      <li><span class="n">4</span><span>Or try it like a new business: <code>localhost:3000/fillo</code> and sign up with any number, for example 044 555 555.</span></li>
+    </ol>
+  </section>
+
+  <section id="n">
+    <span class="eyebrow">That small button</span>
+    <h2>The round "N" in the corner</h2>
+    <p>That's a tool of Next.js, the system the app is built with. It only shows while the app runs on your PC in test mode. Customers will never see it online. You can ignore it.</p>
+  </section>
+
+  <footer>Termini · notes for Roni · 15 November 2026</footer>
+</div>

@@ -1,0 +1,311 @@
+/* generated from content.json by tools/sync-content.mjs; do not edit */
+window.FG_CONTENT = {
+  "meta": {
+    "template": "klinike-dentare",
+    "lang": "sq",
+    "title": "Dental Rina · Klinikë dentare në Prishtinë",
+    "description": "Kontroll, pastrim, mbushje, implante dhe ortodonci në Prishtinë. Çmime të qarta dhe termin online pa pritje."
+  },
+  "theme": {
+    "accent": "",
+    "variant": ""
+  },
+  "brand": {
+    "name": "Dental Rina",
+    "category": "Klinikë dentare",
+    "city": "Prishtinë",
+    "since": "2012"
+  },
+  "hero": {
+    "eyebrow": "Klinikë dentare · Prishtinë",
+    "title": "Buzëqeshje pa frikë",
+    "subtitle": "Kujdes dentar i qetë dhe pa dhimbje, me çmime që i di para se të ulesh në karrige.",
+    "image": {
+      "src": "",
+      "alt": "Dentistja duke folur me një paciente të qeshur, ambient i ndritshëm"
+    },
+    "video": {
+      "src": "",
+      "poster": ""
+    }
+  },
+  "highlights": [
+    {
+      "value": "13",
+      "label": "vjet përvojë"
+    },
+    {
+      "value": "0 €",
+      "label": "kontrolli i parë"
+    },
+    {
+      "value": "3",
+      "label": "dentistë specialistë"
+    },
+    {
+      "value": "4.9",
+      "label": "vlerësimi në Google"
+    }
+  ],
+  "about": {
+    "title": "E shpjegojmë çdo hap",
+    "text": "Dental Rina punon në Prishtinë që nga viti 2012. Para çdo trajtimi të tregojmë çfarë do të bëjmë, sa zgjat dhe sa kushton. Punojmë me anestezi lokale dhe me pajisje digjitale, që vizita të jetë e shkurtër dhe e qetë.",
+    "points": [
+      "Kontrolli i parë falas",
+      "Rëntgen digjital në klinikë",
+      "Pagesë me këste për implante",
+      "Sterilizim pas çdo pacienti",
+      "Flasim shqip, anglisht dhe gjermanisht",
+      "Parking për pacientët"
+    ],
+    "image": {
+      "src": "",
+      "alt": "Ordinanca: karrigia dentare, dritë natyrale, ngjyra të buta"
+    }
+  },
+  "services": {
+    "title": "Çfarë bëjmë dhe sa kushton",
+    "intro": "Çmimet janë orientuese. Çmimin e saktë e merr pas kontrollit të parë, pa pagesë.",
+    "groups": [
+      {
+        "name": "Kujdesi bazë",
+        "items": [
+          {
+            "name": "Kontroll dhe këshillim",
+            "description": "Me plan trajtimi me shkrim",
+            "price": "Falas",
+            "duration": 20,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Pastrim i gurëzave",
+            "description": "Me ultratinguj dhe polirim",
+            "price": "25 €",
+            "duration": 40,
+            "tag": "Më i kërkuari",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Mbushje e bardhë",
+            "description": "Kompozit, në ngjyrën e dhëmbit",
+            "price": "nga 20 €",
+            "duration": 40,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Nxjerrje e dhëmbit",
+            "description": "Me anestezi lokale",
+            "price": "nga 20 €",
+            "duration": 30,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "Estetikë dhe protetikë",
+        "items": [
+          {
+            "name": "Zbardhim i dhëmbëve",
+            "description": "Në klinikë, një seancë",
+            "price": "120 €",
+            "duration": 60,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Kurorë zirkoni",
+            "description": "Për një dhëmb",
+            "price": "150 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Implant dentar",
+            "description": "Implanti dhe kurora, me garanci",
+            "price": "nga 450 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Aparat ortodontik",
+            "description": "Fiks ose i tejdukshëm",
+            "price": "nga 600 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "team": {
+    "title": "Njerëzit që kujdesen për ty",
+    "members": [
+      {
+        "name": "Dr. Rina Krasniqi",
+        "role": "Themeluese · Protetikë dentare",
+        "image": {
+          "src": "",
+          "alt": "Portret i Dr. Rina Krasniqit me uniformë të bardhë"
+        }
+      },
+      {
+        "name": "Dr. Ardit Berisha",
+        "role": "Kirurgji orale dhe implante",
+        "image": {
+          "src": "",
+          "alt": "Portret i Dr. Ardit Berishës"
+        }
+      },
+      {
+        "name": "Dr. Elira Hoxha",
+        "role": "Ortodonci",
+        "image": {
+          "src": "",
+          "alt": "Portret i Dr. Elira Hoxhës"
+        }
+      },
+      {
+        "name": "Vjosa Gashi",
+        "role": "Asistente dentare",
+        "image": {
+          "src": "",
+          "alt": "Portret i Vjosa Gashit"
+        }
+      }
+    ]
+  },
+  "gallery": {
+    "title": "Një ambient ku ndihesh rehat",
+    "images": [
+      {
+        "src": "",
+        "alt": "Recepsioni i klinikës me dritë natyrale"
+      },
+      {
+        "src": "",
+        "alt": "Ordinanca kryesore"
+      },
+      {
+        "src": "",
+        "alt": "Rëntgeni digjital"
+      },
+      {
+        "src": "",
+        "alt": "Dhoma e pritjes"
+      },
+      {
+        "src": "",
+        "alt": "Detaj i veglave të sterilizuara"
+      }
+    ]
+  },
+  "reviews": {
+    "title": "Çfarë thonë pacientët",
+    "rating": "4.9",
+    "count": "212 vlerësime",
+    "source": "Google",
+    "items": [
+      {
+        "name": "Arta M.",
+        "text": "Kisha frikë nga dentisti prej vitesh. Dr. Rina ma shpjegoi çdo hap dhe nuk ndjeva asgjë. Tani vij rregullisht.",
+        "rating": 5
+      },
+      {
+        "name": "Besnik R.",
+        "text": "Çmimin ma thanë që në fillim dhe aq pagova. E rezervova terminin online në mbrëmje, pa thirrur askënd.",
+        "rating": 5
+      },
+      {
+        "name": "Fjolla D.",
+        "text": "Erdha nga Zvicra për implante gjatë pushimeve. Punë e shkëlqyer dhe gjithçka u krye brenda afatit.",
+        "rating": 5
+      }
+    ]
+  },
+  "faq": [
+    {
+      "q": "A dhemb trajtimi?",
+      "a": "Punojmë me anestezi lokale, kështu që gjatë trajtimit nuk ndjen dhimbje. Nëse ke frikë, na trego para se të fillojmë dhe ecim më ngadalë."
+    },
+    {
+      "q": "Sa kushton kontrolli i parë?",
+      "a": "Kontrolli i parë dhe plani i trajtimit janë falas. Paguan vetëm nëse vendos ta nisësh trajtimin."
+    },
+    {
+      "q": "A mund të paguaj me këste?",
+      "a": "Po. Për implante dhe aparate ortodontike pagesa ndahet në këste mujore, pa kamatë."
+    },
+    {
+      "q": "Jetoj jashtë. A mund ta kryej trajtimin gjatë pushimeve?",
+      "a": "Po. Na shkruaj në WhatsApp para se të vish, që ta planifikojmë trajtimin për ditët që je në Kosovë."
+    }
+  ],
+  "location": {
+    "title": "Na gjen në qendër të Prishtinës",
+    "address": "Rr. Fehmi Agani 24, kati I",
+    "city": "Prishtinë",
+    "mapQuery": "Rruga Fehmi Agani, Prishtinë",
+    "note": "Përballë parkut të qytetit. Parking në oborr.",
+    "hours": [
+      {
+        "days": "E hënë – E premte",
+        "time": "09:00 – 19:00"
+      },
+      {
+        "days": "E shtunë",
+        "time": "09:00 – 14:00"
+      },
+      {
+        "days": "E diel",
+        "time": "Mbyllur"
+      }
+    ]
+  },
+  "contact": {
+    "phone": "38344234567",
+    "phoneDisplay": "044 234 567",
+    "whatsapp": "",
+    "whatsappMessage": "",
+    "email": "info@dentalrina.com",
+    "instagram": "dentalrina",
+    "facebook": ""
+  },
+  "booking": {
+    "enabled": true,
+    "url": "https://termini.app/dental-rina",
+    "label": "Rezervo termin"
+  },
+  "footer": {
+    "note": "Për raste urgjente jashtë orarit, na shkruaj në WhatsApp."
+  }
+};

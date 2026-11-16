@@ -1,0 +1,262 @@
+<!doctype html>
+<html lang="sq">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Berberi Arti · Rezervo termin</title>
+  <meta name="theme-color" content="#ffffff">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="termini.css">
+</head>
+<!--
+  SCREEN: customer booking page  ·  route /{slug}  ·  termini.app/berberi-arti
+  Spec: 01-product-design.md §3.1, §3.3, §3.4.   Review: ?step=1|2|3  ?theme=dark
+  Components: <BusinessHeader> <StepProgress> <ServiceList> <StaffChips> <DayStrip> <SlotGrid> <CustomerForm> <BottomBar>
+  One page, three steps, no account. Step 1 is skipped when the business has one service.
+-->
+<body class="page">
+  <div class="app app--bar">
+
+    <!-- BusinessHeader: always visible -->
+    <header class="biz">
+      <span class="avatar avatar--lg avatar--ink" aria-hidden="true">A</span>
+      <div class="grow">
+        <h1 class="biz__name">Berberi Arti</h1>
+        <p class="biz__meta">
+          <span>Berber · Gjakovë</span>
+          <span class="biz__open"><span class="dot dot--ok"></span>Hapur deri në 20:00</span>
+        </p>
+      </div>
+      <a class="iconbtn iconbtn--fill" href="tel:+38349123456" aria-label="Thirr Berberin Arti"><i data-icon="phone"></i></a>
+    </header>
+    <a class="biz__addr" href="https://www.google.com/maps/search/?api=1&query=Berberi+Arti+Gjakovë">
+      <i data-icon="pin" class="icon--sm"></i><span class="link">Rr. Ismail Qemali 12, te Çarshia e Madhe</span>
+    </a>
+
+    <!-- StepProgress -->
+    <div class="app__pad split" style="margin-top: 12px; min-height: 44px;">
+      <button class="iconbtn" style="margin-left:-10px" data-show-step="2,3" data-back aria-label="Kthehu"><i data-icon="chevron-left"></i></button>
+      <div class="steps" role="progressbar" aria-valuemin="1" aria-valuemax="3" aria-valuenow="1" aria-label="Hapi"><span></span><span></span><span></span></div>
+      <span class="t-caption t-3 t-num" data-step-count>1 / 3</span>
+    </div>
+
+    <main>
+      <!-- STEP 1 · Shërbimi -->
+      <section data-step="1" aria-labelledby="s1">
+        <div class="app__pad section">
+          <h2 class="t-h1" id="s1">Zgjidh shërbimin</h2>
+        </div>
+        <ul class="list" style="margin-top: 20px" data-select="service">
+          <li><button class="row" data-option="Qethje" data-min="30" data-price="5 €">
+            <span class="row__main"><span class="row__title">Qethje</span><span class="row__meta">30 min</span></span>
+            <span class="row__price">5 €</span>
+            <span class="row__end"><i data-icon="chevron-right" class="row__chev"></i><span class="row__check"><i data-icon="check"></i></span></span>
+          </button></li>
+          <li><button class="row" data-option="Qethje + mjekër" data-min="45" data-price="7 €">
+            <span class="row__main"><span class="row__title">Qethje + mjekër</span><span class="row__meta">45 min</span></span>
+            <span class="row__price">7 €</span>
+            <span class="row__end"><i data-icon="chevron-right" class="row__chev"></i><span class="row__check"><i data-icon="check"></i></span></span>
+          </button></li>
+          <li><button class="row" data-option="Mjekër" data-min="15" data-price="3 €">
+            <span class="row__main"><span class="row__title">Mjekër</span><span class="row__meta">15 min</span></span>
+            <span class="row__price">3 €</span>
+            <span class="row__end"><i data-icon="chevron-right" class="row__chev"></i><span class="row__check"><i data-icon="check"></i></span></span>
+          </button></li>
+          <li><button class="row" data-option="Rruajtje klasike" data-min="20" data-price="4 €">
+            <span class="row__main"><span class="row__title">Rruajtje klasike</span><span class="row__meta">20 min · Me brisk dhe peshqir të nxehtë</span></span>
+            <span class="row__price">4 €</span>
+            <span class="row__end"><i data-icon="chevron-right" class="row__chev"></i><span class="row__check"><i data-icon="check"></i></span></span>
+          </button></li>
+          <li><button class="row" data-option="Qethje për fëmijë" data-min="20" data-price="4 €">
+            <span class="row__main"><span class="row__title">Qethje për fëmijë</span><span class="row__meta">20 min · Deri në 12 vjeç</span></span>
+            <span class="row__price">4 €</span>
+            <span class="row__end"><i data-icon="chevron-right" class="row__chev"></i><span class="row__check"><i data-icon="check"></i></span></span>
+          </button></li>
+          <li><button class="row" data-option="Paketa e dhëndrit" data-min="75" data-price="20 €">
+            <span class="row__main"><span class="row__title">Paketa e dhëndrit</span><span class="row__meta">1 orë 15 min · Qethje, mjekër dhe maskë</span></span>
+            <span class="row__price">20 €</span>
+            <span class="row__end"><i data-icon="chevron-right" class="row__chev"></i><span class="row__check"><i data-icon="check"></i></span></span>
+          </button></li>
+        </ul>
+      </section>
+
+      <!-- STEP 2 · Ora -->
+      <section data-step="2" aria-labelledby="s2">
+        <div class="app__pad section stack stack--6">
+          <h2 class="t-h1" id="s2">Zgjidh orën</h2>
+
+          <!-- StaffChips: only when the business has more than one staff member -->
+          <div class="stack stack--3">
+            <p class="label-caps">Te kush</p>
+            <div class="chips" data-select="staff">
+              <button class="chip is-selected" data-option="any" aria-pressed="true">Kushdo që është i lirë</button>
+              <button class="chip" data-option="Arti">Arti</button>
+              <button class="chip" data-option="Leka">Leka</button>
+              <button class="chip" data-option="Beni">Beni</button>
+            </div>
+          </div>
+
+          <!-- DayStrip: 14 days; .is-full = no free time (dimmed, "plot") -->
+          <div class="stack stack--3">
+            <p class="label-caps">Dita</p>
+            <div class="days" data-select="day">
+              <button class="day" data-option="sot, e premte 13 nëntor"><span class="day__dow">Sot</span><span class="day__num">13</span></button>
+              <button class="day is-selected" data-option="nesër, e shtunë 14 nëntor" aria-pressed="true"><span class="day__dow">Nesër</span><span class="day__num">14</span></button>
+              <button class="day is-full" disabled aria-label="E diel 15 nëntor, mbyllur"><span class="day__dow">mbyllur</span><span class="day__num">15</span></button>
+              <button class="day" data-option="e hënë 16 nëntor"><span class="day__dow">Hën</span><span class="day__num">16</span></button>
+              <button class="day" data-option="e martë 17 nëntor"><span class="day__dow">Mar</span><span class="day__num">17</span></button>
+              <button class="day is-full" disabled aria-label="E mërkurë 18 nëntor, plot"><span class="day__dow">plot</span><span class="day__num">18</span></button>
+              <button class="day" data-option="e enjte 19 nëntor"><span class="day__dow">Enj</span><span class="day__num">19</span></button>
+              <button class="day" data-option="e premte 20 nëntor"><span class="day__dow">Pre</span><span class="day__num">20</span></button>
+              <button class="day" data-option="e shtunë 21 nëntor"><span class="day__dow">Sht</span><span class="day__num">21</span></button>
+              <button class="day is-full" disabled aria-label="E diel 22 nëntor, mbyllur"><span class="day__dow">mbyllur</span><span class="day__num">22</span></button>
+              <button class="day" data-option="e hënë 23 nëntor"><span class="day__dow">Hën</span><span class="day__num">23</span></button>
+              <button class="day" data-option="e martë 24 nëntor"><span class="day__dow">Mar</span><span class="day__num">24</span></button>
+              <button class="day" data-option="e mërkurë 25 nëntor"><span class="day__dow">Mër</span><span class="day__num">25</span></button>
+              <button class="day" data-option="e enjte 26 nëntor"><span class="day__dow">Enj</span><span class="day__num">26</span></button>
+            </div>
+          </div>
+
+          <!-- SlotGrid: taken times are not rendered -->
+          <div data-select="slot" aria-label="Orët e lira">
+            <div class="slotgroup">
+              <p class="label-caps slotgroup__label">Paradite</p>
+              <div class="slots">
+                <button class="slot" data-option="09:00">09:00</button>
+                <button class="slot" data-option="09:30">09:30</button>
+                <button class="slot" data-option="10:15">10:15</button>
+                <button class="slot" data-option="11:00">11:00</button>
+                <button class="slot" data-option="11:30">11:30</button>
+              </div>
+            </div>
+            <div class="slotgroup">
+              <p class="label-caps slotgroup__label">Pasdite</p>
+              <div class="slots">
+                <button class="slot" data-option="13:30">13:30</button>
+                <button class="slot" data-option="14:00">14:00</button>
+                <button class="slot" data-option="15:30">15:30</button>
+                <button class="slot" data-option="16:00">16:00</button>
+                <button class="slot" data-option="16:45">16:45</button>
+                <button class="slot" data-option="17:15">17:15</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty state for a day with no free times (§3.3); shown instead of the grid -->
+          <div class="empty card card--flat" hidden data-empty-day>
+            <p class="empty__title">Asnjë orë e lirë këtë ditë.</p>
+            <button class="btn btn--secondary btn--sm">Shiko të hënën, 16 nëntor</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 3 · Të dhënat -->
+      <section data-step="3" aria-labelledby="s3">
+        <form class="app__pad section stack stack--6" novalidate onsubmit="return false">
+          <h2 class="t-h1" id="s3">Kush po vjen?</h2>
+
+          <div class="card card--accent split">
+            <div class="grow">
+              <p class="t-h3" data-sum-service>Qethje</p>
+              <p class="t-small t-2" data-sum-when>e shtunë, 14 nëntor · ora 15:30</p>
+            </div>
+            <button type="button" class="btn btn--ghost btn--sm btn--auto" data-go="2">Ndrysho</button>
+          </div>
+
+          <div class="stack">
+            <div class="field">
+              <label class="field__label" for="name">Emri</label>
+              <input class="input" id="name" name="name" autocomplete="name" placeholder="Emri dhe mbiemri" required>
+              <p class="field__error" id="name-err">Shkruaj emrin.</p>
+            </div>
+            <div class="field">
+              <label class="field__label" for="phone">Numri i telefonit</label>
+              <div class="inputgroup">
+                <span class="inputgroup__ad">+383</span>
+                <input class="input t-num" id="phone" name="phone" inputmode="tel" autocomplete="tel-national" placeholder="44 123 456" required aria-describedby="phone-hint phone-err">
+              </div>
+              <p class="field__hint" id="phone-hint">Vetëm për konfirmimin dhe kujtesën e terminit.</p>
+              <p class="field__error" id="phone-err">Shkruaj një numër të vlefshëm, p.sh. 044 123 456.</p>
+            </div>
+            <div class="field">
+              <label class="field__label" for="note">Shënim për Berberin Arti <small>(nëse do)</small></label>
+              <textarea class="input" id="note" name="note" rows="2" placeholder="P.sh. vij me djalin"></textarea>
+            </div>
+            <!-- honeypot (§5): hidden from people, bots fill it -->
+            <input class="sr" tabindex="-1" autocomplete="off" name="website" aria-hidden="true">
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <p class="footnote mt-auto">Rezervim përmes <a href="https://termini.app"><span class="wordmark wordmark--sm">termini</span></a></p>
+  </div>
+
+  <!-- BottomBar: appears from step 2 once a time is chosen -->
+  <div class="bar" data-bar>
+    <div class="bar__in" data-show-step="2">
+      <p class="bar__summary"><b data-bar-title>Qethje · 5 €</b><span data-bar-when>Zgjidh një orë</span></p>
+      <button class="btn btn--primary" data-go="3" data-next disabled>Vazhdo</button>
+    </div>
+    <div class="bar--stack" data-show-step="3" hidden>
+      <div class="bar__in">
+        <button class="btn btn--primary" data-confirm>Konfirmo terminin</button>
+        <p class="bar__note">Pagesa bëhet në lokal. <span data-bar-price>5 €</span></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="termini.js"></script>
+  <script>
+    /* Prototype state only. In the app this is <BookingFlow> state + POST /api/public/{slug}/bookings. */
+    (function () {
+      var st = { service: 'Qethje', price: '5 €', day: 'e shtunë, 14 nëntor', slot: '' };
+      var $ = function (s) { return document.querySelector(s); };
+      function render() {
+        $('[data-bar-title]').textContent = st.service + ' · ' + st.price;
+        $('[data-bar-when]').textContent = st.slot ? st.day + ' · ' + st.slot : 'Zgjidh një orë';
+        $('[data-sum-service]').textContent = st.service + ' · ' + st.price;
+        $('[data-sum-when]').textContent = st.day + ' · ora ' + (st.slot || '–');
+        $('[data-bar-price]').textContent = st.price;
+        $('[data-next]').disabled = !st.slot;
+      }
+      document.addEventListener('t:select', function (e) {
+        var g = e.target.getAttribute('data-select'), el = e.detail.el;
+        if (g === 'service') { st.service = e.detail.value; st.price = el.getAttribute('data-price'); setTimeout(function () { T.go(2); }, 220); }
+        if (g === 'day') { st.day = e.detail.value.replace(/^(sot|nesër), /, '').replace(/^(e \S+) /, '$1, '); st.slot = ''; T.all('.slot.is-selected').forEach(function (s) { s.classList.remove('is-selected'); }); }
+        if (g === 'slot') st.slot = e.detail.value;
+        render();
+      });
+      document.addEventListener('t:step', function (e) {
+        var n = e.detail;
+        $('[data-step-count]').textContent = n + ' / 3';
+        $('.steps').setAttribute('aria-valuenow', n);
+        $('[data-bar]').classList.toggle('is-visible', n > 1);
+        render();
+      });
+      $('[data-back]').addEventListener('click', function () { T.go(T.step() - 1); });
+      $('[data-confirm]').addEventListener('click', function () {
+        var ok = true;
+        [['name', function (v) { return v.trim().length > 1; }], ['phone', function (v) { return v.replace(/\D/g, '').length >= 8; }]].forEach(function (f) {
+          var input = document.getElementById(f[0]), bad = !f[1](input.value);
+          input.closest('.field').classList.toggle('is-invalid', bad);
+          input.setAttribute('aria-invalid', bad ? 'true' : 'false');
+          if (bad && ok) { input.focus(); ok = false; }
+        });
+        if (!ok) return;
+        this.classList.add('is-loading');
+        setTimeout(function () { location.href = 'confirmation.html'; }, 600);
+      });
+      document.addEventListener('t:ready', function () {
+        if (T.param('step') === '2' || T.param('step') === '3') {
+          var s = document.querySelector('.slot[data-option="15:30"]'); s.classList.add('is-selected'); st.slot = '15:30';
+        }
+        if (T.param('state') === 'error') { document.getElementById('phone').value = '44 12'; $('[data-confirm]').click(); }
+        render();
+      });
+    })();
+  </script>
+</body>
+</html>

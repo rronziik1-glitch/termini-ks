@@ -1,0 +1,95 @@
+{
+  "meta": {
+    "template": "bujtine",
+    "lang": "sq",
+    "title": "Bujtina Guri i Kuq · Bujtinë në Rugovë, Pejë",
+    "description": "Dhoma me pamje nga Bjeshkët e Nemuna, mëngjes shtëpie dhe darkë nga saçi në Rugovë, 25 minuta nga Peja. Rezervo qëndrimin online."
+  },
+  "theme": { "accent": "", "variant": "" },
+  "brand": { "name": "Guri i Kuq", "category": "Bujtinë", "city": "Rugovë", "since": "2009" },
+  "hero": {
+    "eyebrow": "Bujtinë · Rugovë, Pejë",
+    "title": "Zgjohu mes maleve",
+    "subtitle": "Dhoma druri me pamje nga Bjeshkët e Nemuna, mëngjes shtëpie dhe qetësi, 25 minuta nga Peja.",
+    "image": { "src": "", "alt": "Bujtina prej druri në lëndinë, me Bjeshkët e Nemuna prapa, mjegull mëngjesi" },
+    "video": { "src": "", "poster": "" }
+  },
+  "highlights": [
+    { "value": "1 350 m", "label": "lartësi mbidetare" },
+    { "value": "25 min", "label": "nga qendra e Pejës" },
+    { "value": "8", "label": "dhoma dhe një kasolle" },
+    { "value": "4.9", "label": "vlerësimi në Google" }
+  ],
+  "about": {
+    "title": "Shtëpia e familjes, e hapur për mysafirë",
+    "text": "Familja Nikçi pret mysafirë në Rugovë që nga viti 2009. Bukën, djathin dhe mjaltin i bëjmë vetë, kurse mishi vjen nga stanet përreth. Në mëngjes të zgjon ajri i malit, në mbrëmje ulesh pranë oxhakut.",
+    "points": ["Mëngjesi i përfshirë në çmim", "Darkë nga saçi, me porosi", "Shtigje ecjeje nga dera", "Wi-Fi dhe parking falas", "Ngrohje me dru në çdo dhomë", "Kafshët shtëpiake janë të mirëseardhura"],
+    "image": { "src": "", "alt": "Tarraca e bujtinës me tavolinë mëngjesi dhe pamje nga lugina" }
+  },
+  "services": {
+    "title": "Dhomat",
+    "intro": "Çmimet janë për natë, me mëngjes. Fëmijët deri në 6 vjeç flenë falas.",
+    "groups": [
+      {
+        "name": "",
+        "items": [
+          { "name": "Dhomë dyshe", "description": "Një krevat i madh, banjë private dhe ballkon me pamje nga lugina.", "price": "45 € / natë", "duration": null, "tag": "Më e kërkuara", "image": { "src": "", "alt": "Dhomë dyshe me mure druri, krevat i bardhë dhe dritare nga mali" } },
+          { "name": "Dhomë familjare", "description": "Për katër veta: një krevat i madh dhe dy teke, banjë private.", "price": "70 € / natë", "duration": null, "tag": "", "image": { "src": "", "alt": "Dhomë familjare me katër shtretër dhe qilim tradicional" } },
+          { "name": "Kasollja në lëndinë", "description": "E ndarë nga bujtina, me oxhak, kuzhinë të vogël dhe verandë. Deri në pesë veta.", "price": "95 € / natë", "duration": null, "tag": "", "image": { "src": "", "alt": "Kasolle druri në lëndinë, me tym nga oxhaku, në muzg" } },
+          { "name": "Dhomë teke", "description": "Për udhëtarë dhe alpinistë. Banjë private, tavolinë pune.", "price": "30 € / natë", "duration": null, "tag": "", "image": { "src": "", "alt": "Dhomë teke e thjeshtë me dritare të vogël nga pylli" } }
+        ]
+      }
+    ]
+  },
+  "gallery": {
+    "title": "Një ditë në Rugovë",
+    "images": [
+      { "src": "", "alt": "Mëngjes në tarracë: bukë, djathë, mjaltë dhe çaj mali" },
+      { "src": "", "alt": "Shteg ecjeje drejt Liqenit të Kuqishtës" },
+      { "src": "", "alt": "Oxhaku i ndezur në sallën e përbashkët" },
+      { "src": "", "alt": "Flija duke u pjekur nën saç në oborr" },
+      { "src": "", "alt": "Bujtina e mbuluar me borë në dimër" },
+      { "src": "", "alt": "Qielli me yje mbi çatinë e bujtinës" }
+    ]
+  },
+  "reviews": {
+    "title": "Fjalët e tyre",
+    "rating": "4.9",
+    "count": "187 vlerësime",
+    "source": "Google",
+    "items": [
+      { "name": "Vlora dhe Besniku, Cyrih", "text": "Erdhëm për dy net dhe ndenjëm pesë. Fëmijët s'donin të ktheheshin në qytet.", "rating": 5 },
+      { "name": "Thomas R., Mynih", "text": "Pritje si në familje. Mëngjesi me djathë e mjaltë shtëpie ishte më i miri i krejt udhëtimit.", "rating": 5 },
+      { "name": "Arbnora H., Prishtinë", "text": "Qetësi e plotë, dhomë e ngrohtë dhe darkë nga saçi. Kthehemi çdo vjeshtë.", "rating": 5 }
+    ]
+  },
+  "faq": [
+    { "q": "A është e hapur bujtina në dimër?", "a": "Po, punojmë gjithë vitin. Rruga pastrohet rregullisht, por nga dhjetori deri në mars rekomandojmë goma dimri ose zinxhirë." },
+    { "q": "A përfshihet ushqimi në çmim?", "a": "Mëngjesi përfshihet. Drekën dhe darkën i përgatisim me porosi, 8 deri në 12 € për person." },
+    { "q": "Si paguhet?", "a": "Me para në dorë ose me transfer bankar. Për rezervime në korrik dhe gusht kërkojmë kapar 20 €." },
+    { "q": "A organizoni ecje ose udhërrëfyes?", "a": "Po. Të lidhim me udhërrëfyes vendas për Liqenin e Kuqishtës, Hajlën dhe shtigjet e Majave të Ballkanit." }
+  ],
+  "location": {
+    "title": "25 minuta nga Peja",
+    "address": "Fshati Drelaj, Rugovë",
+    "city": "Pejë",
+    "mapQuery": "Drelaj, Rugovë, Pejë",
+    "note": "Nga Peja merr rrugën e Grykës së Rugovës. Pas 18 km, kthehu majtas te tabela «Guri i Kuq».",
+    "hours": [
+      { "days": "Hyrja në dhomë", "time": "nga ora 14:00" },
+      { "days": "Dalja nga dhoma", "time": "deri në 11:00" },
+      { "days": "Mëngjesi", "time": "07:30 – 10:30" }
+    ]
+  },
+  "contact": {
+    "phone": "38344456789",
+    "phoneDisplay": "044 456 789",
+    "whatsapp": "",
+    "whatsappMessage": "Përshëndetje! Dua të pyes për dhoma të lira.",
+    "email": "info@guriikuq.com",
+    "instagram": "bujtina.guriikuq",
+    "facebook": ""
+  },
+  "booking": { "enabled": true, "url": "https://termini.app/guri-i-kuq", "label": "Rezervo qëndrimin" },
+  "footer": { "note": "Anulimi është falas deri në 3 ditë para ardhjes." }
+}

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="sq">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Termini u rezervua · Berberi Arti</title>
+  <meta name="theme-color" content="#ffffff">
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="termini.css">
+</head>
+<!--
+  SCREEN: booking confirmation  ·  route /{slug}/t/{token}
+  Spec: 01-product-design.md §3.2, §3.5 (message A).   Review: ?sheet=cancel  ?state=cancelled  ?theme=dark
+  Components: <SuccessMark> <BookingSummary> <WhatsAppButton> <CancelSheet>
+  The same URL is the customer's permanent view of the booking: status confirmed | cancelled | completed.
+-->
+<body class="page">
+  <div class="app">
+    <main class="app__pad stack stack--6" style="padding-top: 56px;">
+
+      <!-- status: confirmed -->
+      <div class="stack" data-state="confirmed">
+        <div class="success" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7.5"/></svg>
+        </div>
+        <h1 class="t-display fade-up" style="--i:0">Termini u rezervua!</h1>
+        <p class="t-2 fade-up" style="--i:1">Të presim të shtunën në 15:30. Dërgoja konfirmimin berberit në WhatsApp, që ta ketë edhe ai.</p>
+      </div>
+
+      <!-- status: cancelled (shown instead of the block above) -->
+      <div class="stack" data-state="cancelled" hidden>
+        <span class="badge badge--danger" style="align-self:flex-start">Anuluar</span>
+        <h1 class="t-display">Termini u anulua</h1>
+        <p class="t-2">Berberi Arti u njoftua. Mund të zgjedhësh një orë tjetër kur të duash.</p>
+      </div>
+
+      <!-- BookingSummary -->
+      <dl class="card summary fade-up" style="--i:2">
+        <div class="summary__row"><dt>Shërbimi</dt><dd>Qethje · 30 min</dd></div>
+        <div class="summary__row"><dt>Kur</dt><dd><time datetime="2026-11-14T15:30+01:00">e shtunë, 14 nëntor · 15:30</time></dd></div>
+        <div class="summary__row"><dt>Ku</dt><dd>Berberi Arti<br><span class="t-small t-2">Rr. Ismail Qemali 12, Gjakovë</span></dd></div>
+        <div class="summary__row"><dt>Çmimi</dt><dd>5 € <span class="t-small t-2">· paguan në lokal</span></dd></div>
+      </dl>
+
+      <div class="stack stack--2 fade-up" style="--i:3" data-state="confirmed">
+        <!-- message A, §3.5: https://wa.me/{business}?text=… -->
+        <a class="btn btn--whatsapp" href="https://wa.me/38349123456?text=P%C3%ABrsh%C3%ABndetje!%20Sapo%20rezervova%20termin%3A%0AQethje%2C%20e%20shtun%C3%AB%2C%2014%20n%C3%ABntor%2C%20ora%2015%3A30%0AEmri%3A%20Dren%20Kelmendi%0Ahttps%3A%2F%2Ftermini.app%2Fberberi-arti%2Ft%2Fk7Qm2x">
+          <i data-icon="whatsapp"></i>Dërgo konfirmimin në WhatsApp
+        </a>
+        <div class="cluster" style="flex-wrap: nowrap;">
+          <a class="btn btn--secondary" href="booking.ics" download data-toast="U shtua në kalendar."><i data-icon="calendar-plus" class="icon--sm"></i>Shto në kalendar</a>
+          <a class="btn btn--secondary" href="https://www.google.com/maps/search/?api=1&query=Berberi+Arti+Gjakovë"><i data-icon="navigation" class="icon--sm"></i>Si të vij</a>
+        </div>
+      </div>
+
+      <div class="stack stack--2" data-state="cancelled" hidden>
+        <a class="btn btn--primary" href="booking.html">Rezervo një orë tjetër</a>
+      </div>
+
+      <p class="t-center fade-up" style="--i:4" data-state="confirmed">
+        <button class="link link--danger t-small" style="min-height:44px" data-sheet-open="cancel">Anulo terminin</button>
+      </p>
+    </main>
+
+    <!-- Growth loop: every confirmation carries the brand -->
+    <footer class="footnote mt-auto stack stack--2" style="align-items:center">
+      <p>Rezervuar përmes <a href="https://termini.app"><span class="wordmark wordmark--sm">termini</span></a></p>
+      <p>Ke biznes? <a class="link" href="onboarding.html">Merre linkun tënd falas.</a></p>
+    </footer>
+  </div>
+
+  <!-- CancelSheet -->
+  <section class="sheet" id="cancel" role="dialog" aria-modal="true" aria-labelledby="cancel-title" aria-hidden="true">
+    <span class="sheet__grab"></span>
+    <div class="sheet__head"><h2 class="sheet__title" id="cancel-title">A je i sigurt?</h2></div>
+    <div class="sheet__body">
+      <p class="t-2">Termini për Qethje, të shtunën më 14 nëntor në 15:30, do të anulohet dhe ora do t'i lirohet dikujt tjetër.</p>
+      <!-- too late (§3.4): replaces the text above and hides "Po, anulo"
+      <p class="t-2">Termini është për më pak se 2 orë. Thirr në 049 123 456 për ta anuluar.</p> -->
+    </div>
+    <div class="sheet__actions">
+      <button class="btn btn--danger" data-cancel>Po, anulo</button>
+      <button class="btn btn--secondary" data-sheet-close>Jo, mbaje</button>
+    </div>
+  </section>
+
+  <script src="termini.js"></script>
+  <script>
+    (function () {
+      function setState(s) { T.all('[data-state]').forEach(function (el) { el.hidden = el.getAttribute('data-state') !== s; }); }
+      document.querySelector('[data-cancel]').addEventListener('click', function () { T.close(); setState('cancelled'); window.scrollTo(0, 0); });
+      if (T.param('state')) setState(T.param('state'));
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "termini-app-v4",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "build/app-v4", "run", "dev"],
+      "port": 3000
+    },
+    {
+      "name": "termini-app-v3",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["--prefix", "build/app-v3", "run", "dev", "--", "-p", "3002"],
+      "port": 3002
+    }
+  ]
+}

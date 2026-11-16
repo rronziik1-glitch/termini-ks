@@ -1,0 +1,179 @@
+<!doctype html>
+<html lang="sq" data-fg-loading data-fg-demo>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Restorant</title>
+  <meta name="description" content="">
+  <meta name="theme-color" content="#f3ece0">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..600;1,9..144,300..500&family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../base.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="fg-header head">
+    <nav class="head__nav head__nav--l" aria-label="Kryesore">
+      <a href="#menyja">Menyja</a>
+      <a href="#galeria" data-if="gallery.images">Galeria</a>
+    </nav>
+    <a class="head__brand" href="#top" data-t="brand.name"></a>
+    <nav class="head__nav head__nav--r" aria-label="Kontakt">
+      <a href="#lokacioni">Lokacioni</a>
+      <a class="head__cta" data-cta data-attr="href:links.booking" data-t="booking.label"></a>
+    </nav>
+    <a class="head__menu" href="#menyja">Menyja</a>
+  </header>
+
+  <main id="top">
+
+    <!-- HERO -->
+    <section class="hero" data-hero>
+      <div class="hero__media" data-parallax="0.14">
+        <img data-img="hero.image" fetchpriority="high" alt="">
+        <video data-video="hero.video" autoplay muted loop playsinline></video>
+      </div>
+      <div class="hero__shade"></div>
+      <div class="hero__body fg-wrap">
+        <p class="hero__eyebrow" data-reveal data-t="hero.eyebrow"></p>
+        <h1 class="hero__title" data-reveal data-t="hero.title"></h1>
+        <p class="hero__sub" data-reveal data-t="hero.subtitle"></p>
+        <div class="hero__actions" data-reveal>
+          <a class="btn btn--solid" data-cta data-attr="href:links.booking" data-t="booking.label"></a>
+          <a class="btn btn--glass" href="#menyja">Shiko menynë</a>
+        </div>
+      </div>
+      <ul class="hero__strip" data-if="location.hours" data-reveal="fade">
+        <template data-each="location.hours">
+          <li><span data-t=".days"></span><b data-t=".time"></b></li>
+        </template>
+      </ul>
+    </section>
+
+    <!-- STATEMENT -->
+    <section class="statement" data-if="about.text">
+      <div class="fg-wrap statement__in">
+        <p class="label" data-reveal><span data-t="brand.sinceText"></span></p>
+        <h2 class="statement__title" data-reveal data-t="about.title"></h2>
+        <p class="statement__text" data-reveal data-t="about.text"></p>
+        <ul class="statement__points" data-if="about.points" data-reveal>
+          <template data-each="about.points"><li data-t="."></li></template>
+        </ul>
+      </div>
+      <div class="statement__media fg-wrap">
+        <div class="fg-media statement__img" data-reveal="clip"><img data-img="about.image" alt=""></div>
+      </div>
+    </section>
+
+    <!-- MENU -->
+    <section class="menu" id="menyja">
+      <div class="fg-wrap">
+        <header class="menu__head">
+          <p class="label" data-reveal>Menyja</p>
+          <h2 class="title" data-reveal data-t="services.title"></h2>
+          <p class="menu__intro" data-if="services.intro" data-reveal data-t="services.intro"></p>
+        </header>
+        <div class="menu__cols">
+          <template data-each="services.groups">
+            <section class="course" data-reveal>
+              <h3 class="course__name"><span class="course__n" data-t=".$n"></span><span data-t=".name"></span></h3>
+              <ul>
+                <template data-each=".items">
+                  <li class="dish">
+                    <p class="dish__top">
+                      <span class="dish__name" data-t=".name"></span>
+                      <em class="dish__tag" data-if=".tag" data-t=".tag"></em>
+                      <span class="dish__dots" aria-hidden="true"></span>
+                      <span class="dish__price" data-t=".price"></span>
+                    </p>
+                    <p class="dish__desc" data-if=".description" data-t=".description"></p>
+                  </li>
+                </template>
+              </ul>
+            </section>
+          </template>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="gallery" id="galeria" data-if="gallery.images">
+      <div class="fg-wrap">
+        <header class="gallery__head">
+          <p class="label" data-reveal>Galeria</p>
+          <h2 class="title" data-reveal data-t="gallery.title"></h2>
+        </header>
+        <div class="gallery__grid">
+          <template data-each="gallery.images">
+            <button class="gallery__item fg-media" data-lightbox data-reveal="clip"><img data-img="." alt=""></button>
+          </template>
+        </div>
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="voices" data-if="reviews.items">
+      <div class="fg-wrap">
+        <p class="label" data-reveal><span data-if="reviews.rating"><b data-t="reviews.rating"></b> ★ · <span data-t="reviews.summary"></span></span></p>
+        <h2 class="title" data-reveal data-t="reviews.title"></h2>
+      </div>
+      <ul class="voices__rail" data-reveal="fade">
+        <template data-each="reviews.items">
+          <li class="voice">
+            <blockquote data-t=".text"></blockquote>
+            <cite data-t=".name"></cite>
+          </li>
+        </template>
+      </ul>
+    </section>
+
+    <!-- LOCATION -->
+    <section class="place" id="lokacioni">
+      <div class="fg-wrap place__grid">
+        <div class="place__info">
+          <p class="label" data-reveal>Na gjej</p>
+          <h2 class="title" data-reveal data-t="location.title"></h2>
+          <a class="place__addr" data-cta data-reveal data-attr="href:links.map">
+            <span data-t="location.full"></span>
+            <small data-if="location.note" data-t="location.note"></small>
+          </a>
+          <dl class="hours" data-reveal>
+            <template data-each="location.hours">
+              <div><dt data-t=".days"></dt><dd data-t=".time"></dd></div>
+            </template>
+          </dl>
+          <div class="place__actions" data-reveal>
+            <a class="btn btn--ink" data-cta data-attr="href:links.booking" data-t="booking.label"></a>
+            <a class="btn btn--line" data-cta data-attr="href:links.tel"><i data-icon="phone"></i><span data-t="contact.phoneDisplay"></span></a>
+            <a class="btn btn--line" data-cta data-attr="href:links.whatsapp"><i data-icon="whatsapp"></i>WhatsApp</a>
+          </div>
+        </div>
+        <div class="fg-map" data-reveal="fade"><iframe title="Harta" loading="lazy" referrerpolicy="no-referrer-when-downgrade" data-attr="src:links.mapEmbed"></iframe></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="fg-footer foot">
+    <div class="fg-wrap">
+      <p class="foot__brand" data-t="brand.name"></p>
+      <p class="foot__note" data-if="footer.note" data-t="footer.note"></p>
+      <div class="foot__row">
+        <a data-cta data-if="links.instagram" data-attr="href:links.instagram"><i data-icon="instagram"></i><span data-t="contact.instagramDisplay"></span></a>
+        <a data-cta data-attr="href:links.tel"><i data-icon="phone"></i><span data-t="contact.phoneDisplay"></span></a>
+      </div>
+      <p class="foot__legal">© <span data-t="year"></span> <span data-t="brand.name"></span> · <span data-t="location.full"></span></p>
+      <a class="fg-credit" href="https://faqjagati.com" rel="noopener">Faqe nga <b>Faqja Gati</b></a>
+    </div>
+  </footer>
+
+  <div class="fg-bar" data-actionbar>
+    <a class="fg-bar__btn fg-bar__btn--wa" data-attr="href:links.whatsapp" aria-label="Shkruaj në WhatsApp"><i data-icon="whatsapp"></i></a>
+    <a class="fg-bar__btn fg-bar__btn--book" data-attr="href:links.booking"><span data-t="booking.label"></span></a>
+  </div>
+
+  <script src="content.js"></script>
+  <script src="../fg.js"></script>
+</body>
+</html>

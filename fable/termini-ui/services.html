@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="sq">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Shërbimet · Berberi Arti</title>
+  <meta name="theme-color" content="#f6f6f3">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="termini.css">
+</head>
+<!--
+  SCREEN: owner services  ·  route /app/sherbimet
+  Spec: 01-product-design.md §4.4.   Review: ?sheet=service | ?sheet=delete | ?state=empty | ?theme=dark
+  Components: <ServiceList> <ServiceRow> <ServiceSheet> <DeleteServiceSheet> <TabBar>
+  API: GET/POST /api/services · PATCH/DELETE /api/services/{id} · PUT /api/services/order
+  The switch saves at once (PATCH active). Everything else is edited in the sheet and saved with "Ruaj".
+  Order = the order customers see. Drag the handle (in React: dnd-kit sortable, keyboard: space + arrows).
+-->
+<body class="page page--subtle">
+  <div class="app app--tabs">
+
+    <header class="topbar">
+      <h1 class="t-h2 grow">Shërbimet</h1>
+      <button class="btn btn--primary btn--sm btn--auto" data-sheet-open="service" data-new><i data-icon="plus" class="icon--sm"></i>Shto</button>
+    </header>
+
+    <main class="app__pad stack" style="padding-top: 12px;" data-state="list">
+      <p class="t-small t-2">Kështu i sheh klienti kur rezervon. <a class="link" href="booking.html">Shiko faqen</a></p>
+
+      <!-- ServiceList -->
+      <ul class="list--card" data-services>
+        <li class="row" data-toggles>
+          <button class="row__handle iconbtn" aria-label="Zhvendos Qethje"><i data-icon="grip"></i></button>
+          <button class="row__tap" data-sheet-open="service" data-name="Qethje" data-min="30" data-price="5" data-desc="">
+            <span class="row__main"><span class="row__title">Qethje</span><span class="row__meta">30 min</span></span>
+            <span class="row__price">5 €</span>
+          </button>
+          <button class="switch" role="switch" aria-checked="true" aria-label="Qethje, e rezervueshme"></button>
+        </li>
+        <li class="row" data-toggles>
+          <button class="row__handle iconbtn" aria-label="Zhvendos Qethje + mjekër"><i data-icon="grip"></i></button>
+          <button class="row__tap" data-sheet-open="service" data-name="Qethje + mjekër" data-min="45" data-price="7" data-desc="">
+            <span class="row__main"><span class="row__title">Qethje + mjekër</span><span class="row__meta">45 min</span></span>
+            <span class="row__price">7 €</span>
+          </button>
+          <button class="switch" role="switch" aria-checked="true" aria-label="Qethje + mjekër, e rezervueshme"></button>
+        </li>
+        <li class="row" data-toggles>
+          <button class="row__handle iconbtn" aria-label="Zhvendos Mjekër"><i data-icon="grip"></i></button>
+          <button class="row__tap" data-sheet-open="service" data-name="Mjekër" data-min="15" data-price="3" data-desc="">
+            <span class="row__main"><span class="row__title">Mjekër</span><span class="row__meta">15 min</span></span>
+            <span class="row__price">3 €</span>
+          </button>
+          <button class="switch" role="switch" aria-checked="true" aria-label="Mjekër, e rezervueshme"></button>
+        </li>
+        <li class="row" data-toggles>
+          <button class="row__handle iconbtn" aria-label="Zhvendos Rruajtje klasike"><i data-icon="grip"></i></button>
+          <button class="row__tap" data-sheet-open="service" data-name="Rruajtje klasike" data-min="20" data-price="4" data-desc="Me brisk dhe peshqir të nxehtë">
+            <span class="row__main"><span class="row__title">Rruajtje klasike</span><span class="row__meta">20 min · Me brisk dhe peshqir të nxehtë</span></span>
+            <span class="row__price">4 €</span>
+          </button>
+          <button class="switch" role="switch" aria-checked="true" aria-label="Rruajtje klasike, e rezervueshme"></button>
+        </li>
+        <li class="row is-off" data-toggles>
+          <button class="row__handle iconbtn" aria-label="Zhvendos Qethje për fëmijë"><i data-icon="grip"></i></button>
+          <button class="row__tap" data-sheet-open="service" data-name="Qethje për fëmijë" data-min="20" data-price="4" data-desc="Deri në 12 vjeç">
+            <span class="row__main"><span class="row__title">Qethje për fëmijë</span><span class="row__meta">20 min · Deri në 12 vjeç</span></span>
+            <span class="row__price">4 €</span>
+          </button>
+          <button class="switch" role="switch" aria-checked="false" aria-label="Qethje për fëmijë, e rezervueshme"></button>
+        </li>
+        <li class="row" data-toggles>
+          <button class="row__handle iconbtn" aria-label="Zhvendos Paketa e dhëndrit"><i data-icon="grip"></i></button>
+          <button class="row__tap" data-sheet-open="service" data-name="Paketa e dhëndrit" data-min="75" data-price="20" data-from="1" data-desc="Qethje, mjekër dhe maskë">
+            <span class="row__main"><span class="row__title">Paketa e dhëndrit</span><span class="row__meta">1 orë 15 min · Qethje, mjekër dhe maskë</span></span>
+            <span class="row__price">nga 20 €</span>
+          </button>
+          <button class="switch" role="switch" aria-checked="true" aria-label="Paketa e dhëndrit, e rezervueshme"></button>
+        </li>
+      </ul>
+
+      <p class="t-small t-3 t-center">Të fikurat s'shfaqen për rezervime të reja. Terminet e marra mbeten.</p>
+    </main>
+
+    <!-- Empty state (?state=empty) -->
+    <main class="app__pad" style="padding-top: 12px;" data-state="empty" hidden>
+      <section class="card empty">
+        <p class="empty__title">Ende s'ke shërbime.</p>
+        <p class="empty__text">Shto të parin që klientët të mund të rezervojnë.</p>
+        <button class="btn btn--primary" data-sheet-open="service" data-new>Shto shërbim</button>
+      </section>
+    </main>
+  </div>
+
+  <!-- TabBar -->
+  <nav class="tabs" aria-label="Kryesore">
+    <div class="tabs__in">
+      <a class="tab" href="calendar.html"><i data-icon="calendar"></i>Kalendari</a>
+      <a class="tab" href="#" data-toast="Klientët: lista ndërtohet vetë nga terminet."><i data-icon="users"></i>Klientët</a>
+      <a class="tab is-active" href="services.html" aria-current="page"><i data-icon="scissors"></i>Shërbimet</a>
+      <a class="tab" href="settings.html"><i data-icon="settings"></i>Cilësimet</a>
+    </div>
+  </nav>
+
+  <!-- ServiceSheet: add or edit -->
+  <section class="sheet" id="service" role="dialog" aria-modal="true" aria-labelledby="svc-title" aria-hidden="true">
+    <span class="sheet__grab"></span>
+    <div class="sheet__head">
+      <h2 class="sheet__title" id="svc-title">Qethje</h2>
+      <button class="iconbtn iconbtn--fill" data-sheet-close aria-label="Mbyll"><i data-icon="x"></i></button>
+    </div>
+    <form class="sheet__body stack" onsubmit="return false" novalidate>
+      <div class="field">
+        <label class="field__label" for="sn">Emri</label>
+        <input class="input" id="sn" autocomplete="off" placeholder="P.sh. Qethje" value="Qethje">
+        <p class="field__error">Shkruaj emrin e shërbimit.</p>
+      </div>
+
+      <div class="stack stack--3">
+        <p class="field__label" id="dur-l">Sa zgjat</p>
+        <div class="chips chips--wrap" data-select="duration" role="group" aria-labelledby="dur-l">
+          <button type="button" class="chip" data-option="15">15 min</button>
+          <button type="button" class="chip" data-option="20">20 min</button>
+          <button type="button" class="chip is-selected" data-option="30" aria-pressed="true">30 min</button>
+          <button type="button" class="chip" data-option="45">45 min</button>
+          <button type="button" class="chip" data-option="60">1 orë</button>
+          <button type="button" class="chip" data-option="90">1 orë 30</button>
+          <button type="button" class="chip" data-option="custom">Tjetër</button>
+        </div>
+        <!-- shown when "Tjetër" is chosen -->
+        <label class="inputgroup" data-custom-duration hidden>
+          <span class="sr">Kohëzgjatja në minuta</span>
+          <input class="input t-num" inputmode="numeric" placeholder="75">
+          <span class="inputgroup__ad inputgroup__ad--end">min</span>
+        </label>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="sp">Çmimi <small>(nëse do ta tregosh)</small></label>
+        <div class="inputgroup">
+          <input class="input t-num" id="sp" inputmode="decimal" placeholder="0" value="5">
+          <span class="inputgroup__ad inputgroup__ad--end">€</span>
+        </div>
+        <p class="field__hint">Bosh = klienti sheh "Çmimi në lokal".</p>
+        <label class="check"><input type="checkbox" id="sf">Çmimi fillon nga kjo shumë ("nga 5 €")</label>
+      </div>
+
+      <div class="field">
+        <label class="field__label" for="sd">Përshkrimi <small>(nëse do)</small></label>
+        <textarea class="input" id="sd" rows="2" maxlength="80" placeholder="P.sh. Me brisk dhe peshqir të nxehtë"></textarea>
+      </div>
+
+      <button type="button" class="btn btn--ghost btn--sm" style="color: var(--danger)" data-sheet-open="delete" data-delete><i data-icon="trash" class="icon--sm"></i>Fshije shërbimin</button>
+    </form>
+    <div class="sheet__actions">
+      <button class="btn btn--primary" data-save>Ruaj</button>
+    </div>
+  </section>
+
+  <!-- DeleteServiceSheet (§4.4): future bookings stay -->
+  <section class="sheet" id="delete" role="dialog" aria-modal="true" aria-labelledby="del-title" aria-hidden="true">
+    <span class="sheet__grab"></span>
+    <div class="sheet__head"><h2 class="sheet__title" id="del-title">Ta fshijmë këtë shërbim?</h2></div>
+    <div class="sheet__body">
+      <p class="t-2">Ky shërbim ka 3 termine të ardhshme. Ato mbeten; shërbimi nuk shfaqet më për rezervime të reja.</p>
+      <!-- without future bookings:
+      <p class="t-2">Shërbimi nuk do të shfaqet më te linku yt.</p> -->
+    </div>
+    <div class="sheet__actions">
+      <button class="btn btn--danger" data-sheet-close data-toast="Shërbimi u fshi." data-toast-action="Zhbëj">Po, fshije</button>
+      <button class="btn btn--secondary" data-sheet-close>Jo, mbaje</button>
+    </div>
+  </section>
+
+  <script src="termini.js"></script>
+  <script>
+    /* Prototype only. App: <ServiceSheet service={…}> with form state; POST or PATCH on "Ruaj". */
+    (function () {
+      var $ = function (s) { return document.querySelector(s); };
+      var s = T.param('state');
+      if (s) T.all('main[data-state]').forEach(function (m) { m.hidden = m.getAttribute('data-state') !== s; });
+
+      function pick(min) {
+        var hit = false;
+        T.all('[data-select="duration"] .chip').forEach(function (c) {
+          var on = c.getAttribute('data-option') === String(min); hit = hit || on;
+          c.classList.toggle('is-selected', on); c.setAttribute('aria-pressed', on ? 'true' : 'false');
+        });
+        var custom = $('[data-select="duration"] [data-option="custom"]');
+        custom.classList.toggle('is-selected', !hit); custom.setAttribute('aria-pressed', hit ? 'false' : 'true');
+        $('[data-custom-duration]').hidden = hit;
+        $('[data-custom-duration] input').value = hit ? '' : min;
+      }
+      /* fill the sheet from the tapped row, or clear it for a new service */
+      document.addEventListener('click', function (e) {
+        var row = e.target.closest('.row__tap'), fresh = e.target.closest('[data-new]');
+        if (!row && !fresh) return;
+        $('#svc-title').textContent = row ? row.getAttribute('data-name') : 'Shërbim i ri';
+        $('#sn').value = row ? row.getAttribute('data-name') : '';
+        $('#sp').value = row ? row.getAttribute('data-price') : '';
+        $('#sd').value = row ? row.getAttribute('data-desc') : '';
+        $('#sf').checked = !!(row && row.getAttribute('data-from'));
+        $('[data-delete]').hidden = !row;
+        $('#sn').closest('.field').classList.remove('is-invalid');
+        pick(row ? row.getAttribute('data-min') : 30);
+      });
+      document.addEventListener('t:select', function (e) {
+        if (e.target.getAttribute('data-select') !== 'duration') return;
+        var custom = e.detail.value === 'custom';
+        $('[data-custom-duration]').hidden = !custom;
+        if (custom) $('[data-custom-duration] input').focus();
+      });
+      document.addEventListener('t:toggle', function (e) {
+        if (e.target.closest('[data-services]')) T.toast(e.detail ? 'Klientët mund ta rezervojnë përsëri.' : 'U fik. S\'shfaqet më për rezervime të reja.', 'Zhbëj');
+      });
+      $('[data-save]').addEventListener('click', function () {
+        var name = $('#sn'), bad = name.value.trim().length < 2;
+        name.closest('.field').classList.toggle('is-invalid', bad);
+        name.setAttribute('aria-invalid', bad ? 'true' : 'false');
+        if (bad) return name.focus();
+        T.close(); T.toast('Shërbimi u ruajt.');
+      });
+    })();
+  </script>
+</body>
+</html>

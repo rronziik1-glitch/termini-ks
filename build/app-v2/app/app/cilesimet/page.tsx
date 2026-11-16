@@ -1,0 +1,15 @@
+import type { Metadata } from 'next';
+import Settings from '@/components/Settings';
+import { getOrigin, getSession } from '@/lib/session';
+import { settingsData } from '@/lib/settings-data';
+import { sq } from '@/lib/sq';
+
+export async function generateMetadata(): Promise<Metadata> {
+  const { business } = await getSession();
+  return { title: sq.settings.pageTitle(business?.name || 'Termini') };
+}
+
+export default async function SettingsPage() {
+  const [{ user, business }, origin] = await Promise.all([getSession(), getOrigin()]);
+  return <Settings view="main" data={await settingsData(user!, business!, origin)} />;
+}

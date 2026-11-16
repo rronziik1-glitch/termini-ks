@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="sq" data-fg-loading data-fg-demo>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Autoshkollë</title>
+  <meta name="description" content="">
+  <meta name="theme-color" content="#f4f5f7">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Sora:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../base.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="fg-header head">
+    <div class="head__in">
+      <a class="head__brand" href="#top"><span class="head__mark" data-t="brand.initial"></span><span data-t="brand.name"></span></a>
+      <nav class="head__nav" aria-label="Kryesore">
+        <a href="#kategorite">Kategoritë</a>
+        <a href="#hapat">Si funksionon</a>
+        <a href="#instruktoret" data-if="team.members">Instruktorët</a>
+        <a href="#lokacioni">Lokacioni</a>
+      </nav>
+      <a class="head__call" data-cta data-attr="href:links.tel" aria-label="Thirr autoshkollën"><i data-icon="phone"></i></a>
+      <a class="pill pill--ink head__cta" data-cta data-attr="href:links.booking" data-t="booking.label"></a>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- HERO -->
+    <section class="hero" data-hero>
+      <div class="fg-wrap hero__grid">
+        <div class="hero__body">
+          <p class="plate" data-reveal><b>L</b><span data-t="hero.eyebrow"></span></p>
+          <h1 class="hero__title" data-reveal data-t="hero.title"></h1>
+          <p class="hero__sub" data-reveal data-t="hero.subtitle"></p>
+          <div class="hero__actions" data-reveal>
+            <a class="pill pill--accent pill--lg" data-cta data-attr="href:links.whatsapp">Regjistrohu<i data-icon="arrow"></i></a>
+            <a class="pill pill--ghost pill--lg" data-cta data-attr="href:links.booking"><i data-icon="calendar"></i><span data-t="booking.label"></span></a>
+          </div>
+          <p class="hero__trust" data-if="reviews.rating" data-reveal>
+            <span class="stars" aria-hidden="true">★★★★★</span>
+            <b data-t="reviews.rating"></b><span data-t="reviews.summary"></span>
+          </p>
+        </div>
+        <div class="hero__visual" data-reveal="scale">
+          <div class="hero__media fg-media">
+            <img data-img="hero.image" fetchpriority="high" alt="">
+            <video data-video="hero.video" autoplay muted loop playsinline></video>
+          </div>
+          <span class="hero__road" aria-hidden="true"></span>
+        </div>
+      </div>
+    </section>
+
+    <!-- PASS RATE + FACTS: the first fact is the headline number -->
+    <section class="facts" data-if="highlights">
+      <ul class="fg-wrap facts__grid">
+        <template data-each="highlights">
+          <li class="fact" data-reveal><strong data-t=".value"></strong><span data-t=".label"></span></li>
+        </template>
+      </ul>
+    </section>
+
+    <!-- CATEGORIES + PRICES: the first group is shown as cards (the licence categories), the others as price lists -->
+    <section class="sec" id="kategorite">
+      <div class="fg-wrap">
+        <header class="sec__head">
+          <p class="kicker" data-reveal>Kategoritë dhe çmimet</p>
+          <h2 class="sec__title" data-reveal data-t="services.title"></h2>
+          <p class="sec__intro" data-if="services.intro" data-reveal data-t="services.intro"></p>
+        </header>
+        <div class="groups">
+          <template data-each="services.groups">
+            <section class="group">
+              <h3 class="group__name" data-if=".name" data-reveal data-t=".name"></h3>
+              <ul class="group__list">
+                <template data-each=".items">
+                  <li class="cat" data-reveal>
+                    <span class="cat__n" aria-hidden="true" data-t=".$n"></span>
+                    <div class="cat__main">
+                      <p class="cat__name"><span data-t=".name"></span><em class="cat__tag" data-if=".tag" data-t=".tag"></em></p>
+                      <p class="cat__meta" data-if=".meta" data-t=".meta"></p>
+                    </div>
+                    <p class="cat__price" data-if=".price" data-t=".price"></p>
+                    <a class="cat__go" data-cta data-attr="href:.askLink">Regjistrohu<i data-icon="arrow"></i></a>
+                  </li>
+                </template>
+              </ul>
+            </section>
+          </template>
+        </div>
+      </div>
+    </section>
+
+    <!-- STEPS -->
+    <section class="sec sec--ink" id="hapat">
+      <div class="fg-wrap">
+        <header class="sec__head">
+          <p class="kicker" data-reveal>Si funksionon</p>
+          <h2 class="sec__title" data-reveal>Nga regjistrimi deri te patenta</h2>
+        </header>
+        <ol class="steps">
+          <li class="step" data-reveal><span class="step__n">1</span><h3>Regjistrohu</h3><p>Na shkruaj ose eja në zyrë. Të tregojmë dokumentet dhe çmimin e plotë.</p></li>
+          <li class="step" data-reveal><span class="step__n">2</span><h3>Teoria</h3><p>Ligjëratat dhe testet provuese, derisa të ndihesh gati për provimin me shkrim.</p></li>
+          <li class="step" data-reveal><span class="step__n">3</span><h3>Orët e vozitjes</h3><p>I rezervon online, në orarin që të përshtatet ty.</p></li>
+          <li class="step" data-reveal><span class="step__n">4</span><h3>Provimi</h3><p>Dalim bashkë në rrugët e provimit para ditës së madhe.</p></li>
+        </ol>
+        <div class="steps__cta" data-reveal>
+          <a class="pill pill--yellow pill--lg" data-cta data-attr="href:links.booking"><i data-icon="calendar"></i><span data-t="booking.label"></span></a>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="sec" data-if="about.text">
+      <div class="fg-wrap about">
+        <div class="about__media fg-media" data-reveal="scale"><img data-img="about.image" alt=""></div>
+        <div class="about__body">
+          <p class="kicker" data-reveal>Rreth autoshkollës</p>
+          <h2 class="sec__title" data-reveal data-t="about.title"></h2>
+          <p class="about__text" data-reveal data-t="about.text"></p>
+          <ul class="checks" data-if="about.points">
+            <template data-each="about.points">
+              <li data-reveal><span class="checks__i"><i data-icon="check"></i></span><span data-t="."></span></li>
+            </template>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- INSTRUCTORS -->
+    <section class="sec sec--tint" id="instruktoret" data-if="team.members">
+      <div class="fg-wrap">
+        <header class="sec__head">
+          <p class="kicker" data-reveal>Instruktorët</p>
+          <h2 class="sec__title" data-reveal data-t="team.title"></h2>
+        </header>
+        <ul class="team">
+          <template data-each="team.members">
+            <li class="member" data-reveal>
+              <div class="member__media fg-media"><img data-img=".image" alt=""></div>
+              <p class="member__name" data-t=".name"></p>
+              <p class="member__role" data-t=".role"></p>
+            </li>
+          </template>
+        </ul>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="sec" data-if="gallery.images">
+      <div class="fg-wrap">
+        <header class="sec__head">
+          <p class="kicker" data-reveal>Veturat dhe poligoni</p>
+          <h2 class="sec__title" data-reveal data-t="gallery.title"></h2>
+        </header>
+      </div>
+      <div class="rail" data-reveal="fade">
+        <template data-each="gallery.images">
+          <button class="rail__item fg-media" data-lightbox><img data-img="." alt=""></button>
+        </template>
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="sec sec--tint" data-if="reviews.items">
+      <div class="fg-wrap">
+        <header class="sec__head">
+          <p class="kicker" data-reveal>Kandidatët</p>
+          <h2 class="sec__title" data-reveal data-t="reviews.title"></h2>
+        </header>
+      </div>
+      <ul class="reviews" data-reveal="fade">
+        <template data-each="reviews.items">
+          <li class="review">
+            <span class="stars" data-t=".stars"></span>
+            <blockquote data-t=".text"></blockquote>
+            <p class="review__who"><span class="review__av" data-t=".initial"></span><cite data-t=".name"></cite></p>
+          </li>
+        </template>
+      </ul>
+    </section>
+
+    <!-- FAQ -->
+    <section class="sec" id="pyetje" data-if="faq">
+      <div class="fg-wrap faq">
+        <header class="sec__head">
+          <p class="kicker" data-reveal>Pyetje të shpeshta</p>
+          <h2 class="sec__title" data-reveal>Para se të fillosh</h2>
+        </header>
+        <div class="faq__list">
+          <template data-each="faq">
+            <details class="qa" data-reveal>
+              <summary><span data-t=".q"></span><span class="qa__plus" aria-hidden="true"></span></summary>
+              <p data-t=".a"></p>
+            </details>
+          </template>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOCATION -->
+    <section class="sec sec--tint" id="lokacioni">
+      <div class="fg-wrap place">
+        <div class="place__card" data-reveal>
+          <p class="kicker">Lokacioni dhe orari</p>
+          <h2 class="sec__title" data-t="location.title"></h2>
+          <a class="place__addr" data-if="location.full" data-cta data-attr="href:links.map"><i data-icon="pin"></i><span><span data-t="location.full"></span><small data-if="location.note" data-t="location.note"></small></span></a>
+          <dl class="hours" data-if="location.hours">
+            <template data-each="location.hours">
+              <div><dt data-t=".days"></dt><dd data-t=".time"></dd></div>
+            </template>
+          </dl>
+          <div class="place__actions">
+            <a class="pill pill--ghost" data-cta data-attr="href:links.whatsapp"><i data-icon="whatsapp"></i>WhatsApp</a>
+            <a class="pill pill--ghost" data-cta data-attr="href:links.map"><i data-icon="arrow-up-right"></i>Si të vij</a>
+          </div>
+        </div>
+        <div class="fg-map" data-reveal="fade"><iframe title="Harta" loading="lazy" referrerpolicy="no-referrer-when-downgrade" data-attr="src:links.mapEmbed"></iframe></div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="sec sec--cta">
+      <div class="fg-wrap">
+        <div class="cta" data-reveal>
+          <span class="cta__lane" aria-hidden="true"></span>
+          <h2 class="cta__title">Timoni të pret</h2>
+          <p class="cta__text">Regjistrohu sot dhe rezervoje orën e parë të vozitjes online.</p>
+          <div class="cta__actions">
+            <a class="pill pill--yellow pill--lg" data-cta data-attr="href:links.whatsapp">Regjistrohu<i data-icon="arrow"></i></a>
+            <a class="pill pill--glass pill--lg" data-cta data-attr="href:links.booking"><i data-icon="calendar"></i><span data-t="booking.label"></span></a>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="fg-footer foot">
+    <div class="fg-wrap foot__in">
+      <p class="foot__brand"><span class="head__mark" data-t="brand.initial"></span><span data-t="brand.name"></span></p>
+      <p class="foot__note" data-if="footer.note" data-t="footer.note"></p>
+      <p class="foot__legal">© <span data-t="year"></span> <span data-t="brand.name"></span><span data-if="location.full"> · <span data-t="location.full"></span></span></p>
+      <a class="fg-credit" href="https://faqjagati.com" rel="noopener">Faqe nga <b>Faqja Gati</b></a>
+    </div>
+  </footer>
+
+  <div class="fg-bar" data-actionbar>
+    <a class="fg-bar__btn fg-bar__btn--wa" data-attr="href:links.whatsapp" aria-label="Shkruaj në WhatsApp"><i data-icon="whatsapp"></i></a>
+    <a class="fg-bar__btn fg-bar__btn--book" data-attr="href:links.booking"><span data-t="booking.label"></span></a>
+  </div>
+
+  <script src="content.js"></script>
+  <script src="../fg.js"></script>
+</body>
+</html>

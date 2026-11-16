@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="sq" data-fg-loading data-fg-demo>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Dyqan</title>
+  <meta name="description" content="">
+  <meta name="theme-color" content="#ffffff">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,600;12..96,700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../base.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="fg-header head">
+    <div class="head__in">
+      <a class="head__brand" href="#top"><span class="head__mark" data-t="brand.initial"></span><span data-t="brand.name"></span></a>
+      <nav class="head__nav" aria-label="Kryesore">
+        <a href="#produktet">Produktet</a>
+        <a href="#porosia">Si porositet</a>
+        <a href="#lokacioni">Dyqani</a>
+      </nav>
+      <a class="btn btn--ink head__cta" data-cta data-attr="href:links.booking"><i data-icon="whatsapp" data-if="!links.bookingIsTermini"></i><span>Porosit</span></a>
+    </div>
+  </header>
+
+  <main id="top">
+
+    <!-- HERO -->
+    <section class="hero" data-hero>
+      <div class="fg-wrap hero__grid">
+        <div class="hero__body">
+          <p class="chip" data-reveal data-t="hero.eyebrow"></p>
+          <h1 class="hero__title" data-reveal data-t="hero.title"></h1>
+          <p class="hero__sub" data-reveal data-t="hero.subtitle"></p>
+          <div class="hero__actions" data-reveal>
+            <a class="btn btn--accent btn--lg" data-cta data-attr="href:links.booking"><i data-icon="whatsapp" data-if="!links.bookingIsTermini"></i><span data-t="booking.label"></span></a>
+            <a class="btn btn--soft btn--lg" href="#produktet">Shiko produktet</a>
+          </div>
+          <p class="hero__trust" data-if="reviews.rating" data-reveal>
+            <span class="stars" aria-hidden="true">★★★★★</span><b data-t="reviews.rating"></b><span data-t="reviews.summary"></span>
+          </p>
+        </div>
+        <div class="hero__media fg-media" data-reveal="scale">
+          <img data-img="hero.image" fetchpriority="high" alt="">
+          <video data-video="hero.video" autoplay muted loop playsinline></video>
+        </div>
+      </div>
+    </section>
+
+    <!-- FACTS -->
+    <section class="facts" data-if="highlights">
+      <ul class="fg-wrap facts__list">
+        <template data-each="highlights">
+          <li class="fact" data-reveal><strong data-t=".value"></strong><span data-t=".label"></span></li>
+        </template>
+      </ul>
+    </section>
+
+    <!-- PRODUCTS -->
+    <section class="sec" id="produktet">
+      <div class="fg-wrap">
+        <header class="sec__head">
+          <h2 class="title" data-reveal data-t="services.title"></h2>
+          <p class="sec__intro" data-if="services.intro" data-reveal data-t="services.intro"></p>
+        </header>
+        <template data-each="services.groups">
+          <div class="shelf">
+            <h3 class="shelf__name" data-if=".name" data-reveal><span data-t=".name"></span></h3>
+            <ul class="shelf__grid">
+              <template data-each=".items">
+                <li class="card" data-reveal>
+                  <a class="card__link" data-cta data-attr="href:.askLink">
+                    <div class="card__media fg-media">
+                      <img data-img=".image" alt="">
+                      <em class="card__tag" data-if=".tag" data-t=".tag"></em>
+                    </div>
+                    <div class="card__body">
+                      <h4 class="card__name" data-t=".name"></h4>
+                      <p class="card__desc" data-if=".description" data-t=".description"></p>
+                      <p class="card__foot">
+                        <span class="card__price" data-t=".price"></span>
+                        <span class="card__buy"><i data-icon="whatsapp"></i>Porosit</span>
+                      </p>
+                    </div>
+                  </a>
+                </li>
+              </template>
+            </ul>
+          </div>
+        </template>
+      </div>
+    </section>
+
+    <!-- HOW TO ORDER -->
+    <section class="sec how" id="porosia">
+      <div class="fg-wrap">
+        <header class="sec__head">
+          <h2 class="title" data-reveal>Porosia merr një minutë</h2>
+        </header>
+        <ol class="how__list">
+          <li class="step" data-reveal><span class="step__n">1</span><h3>Zgjidh produktin</h3><p>Shtyp «Porosit» te produkti që të pëlqen.</p></li>
+          <li class="step" data-reveal><span class="step__n">2</span><h3>Na shkruaj në WhatsApp</h3><p>Mesazhi hapet i gatshëm. Na trego adresën ose kur vjen ta marrësh.</p></li>
+          <li class="step" data-reveal><span class="step__n">3</span><h3>Paguaj kur ta marrësh</h3><p>Me para në dorë, në dyqan ose te dera.</p></li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="sec about" data-if="about.text">
+      <div class="fg-wrap about__grid">
+        <div class="about__media fg-media" data-reveal="scale"><img data-img="about.image" alt=""></div>
+        <div class="about__body">
+          <p class="chip" data-reveal data-if="brand.sinceText" data-t="brand.sinceText"></p>
+          <h2 class="title" data-reveal data-t="about.title"></h2>
+          <p class="about__text" data-reveal data-t="about.text"></p>
+          <ul class="checks" data-if="about.points">
+            <template data-each="about.points">
+              <li data-reveal><i data-icon="check"></i><span data-t="."></span></li>
+            </template>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="sec gallery" data-if="gallery.images">
+      <div class="fg-wrap">
+        <header class="sec__head">
+          <h2 class="title" data-reveal data-t="gallery.title"></h2>
+        </header>
+      </div>
+      <div class="gallery__rail" data-reveal="fade">
+        <template data-each="gallery.images">
+          <button class="gallery__item fg-media" data-lightbox><img data-img="." alt=""></button>
+        </template>
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="sec voices" data-if="reviews.items">
+      <div class="fg-wrap">
+        <header class="sec__head">
+          <h2 class="title" data-reveal data-t="reviews.title"></h2>
+        </header>
+        <ul class="voices__list">
+          <template data-each="reviews.items">
+            <li class="voice" data-reveal>
+              <span class="stars" data-t=".stars"></span>
+              <blockquote data-t=".text"></blockquote>
+              <p class="voice__who"><span class="voice__av" data-t=".initial"></span><cite data-t=".name"></cite></p>
+            </li>
+          </template>
+        </ul>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="sec faq" data-if="faq">
+      <div class="fg-wrap faq__grid">
+        <header class="sec__head"><h2 class="title" data-reveal>Pyetje të shpeshta</h2></header>
+        <div class="faq__list">
+          <template data-each="faq">
+            <details class="qa" data-reveal>
+              <summary><span data-t=".q"></span><span class="qa__plus" aria-hidden="true"></span></summary>
+              <p data-t=".a"></p>
+            </details>
+          </template>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOCATION -->
+    <section class="sec place" id="lokacioni">
+      <div class="fg-wrap place__grid">
+        <div class="place__card" data-reveal>
+          <h2 class="title" data-t="location.title"></h2>
+          <a class="place__addr" data-cta data-attr="href:links.map"><i data-icon="pin"></i><span><span data-t="location.full"></span><small data-if="location.note" data-t="location.note"></small></span></a>
+          <dl class="hours">
+            <template data-each="location.hours">
+              <div><dt data-t=".days"></dt><dd data-t=".time"></dd></div>
+            </template>
+          </dl>
+          <div class="place__actions">
+            <a class="btn btn--soft" data-cta data-attr="href:links.tel"><i data-icon="phone"></i><span data-t="contact.phoneDisplay"></span></a>
+            <a class="btn btn--soft" data-cta data-if="links.instagram" data-attr="href:links.instagram"><i data-icon="instagram"></i><span data-t="contact.instagramDisplay"></span></a>
+            <a class="btn btn--soft" data-cta data-if="links.bookingIsTermini" data-attr="href:links.booking"><i data-icon="calendar"></i><span data-t="booking.label"></span></a>
+          </div>
+        </div>
+        <div class="fg-map" data-reveal="fade"><iframe title="Harta" loading="lazy" referrerpolicy="no-referrer-when-downgrade" data-attr="src:links.mapEmbed"></iframe></div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="sec sec--cta">
+      <div class="fg-wrap">
+        <a class="cta" data-cta data-reveal data-attr="href:links.whatsapp">
+          <span class="cta__small">S'e gjen atë që kërkon?</span>
+          <span class="cta__big">Na shkruaj në WhatsApp<i data-icon="arrow-up-right"></i></span>
+          <span class="cta__small">Përgjigjemi brenda pak minutash gjatë orarit të punës.</span>
+        </a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="fg-footer foot">
+    <div class="fg-wrap foot__in">
+      <p class="foot__brand"><span class="head__mark" data-t="brand.initial"></span><span data-t="brand.name"></span></p>
+      <p class="foot__note" data-if="footer.note" data-t="footer.note"></p>
+      <p class="foot__legal">© <span data-t="year"></span> <span data-t="brand.name"></span> · <span data-t="location.full"></span></p>
+      <a class="fg-credit" href="https://faqjagati.com" rel="noopener">Faqe nga <b>Faqja Gati</b></a>
+    </div>
+  </footer>
+
+  <div class="fg-bar" data-actionbar>
+    <a class="fg-bar__btn fg-bar__btn--wa fg-bar__btn--tel" data-attr="href:links.tel" aria-label="Thirr dyqanin"><i data-icon="phone"></i></a>
+    <a class="fg-bar__btn fg-bar__btn--book" data-attr="href:links.booking"><i data-icon="whatsapp" data-if="!links.bookingIsTermini"></i><span data-t="booking.label"></span></a>
+  </div>
+
+  <script src="content.js"></script>
+  <script src="../fg.js"></script>
+</body>
+</html>

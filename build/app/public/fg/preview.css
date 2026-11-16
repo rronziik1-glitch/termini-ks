@@ -1,0 +1,91 @@
+/* ==========================================================================
+   preview.css · Faqja Gati watermark version
+   Link this AFTER the template's style.css on the unpaid preview and add
+   data-fg-preview to <html> (fg.js then also strips links; see FG.lockPreview).
+   Demo: open any template with ?preview=1
+
+   This file is deterrence. The real protection is done by the server:
+   low-resolution images with the watermark burned in, links and phone numbers
+   removed from the markup, expiring URL (01-product-design.md §6.3).
+   ========================================================================== */
+
+/* 1. Watermark: fixed, above everything, cannot be clicked or selected */
+html[data-fg-preview] body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2147483646;
+  pointer-events: none;
+  background-repeat: repeat;
+  background-size: 300px 190px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='190' viewBox='0 0 300 190'%3E%3Cg transform='rotate(-24 150 95)' font-family='Arial,Helvetica,sans-serif' font-size='17' font-weight='700' letter-spacing='.5' text-anchor='middle'%3E%3Ctext x='150' y='100' fill='none' stroke='%23000' stroke-opacity='.26' stroke-width='3'%3EFaqja Gati – Preview%3C/text%3E%3Ctext x='150' y='100' fill='%23fff' fill-opacity='.34'%3EFaqja Gati – Preview%3C/text%3E%3C/g%3E%3C/svg%3E");
+}
+
+/* 2. Ribbon that says what this is */
+html[data-fg-preview] .fg-preview-ribbon {
+  display: block;
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 2147483647;
+  padding: 9px 16px calc(9px);
+  padding-top: calc(9px + env(safe-area-inset-top));
+  background: #0c0c0d;
+  color: #fff;
+  font: 600 13px/1.3 system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+  letter-spacing: 0.01em;
+  text-align: center;
+  pointer-events: none;
+}
+html[data-fg-preview] body { padding-top: 36px; }
+html[data-fg-preview] .fg-header { top: 36px; }
+html[data-fg-preview] { scroll-padding-top: 108px; }
+
+/* 3. Nothing is clickable, selectable or draggable */
+html[data-fg-preview] a,
+html[data-fg-preview] button,
+html[data-fg-preview] input,
+html[data-fg-preview] select,
+html[data-fg-preview] textarea,
+html[data-fg-preview] iframe,
+html[data-fg-preview] [role="button"],
+html[data-fg-preview] [data-lightbox] {
+  pointer-events: none !important;
+  cursor: default !important;
+}
+html[data-fg-preview] body {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+html[data-fg-preview] img,
+html[data-fg-preview] video {
+  -webkit-user-drag: none;
+  user-drag: none;
+  pointer-events: none;
+}
+
+/* 4. Buttons look switched off, so the owner understands what payment unlocks */
+html[data-fg-preview] .fg-bar__btn,
+html[data-fg-preview] [data-cta] {
+  filter: saturate(0.35);
+  opacity: 0.72;
+}
+
+/* 5. The map is replaced by a tonal block */
+html[data-fg-preview] .fg-map iframe { display: none; }
+html[data-fg-preview] .fg-map::after {
+  content: "Harta shfaqet pas pagesës";
+  position: absolute; inset: 0;
+  display: grid; place-items: center;
+  font: 500 14px/1 system-ui, sans-serif;
+  color: var(--muted, #777);
+}
+
+/* 6. Printing or "save as PDF" gives a blank page */
+@media print {
+  html[data-fg-preview] body > * { display: none !important; }
+  html[data-fg-preview] body::before {
+    content: "Faqja Gati – Preview. Kjo faqe nuk printohet para pagesës.";
+    display: block; padding: 40px; font: 600 16px system-ui, sans-serif; color: #000;
+  }
+}

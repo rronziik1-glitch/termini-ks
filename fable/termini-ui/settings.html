@@ -1,0 +1,465 @@
+<!doctype html>
+<html lang="sq">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Cilësimet · Berberi Arti</title>
+  <meta name="theme-color" content="#f6f6f3">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="termini.css">
+</head>
+<!--
+  SCREEN: owner settings  ·  routes /app/cilesimet, /app/cilesimet/orari, /rezervimet, /profili
+  Spec: 01-product-design.md §4.5, §4.6, §5.   Review: ?view=orari|rezervimet|profili  ?sheet=dayoff|logout  ?theme=dark
+  Components: <SettingsHome> <LinkCard> <HoursEditor> <LunchBreak> <DaysOffList> <DayOffSheet> <BookingRules> <ProfileForm>
+  API: PATCH /api/business · GET/PUT /api/hours · GET/POST/DELETE /api/time-off · GET /api/business/qr.svg
+
+  Saving rule (keep it the same everywhere):
+  · a switch or a choice saves at once and shows the toast "U ruajt."
+  · anything typed, and the weekly hours, is saved with the "Ruaj" button in the bottom bar.
+  Each [data-view] below is its own route in the app; the tab bar shows only on the home view.
+-->
+<body class="page page--subtle">
+  <div class="app app--tabs">
+
+    <!-- ================================================================ HOME -->
+    <div data-view="main">
+      <header class="topbar"><h1 class="t-h2 grow">Cilësimet</h1></header>
+
+      <main class="app__pad stack stack--6" style="padding-top: 12px;">
+
+        <!-- LinkCard -->
+        <section class="linkbox" aria-label="Linku im">
+          <p class="t-caption" style="opacity: 0.6; margin-bottom: 8px;">Linku yt për rezervime</p>
+          <p class="linkbox__url">termini.app/<b>berberi-arti</b></p>
+          <div class="linkbox__actions">
+            <button class="btn" data-toast="Linku u kopjua."><i data-icon="copy" class="icon--sm"></i>Kopjo</button>
+            <button class="btn" data-toast="QR-kodi u shkarkua. Printoje dhe vendose te pasqyra."><i data-icon="qr" class="icon--sm"></i>QR-kodi</button>
+            <a class="btn" href="https://wa.me/?text=Tani%20mund%20t%C3%AB%20rezervosh%20termin%20te%20Berberi%20Arti%20online%2C%20pa%20thirrur%3A%20https%3A%2F%2Ftermini.app%2Fberberi-arti"><i data-icon="whatsapp" class="icon--sm"></i>Ndaje</a>
+          </div>
+        </section>
+
+        <!-- bookings_paused -->
+        <section class="list--card">
+          <div class="row">
+            <span class="row__main"><span class="row__title row__title--plain" id="online-l">Rezervimet online</span><span class="row__meta" data-online-meta>Klientët rezervojnë vetë nga linku</span></span>
+            <button class="switch" role="switch" aria-checked="true" aria-labelledby="online-l" data-online></button>
+          </div>
+        </section>
+
+        <section class="group">
+          <h2 class="label-caps group__label">Rezervimet</h2>
+          <div class="list--card">
+            <button class="row" data-view-open="orari">
+              <span class="row__main"><span class="row__title row__title--plain">Orari</span><span class="row__meta">Hën – Sht · nga ora 09:00</span></span>
+              <span class="row__end"><i data-icon="chevron-right"></i></span>
+            </button>
+            <button class="row" data-view-open="orari">
+              <span class="row__main"><span class="row__title row__title--plain">Ditë pushimi</span><span class="row__meta">E ardhshmja: 28 nëntor</span></span>
+              <span class="row__end"><i data-icon="chevron-right"></i></span>
+            </button>
+            <button class="row" data-view-open="rezervimet">
+              <span class="row__main"><span class="row__title row__title--plain">Rregullat e rezervimit</span><span class="row__meta">30 ditë përpara · anulim 2 orë para</span></span>
+              <span class="row__end"><i data-icon="chevron-right"></i></span>
+            </button>
+          </div>
+        </section>
+
+        <section class="group">
+          <h2 class="label-caps group__label">Biznesi</h2>
+          <div class="list--card">
+            <button class="row" data-view-open="profili">
+              <span class="avatar avatar--ink" aria-hidden="true">A</span>
+              <span class="row__main"><span class="row__title row__title--plain">Profili</span><span class="row__meta">Emri, fotoja, adresa, Instagrami</span></span>
+              <span class="row__end"><i data-icon="chevron-right"></i></span>
+            </button>
+            <div class="row">
+              <span class="row__main"><span class="row__title row__title--plain">Stafi</span><span class="row__meta">Disa berberë, secili me kalendar</span></span>
+              <span class="badge">së shpejti</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Faqja Gati cross-sell: opens the Faqja Gati flow prefilled from this business -->
+        <a class="banner" href="https://faqjagati.com/fillo?nga=termini">
+          <i data-icon="sparkles"></i>
+          <span class="banner__text"><b>Bëje faqen e biznesit tënd</b><span>Gati në 2 minuta. E sheh para pagesës.</span></span>
+          <i data-icon="chevron-right" style="color: #fff; opacity: 0.6;"></i>
+        </a>
+
+        <section class="group">
+          <h2 class="label-caps group__label">Llogaria</h2>
+          <div class="list--card">
+            <div class="row">
+              <span class="row__main"><span class="row__title row__title--plain">Arti Hoxha</span><span class="row__meta t-num">+383 49 123 456</span></span>
+            </div>
+            <a class="row" href="https://wa.me/38349000000?text=P%C3%ABrsh%C3%ABndetje%2C%20kam%20nj%C3%AB%20pyetje%20p%C3%ABr%20Termini.">
+              <span class="row__main"><span class="row__title row__title--plain">Na shkruaj në WhatsApp</span><span class="row__meta">Për ndihmë, përgjigjemi brenda ditës</span></span>
+              <span class="row__end"><i data-icon="chevron-right"></i></span>
+            </a>
+            <button class="row" data-sheet-open="logout">
+              <span class="row__main"><span class="row__title row__title--plain">Dil nga llogaria</span></span>
+            </button>
+          </div>
+          <p class="t-center" style="padding-top: 8px;"><button class="link link--danger t-small" style="min-height: 44px;" data-sheet-open="delete-account">Fshije llogarinë</button></p>
+        </section>
+      </main>
+    </div>
+
+    <!-- ================================================================ ORARI -->
+    <div data-view="orari">
+      <header class="topbar">
+        <button class="iconbtn" data-view-open="main" aria-label="Kthehu te Cilësimet"><i data-icon="chevron-left"></i></button>
+        <h1 class="topbar__title">Orari</h1>
+      </header>
+
+      <main class="app__pad stack stack--6" style="padding-top: 8px; padding-bottom: 24px;">
+
+        <!-- HoursEditor: PUT /api/hours (whole week) -->
+        <section class="group">
+          <h2 class="label-caps group__label">Orari i javës</h2>
+          <div class="list--card">
+            <div class="hours" data-toggles>
+              <span class="hours__day"><span>Hënë</span><abbr title="E hënë">Hën</abbr></span>
+              <span class="hours__times"><select class="input input--sm input--time" data-time="09:00" aria-label="E hënë, nga"></select><span>–</span><select class="input input--sm input--time" data-time="20:00" aria-label="E hënë, deri"></select></span>
+              <span class="hours__closed">Mbyllur</span>
+              <button class="switch" role="switch" aria-checked="true" aria-label="E hënë, hapur"></button>
+            </div>
+            <div class="hours" data-toggles>
+              <span class="hours__day"><span>Martë</span><abbr title="E martë">Mar</abbr></span>
+              <span class="hours__times"><select class="input input--sm input--time" data-time="09:00" aria-label="E martë, nga"></select><span>–</span><select class="input input--sm input--time" data-time="20:00" aria-label="E martë, deri"></select></span>
+              <span class="hours__closed">Mbyllur</span>
+              <button class="switch" role="switch" aria-checked="true" aria-label="E martë, hapur"></button>
+            </div>
+            <div class="hours" data-toggles>
+              <span class="hours__day"><span>Mërkurë</span><abbr title="E mërkurë">Mër</abbr></span>
+              <span class="hours__times"><select class="input input--sm input--time" data-time="09:00" aria-label="E mërkurë, nga"></select><span>–</span><select class="input input--sm input--time" data-time="20:00" aria-label="E mërkurë, deri"></select></span>
+              <span class="hours__closed">Mbyllur</span>
+              <button class="switch" role="switch" aria-checked="true" aria-label="E mërkurë, hapur"></button>
+            </div>
+            <div class="hours" data-toggles>
+              <span class="hours__day"><span>Enjte</span><abbr title="E enjte">Enj</abbr></span>
+              <span class="hours__times"><select class="input input--sm input--time" data-time="09:00" aria-label="E enjte, nga"></select><span>–</span><select class="input input--sm input--time" data-time="20:00" aria-label="E enjte, deri"></select></span>
+              <span class="hours__closed">Mbyllur</span>
+              <button class="switch" role="switch" aria-checked="true" aria-label="E enjte, hapur"></button>
+            </div>
+            <div class="hours" data-toggles>
+              <span class="hours__day"><span>Premte</span><abbr title="E premte">Pre</abbr></span>
+              <span class="hours__times"><select class="input input--sm input--time" data-time="09:00" aria-label="E premte, nga"></select><span>–</span><select class="input input--sm input--time" data-time="20:00" aria-label="E premte, deri"></select></span>
+              <span class="hours__closed">Mbyllur</span>
+              <button class="switch" role="switch" aria-checked="true" aria-label="E premte, hapur"></button>
+            </div>
+            <div class="hours" data-toggles>
+              <span class="hours__day"><span>Shtunë</span><abbr title="E shtunë">Sht</abbr></span>
+              <span class="hours__times"><select class="input input--sm input--time" data-time="09:00" aria-label="E shtunë, nga"></select><span>–</span><select class="input input--sm input--time" data-time="18:00" aria-label="E shtunë, deri"></select></span>
+              <span class="hours__closed">Mbyllur</span>
+              <button class="switch" role="switch" aria-checked="true" aria-label="E shtunë, hapur"></button>
+            </div>
+            <div class="hours is-off" data-toggles>
+              <span class="hours__day"><span>Diel</span><abbr title="E diel">Die</abbr></span>
+              <span class="hours__times"><select class="input input--sm input--time" data-time="09:00" aria-label="E diel, nga"></select><span>–</span><select class="input input--sm input--time" data-time="14:00" aria-label="E diel, deri"></select></span>
+              <span class="hours__closed">Mbyllur</span>
+              <button class="switch" role="switch" aria-checked="false" aria-label="E diel, hapur"></button>
+            </div>
+          </div>
+          <!-- shown under the list when "deri" is not after "nga":
+          <p class="field__error" style="display:block" role="alert">Ora e mbylljes duhet të jetë pas hapjes.</p> -->
+        </section>
+
+        <!-- LunchBreak: stored as two working_hours rows per open day (09:00–13:00 and 13:30–20:00) -->
+        <section class="group">
+          <h2 class="label-caps group__label">Pauza</h2>
+          <div class="list--card">
+            <div class="hours" data-toggles>
+              <span class="hours__day"><span>Çdo ditë</span><abbr title="Çdo ditë pune">Çdo ditë</abbr></span>
+              <span class="hours__times"><select class="input input--sm input--time" data-time="13:00" data-time-step="15" aria-label="Pauza, nga"></select><span>–</span><select class="input input--sm input--time" data-time="13:30" data-time-step="15" aria-label="Pauza, deri"></select></span>
+              <span class="hours__closed">Pa pauzë</span>
+              <button class="switch" role="switch" aria-checked="true" aria-label="Pauzë dreke çdo ditë pune"></button>
+            </div>
+          </div>
+          <p class="group__hint">Gjatë pauzës klientët s'mund të rezervojnë.</p>
+        </section>
+
+        <!-- DaysOffList: time_off rows with kind = holiday. Nothing closes automatically (§5). -->
+        <section class="group">
+          <h2 class="label-caps group__label">Ditë pushimi</h2>
+          <ul class="list--card" data-daysoff>
+            <li class="row">
+              <span class="row__main"><span class="row__title row__title--plain">28 nëntor</span><span class="row__meta">E shtunë · Dita e Flamurit</span></span>
+              <button class="iconbtn" aria-label="Hiqe 28 nëntorin" data-remove><i data-icon="x" class="icon--sm"></i></button>
+            </li>
+            <li class="row">
+              <span class="row__main"><span class="row__title row__title--plain">3 – 9 gusht 2027</span><span class="row__meta">7 ditë · Pushimet vjetore</span></span>
+              <button class="iconbtn" aria-label="Hiqi pushimet 3 deri 9 gusht" data-remove><i data-icon="x" class="icon--sm"></i></button>
+            </li>
+          </ul>
+
+          <!-- Suggestions: public holidays and Bajram, one tap to add, never forced -->
+          <p class="group__hint" style="padding-top: 8px;">Festat që vijnë. Prek për ta mbyllur atë ditë:</p>
+          <div class="chips chips--wrap" data-suggest>
+            <button class="chip" data-date="25 dhjetor" data-meta="E premte · Krishtlindjet"><i data-icon="plus" class="icon--xs"></i>25 dhjetor · Krishtlindjet</button>
+            <button class="chip" data-date="1 – 2 janar" data-meta="2 ditë · Viti i Ri"><i data-icon="plus" class="icon--xs"></i>1 – 2 janar · Viti i Ri</button>
+            <button class="chip" data-date="17 shkurt" data-meta="E mërkurë · Dita e Pavarësisë"><i data-icon="plus" class="icon--xs"></i>17 shkurt · Pavarësia</button>
+            <button class="chip" data-date="10 mars" data-meta="E mërkurë · Bajrami i Madh"><i data-icon="plus" class="icon--xs"></i>10 mars · Bajrami i Madh</button>
+          </div>
+
+          <button class="btn btn--secondary" style="margin-top: 8px;" data-sheet-open="dayoff"><i data-icon="plus" class="icon--sm"></i>Shto ditë pushimi</button>
+        </section>
+      </main>
+    </div>
+
+    <!-- =========================================================== REZERVIMET -->
+    <div data-view="rezervimet">
+      <header class="topbar">
+        <button class="iconbtn" data-view-open="main" aria-label="Kthehu te Cilësimet"><i data-icon="chevron-left"></i></button>
+        <h1 class="topbar__title">Rregullat e rezervimit</h1>
+      </header>
+
+      <!-- BookingRules: every choice saves at once (PATCH /api/business) -->
+      <main class="app__pad stack stack--6" style="padding-top: 8px; padding-bottom: 24px;" data-rules>
+        <div class="list--card">
+          <div class="setting">
+            <div><p class="setting__title" id="r1">Sa përpara mund të rezervohet</p></div>
+            <div class="segmented" data-select="max_advance_days" role="group" aria-labelledby="r1">
+              <button data-option="7">7 ditë</button>
+              <button data-option="14">14 ditë</button>
+              <button data-option="30" class="is-selected" aria-pressed="true">30 ditë</button>
+              <button data-option="60">60 ditë</button>
+            </div>
+          </div>
+          <div class="setting">
+            <div>
+              <p class="setting__title" id="r2">Sa para orës mund të rezervohet</p>
+              <p class="setting__hint">Që askush të mos të vijë pa e pasur ti lajmin.</p>
+            </div>
+            <div class="segmented" data-select="min_notice_min" role="group" aria-labelledby="r2">
+              <button data-option="30">30 min</button>
+              <button data-option="60" class="is-selected" aria-pressed="true">1 orë</button>
+              <button data-option="120">2 orë</button>
+              <button data-option="1440">1 ditë</button>
+            </div>
+          </div>
+          <div class="setting">
+            <div>
+              <p class="setting__title" id="r3">Klienti mund ta anulojë deri</p>
+              <p class="setting__hint">Më vonë se kaq, duhet të të thërrasë.</p>
+            </div>
+            <div class="segmented" data-select="cancel_cutoff_min" role="group" aria-labelledby="r3">
+              <button data-option="60">1 orë</button>
+              <button data-option="120" class="is-selected" aria-pressed="true">2 orë</button>
+              <button data-option="360">6 orë</button>
+              <button data-option="1440">1 ditë</button>
+            </div>
+            <p class="setting__hint" style="margin-top: -4px;">para terminit</p>
+          </div>
+          <div class="setting">
+            <div>
+              <p class="setting__title" id="r4">Orët ofrohen çdo</p>
+              <p class="setting__hint">Me 15 min klienti sheh 09:00, 09:15, 09:30…</p>
+            </div>
+            <div class="segmented" data-select="slot_step_min" role="group" aria-labelledby="r4">
+              <button data-option="15" class="is-selected" aria-pressed="true">15 min</button>
+              <button data-option="30">30 min</button>
+            </div>
+          </div>
+        </div>
+
+        <div class="list--card">
+          <div class="row">
+            <span class="row__main"><span class="row__title row__title--plain" id="find-l">Shfaqu te "Gjej termin"</span><span class="row__meta">Klientë të rinj të gjejnë sipas qytetit</span></span>
+            <button class="switch" role="switch" aria-checked="true" aria-labelledby="find-l"></button>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ============================================================== PROFILI -->
+    <div data-view="profili">
+      <header class="topbar">
+        <button class="iconbtn" data-view-open="main" aria-label="Kthehu te Cilësimet"><i data-icon="chevron-left"></i></button>
+        <h1 class="topbar__title">Profili</h1>
+      </header>
+
+      <!-- ProfileForm: PATCH /api/business -->
+      <form class="app__pad stack stack--6" style="padding-top: 8px; padding-bottom: 24px;" onsubmit="return false" novalidate>
+        <div class="photo">
+          <span class="photo__img" aria-hidden="true">A</span>
+          <div class="stack stack--2">
+            <button type="button" class="btn btn--secondary btn--sm btn--auto" data-toast="Zgjidh një foto nga telefoni.">Ndrysho foton</button>
+            <p class="t-small t-3">Logoja ose një foto e lokalit.</p>
+          </div>
+        </div>
+
+        <div class="stack">
+          <div class="field">
+            <label class="field__label" for="pn">Emri i biznesit</label>
+            <input class="input" id="pn" autocomplete="organization" value="Berberi Arti">
+            <p class="field__error">Shkruaj emrin e biznesit.</p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="pd">Përshkrimi <small>(nëse do)</small></label>
+            <textarea class="input" id="pd" rows="2" maxlength="140" placeholder="Një fjali për biznesin tënd">Berber në Çarshi të Madhe që nga 2012. Qethje klasike dhe moderne.</textarea>
+          </div>
+          <div class="field">
+            <label class="field__label" for="pp">Telefoni që shohin klientët</label>
+            <div class="inputgroup"><span class="inputgroup__ad">+383</span><input class="input t-num" id="pp" inputmode="tel" autocomplete="tel-national" value="49 123 456"></div>
+            <p class="field__hint">Këtu të vijnë edhe konfirmimet në WhatsApp.</p>
+            <p class="field__error">Shkruaj një numër të vlefshëm, p.sh. 044 123 456.</p>
+          </div>
+          <div class="field">
+            <label class="field__label" for="pc">Qyteti</label>
+            <select class="input" id="pc" autocomplete="address-level2">
+              <option selected>Gjakovë</option><option>Prishtinë</option><option>Prizren</option><option>Pejë</option><option>Ferizaj</option><option>Gjilan</option><option>Mitrovicë</option><option>Tjetër</option>
+            </select>
+          </div>
+          <div class="field">
+            <label class="field__label" for="pa">Adresa</label>
+            <input class="input" id="pa" autocomplete="street-address" value="Rr. Ismail Qemali 12, te Çarshia e Madhe">
+            <p class="field__hint">Shto diçka që njihet: "te Çarshia", "përballë postës".</p>
+          </div>
+          <button type="button" class="btn btn--secondary" data-toast="Lokacioni u ruajt nga telefoni yt."><i data-icon="pin" class="icon--sm"></i>Jam në lokal, vendose në hartë</button>
+          <div class="field">
+            <label class="field__label" for="pi">Instagrami <small>(nëse ke)</small></label>
+            <div class="inputgroup"><span class="inputgroup__ad">@</span><input class="input" id="pi" autocapitalize="none" autocomplete="off" value="berberi.arti"></div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Save bar: views with typed fields or hours -->
+  <div class="bar is-visible" data-show-view="orari,profili" hidden>
+    <div class="bar__in">
+      <button class="btn btn--primary" data-save>Ruaj</button>
+    </div>
+  </div>
+
+  <!-- TabBar: home view only -->
+  <nav class="tabs" aria-label="Kryesore" data-show-view="main">
+    <div class="tabs__in">
+      <a class="tab" href="calendar.html"><i data-icon="calendar"></i>Kalendari</a>
+      <a class="tab" href="#" data-toast="Klientët: lista ndërtohet vetë nga terminet."><i data-icon="users"></i>Klientët</a>
+      <a class="tab" href="services.html"><i data-icon="scissors"></i>Shërbimet</a>
+      <a class="tab is-active" href="settings.html" aria-current="page"><i data-icon="settings"></i>Cilësimet</a>
+    </div>
+  </nav>
+
+  <!-- DayOffSheet -->
+  <section class="sheet" id="dayoff" role="dialog" aria-modal="true" aria-labelledby="off-title" aria-hidden="true">
+    <span class="sheet__grab"></span>
+    <div class="sheet__head">
+      <h2 class="sheet__title" id="off-title">Ditë pushimi</h2>
+      <button class="iconbtn iconbtn--fill" data-sheet-close aria-label="Mbyll"><i data-icon="x"></i></button>
+    </div>
+    <form class="sheet__body stack" onsubmit="return false" novalidate>
+      <div class="cluster" style="flex-wrap: nowrap; align-items: flex-start;">
+        <div class="field grow">
+          <label class="field__label" for="of">Nga</label>
+          <input class="input t-num" id="of" type="date" value="2026-12-31" min="2026-11-13">
+        </div>
+        <div class="field grow">
+          <label class="field__label" for="ot">Deri</label>
+          <input class="input t-num" id="ot" type="date" value="2026-12-31" min="2026-11-13">
+        </div>
+      </div>
+      <p class="field__hint" style="margin-top: -8px;">Për një ditë të vetme, lëri të dyja njësoj.</p>
+      <div class="field">
+        <label class="field__label" for="or">Arsyeja <small>(e sheh vetëm ti)</small></label>
+        <input class="input" id="or" autocomplete="off" placeholder="P.sh. Pushime, dasmë, festë">
+      </div>
+      <!-- §4.6: the day already has bookings. Replaces "Ruaj" with a link to that day.
+      <p class="card card--flat t-small" role="alert">Ke 3 termine këtë ditë. Anuloji ose zhvendosi më parë. <a class="link" href="calendar.html">Shiko ditën</a></p> -->
+    </form>
+    <div class="sheet__actions">
+      <button class="btn btn--primary" data-add-dayoff>Mbylle këtë ditë</button>
+    </div>
+  </section>
+
+  <!-- LogoutSheet -->
+  <section class="sheet" id="logout" role="dialog" aria-modal="true" aria-labelledby="out-title" aria-hidden="true">
+    <span class="sheet__grab"></span>
+    <div class="sheet__head"><h2 class="sheet__title" id="out-title">Të dalësh nga llogaria?</h2></div>
+    <div class="sheet__body"><p class="t-2">Linku yt vazhdon të punojë. Për të hyrë përsëri të duhet numri 049 123 456.</p></div>
+    <div class="sheet__actions">
+      <a class="btn btn--secondary" href="onboarding.html">Po, dil</a>
+      <button class="btn btn--primary" data-sheet-close>Jo, qëndro</button>
+    </div>
+  </section>
+
+  <!-- DeleteAccountSheet -->
+  <section class="sheet" id="delete-account" role="dialog" aria-modal="true" aria-labelledby="da-title" aria-hidden="true">
+    <span class="sheet__grab"></span>
+    <div class="sheet__head"><h2 class="sheet__title" id="da-title">Ta fshijmë llogarinë?</h2></div>
+    <div class="sheet__body stack">
+      <p class="t-2">Fshihen linku, terminet dhe lista e klientëve. Kjo s'kthehet mbrapsht.</p>
+      <div class="field">
+        <label class="field__label" for="dc">Për ta konfirmuar, shkruaj FSHIJE</label>
+        <input class="input" id="dc" autocomplete="off" autocapitalize="characters">
+      </div>
+    </div>
+    <div class="sheet__actions">
+      <button class="btn btn--danger" data-delete-account disabled>Fshije përgjithmonë</button>
+      <button class="btn btn--secondary" data-sheet-close>Jo, mbaje</button>
+    </div>
+  </section>
+
+  <script src="termini.js"></script>
+  <script>
+    /* Prototype only. */
+    (function () {
+      var $ = function (s) { return document.querySelector(s); };
+      var MONTHS = ['janar', 'shkurt', 'mars', 'prill', 'maj', 'qershor', 'korrik', 'gusht', 'shtator', 'tetor', 'nëntor', 'dhjetor'];
+      var DAYS = ['E diel', 'E hënë', 'E martë', 'E mërkurë', 'E enjte', 'E premte', 'E shtunë'];
+
+      /* choices save at once */
+      document.addEventListener('t:select', function (e) { if (e.target.closest('[data-rules]')) T.toast('U ruajt.'); });
+      document.addEventListener('t:toggle', function (e) {
+        if (e.target.matches('[data-online]')) {
+          $('[data-online-meta]').textContent = e.detail ? 'Klientët rezervojnë vetë nga linku' : 'Të ndalura. Linku tregon numrin tënd.';
+          return T.toast(e.detail ? 'Rezervimet online u hapën.' : 'Rezervimet online u ndalën.', 'Zhbëj');
+        }
+        if (e.target.closest('[data-rules]')) T.toast('U ruajt.');
+      });
+      $('[data-save]').addEventListener('click', function () {
+        var b = this; b.classList.add('is-loading');
+        setTimeout(function () { b.classList.remove('is-loading'); T.toast('U ruajt.'); }, 500);
+      });
+
+      /* days off */
+      function addDayOff(title, meta) {
+        var li = document.createElement('li'); li.className = 'row';
+        li.innerHTML = '<span class="row__main"><span class="row__title row__title--plain"></span><span class="row__meta"></span></span><button class="iconbtn" data-remove><i data-icon="x" class="icon--sm"></i></button>';
+        li.querySelector('.row__title').textContent = title; li.querySelector('.row__meta').textContent = meta;
+        li.querySelector('button').setAttribute('aria-label', 'Hiqe ' + title);
+        $('[data-daysoff]').appendChild(li); T.icons(li);
+      }
+      document.addEventListener('click', function (e) {
+        var el;
+        if ((el = e.target.closest('[data-remove]'))) { el.closest('.row').remove(); T.toast('Dita u hoq. Je përsëri hapur.', 'Zhbëj'); }
+        if ((el = e.target.closest('[data-suggest] .chip'))) { addDayOff(el.getAttribute('data-date'), el.getAttribute('data-meta')); el.remove(); T.toast('U shtua te ditët e pushimit.', 'Zhbëj'); }
+      });
+      $('#of').addEventListener('change', function () { if ($('#ot').value < this.value) $('#ot').value = this.value; $('#ot').min = this.value; });
+      $('[data-add-dayoff]').addEventListener('click', function () {
+        var a = new Date($('#of').value), b = new Date($('#ot').value), n = Math.round((b - a) / 864e5) + 1;
+        if (isNaN(a)) return;
+        var one = !(n > 1);
+        var title = one ? a.getDate() + ' ' + MONTHS[a.getMonth()] : a.getDate() + (a.getMonth() === b.getMonth() ? '' : ' ' + MONTHS[a.getMonth()]) + ' – ' + b.getDate() + ' ' + MONTHS[b.getMonth()];
+        var reason = $('#or').value.trim();
+        addDayOff(title, (one ? DAYS[a.getDay()] : n + ' ditë') + (reason ? ' · ' + reason : ''));
+        T.close(); T.toast('Dita u mbyll për rezervime.');
+      });
+
+      $('#dc').addEventListener('input', function () { $('[data-delete-account]').disabled = this.value.trim().toUpperCase() !== 'FSHIJE'; });
+
+      /* the save bar and the tab bar never show together */
+      document.addEventListener('t:view', function (e) {
+        var sub = e.detail !== 'main';
+        document.querySelector('.app').classList.toggle('app--tabs', !sub);
+        document.querySelector('.app').classList.toggle('app--bar', e.detail === 'orari' || e.detail === 'profili');
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,222 @@
+/* ==========================================================================
+   Termini / Faqja Gati · design tokens
+   Fable 5.2 · 2026-11-13
+   Fonts: add to <head>
+   <link rel="preconnect" href="https://fonts.googleapis.com">
+   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+   Dark mode: follows the system; force with <html data-theme="dark|light">.
+   ========================================================================== */
+
+:root {
+  color-scheme: light dark;
+
+  /* ---- Type ------------------------------------------------------------ */
+  --font-sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+
+  /* size / line-height / tracking / weight */
+  --text-display: 700 2.5rem/1.05 var(--font-sans);   /* 40 · marketing hero, success screen */
+  --text-h1: 600 1.75rem/1.15 var(--font-sans);       /* 28 · screen title */
+  --text-h2: 600 1.375rem/1.25 var(--font-sans);      /* 22 · section title */
+  --text-h3: 600 1.0625rem/1.35 var(--font-sans);     /* 17 · card title, list row */
+  --text-body: 400 1rem/1.5 var(--font-sans);         /* 16 · never smaller in inputs */
+  --text-body-strong: 500 1rem/1.5 var(--font-sans);
+  --text-small: 400 0.875rem/1.45 var(--font-sans);   /* 14 */
+  --text-caption: 500 0.75rem/1.35 var(--font-sans);  /* 12 · labels, badges */
+  --text-time: 600 1rem/1 var(--font-sans);           /* slot times, tabular */
+
+  --tracking-display: -0.035em;
+  --tracking-title: -0.02em;
+  --tracking-body: -0.006em;
+  --tracking-caps: 0.06em;
+
+  /* ---- Space (4px base) ------------------------------------------------ */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-14: 56px;
+  --space-18: 72px;
+  --space-24: 96px;
+
+  --page-gutter: 20px;          /* side padding at 375 */
+  --page-max: 480px;            /* app column */
+  --page-max-wide: 1120px;      /* marketing, desktop calendar */
+  --touch: 44px;                /* minimum hit target */
+  --control-h: 52px;            /* buttons, inputs */
+  --control-h-sm: 40px;
+
+  /* ---- Radius ---------------------------------------------------------- */
+  --radius-xs: 6px;
+  --radius-sm: 10px;
+  --radius-md: 14px;            /* inputs, buttons, slots */
+  --radius-lg: 20px;            /* cards */
+  --radius-xl: 28px;            /* sheets, hero media */
+  --radius-full: 999px;
+
+  /* ---- Motion ---------------------------------------------------------- */
+  --dur-instant: 90ms;          /* press feedback */
+  --dur-fast: 160ms;            /* hover, toggles, colour */
+  --dur-base: 240ms;            /* most transitions */
+  --dur-slow: 400ms;            /* sheets, step changes */
+  --dur-reveal: 700ms;          /* scroll reveal */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);        /* entering, default */
+  --ease-in: cubic-bezier(0.5, 0, 0.75, 0);         /* leaving */
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);    /* moving on screen */
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1); /* small pops only: check mark, badge */
+  --reveal-distance: 24px;
+  --reveal-stagger: 70ms;
+
+  /* ---- Layers ---------------------------------------------------------- */
+  --z-sticky: 10;
+  --z-bar: 20;
+  --z-scrim: 40;
+  --z-sheet: 50;
+  --z-toast: 60;
+
+  /* ---- Brand constants (same in both themes) ---------------------------- */
+  --lime: #c8f03c;
+  --lime-strong: #b4de1f;
+  --ink: #0c0c0d;
+  --whatsapp: #1fa855;          /* button fill, white text 3.2:1 → use with 600 weight ≥16px, or ink text */
+  --whatsapp-ink: #0b3d20;
+}
+
+/* ---- Light (default) ---------------------------------------------------- */
+:root,
+[data-theme="light"] {
+  --bg: #ffffff;
+  --bg-subtle: #f6f6f3;         /* page behind cards */
+  --surface: #ffffff;
+  --surface-2: #f1f1ed;         /* chips, input fill, skeleton */
+  --surface-3: #e8e8e3;         /* pressed */
+  --border: #e4e4df;
+  --border-strong: #c8c8c2;
+
+  --text: #0c0c0d;              /* 19.6:1 on bg */
+  --text-2: #55555a;            /* 7.4:1 */
+  --text-3: #6e6e73;            /* 5.0:1 · smallest allowed for text */
+  --text-disabled: #a9a9ad;
+
+  --primary: #0c0c0d;           /* main button */
+  --on-primary: #ffffff;
+  --primary-hover: #26262a;
+
+  --accent: #c8f03c;            /* selected slot, brand mark, highlights (fill only) */
+  --on-accent: #0c0c0d;         /* 15.6:1 */
+  --accent-soft: #f1fbcf;       /* selected row background */
+  --accent-text: #3f6600;       /* lime as text/link on white: 6.7:1 */
+
+  --success: #1a7f45;
+  --success-soft: #e3f5ea;
+  --danger: #c8321f;
+  --danger-soft: #fdebe8;
+  --warning: #b45309;
+  --warning-soft: #fdf0dc;
+  --info: #1d5fd1;
+  --info-soft: #e7effc;
+
+  --focus: #0c0c0d;
+  --scrim: rgb(12 12 13 / 0.45);
+
+  --shadow-1: 0 1px 2px rgb(12 12 13 / 0.05), 0 1px 1px rgb(12 12 13 / 0.03);
+  --shadow-2: 0 2px 4px rgb(12 12 13 / 0.04), 0 8px 20px rgb(12 12 13 / 0.07);
+  --shadow-3: 0 4px 8px rgb(12 12 13 / 0.05), 0 20px 48px rgb(12 12 13 / 0.14);
+  --shadow-bar: 0 -1px 0 var(--border), 0 -12px 32px rgb(12 12 13 / 0.06);
+}
+
+/* ---- Dark ---------------------------------------------------------------- */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0b0b0c;
+    --bg-subtle: #0b0b0c;
+    --surface: #161618;
+    --surface-2: #1f1f22;
+    --surface-3: #2a2a2e;
+    --border: #2a2a2e;
+    --border-strong: #3d3d42;
+
+    --text: #f5f5f2;
+    --text-2: #b6b6ba;
+    --text-3: #8e8e93;
+    --text-disabled: #5a5a5f;
+
+    --primary: #c8f03c;
+    --on-primary: #0c0c0d;
+    --primary-hover: #d6f66a;
+
+    --accent: #c8f03c;
+    --on-accent: #0c0c0d;
+    --accent-soft: #232b0c;
+    --accent-text: #c8f03c;
+
+    --success: #4ade80;
+    --success-soft: #11291b;
+    --danger: #ff6b5a;
+    --danger-soft: #331512;
+    --warning: #fbbf24;
+    --warning-soft: #33260a;
+    --info: #7fb0ff;
+    --info-soft: #101f38;
+
+    --focus: #c8f03c;
+    --scrim: rgb(0 0 0 / 0.6);
+
+    --shadow-1: 0 0 0 1px rgb(255 255 255 / 0.04);
+    --shadow-2: 0 0 0 1px rgb(255 255 255 / 0.05), 0 12px 28px rgb(0 0 0 / 0.5);
+    --shadow-3: 0 0 0 1px rgb(255 255 255 / 0.06), 0 24px 56px rgb(0 0 0 / 0.65);
+    --shadow-bar: 0 -1px 0 var(--border);
+  }
+}
+
+[data-theme="dark"] {
+  --bg: #0b0b0c;
+  --bg-subtle: #0b0b0c;
+  --surface: #161618;
+  --surface-2: #1f1f22;
+  --surface-3: #2a2a2e;
+  --border: #2a2a2e;
+  --border-strong: #3d3d42;
+  --text: #f5f5f2;
+  --text-2: #b6b6ba;
+  --text-3: #8e8e93;
+  --text-disabled: #5a5a5f;
+  --primary: #c8f03c;
+  --on-primary: #0c0c0d;
+  --primary-hover: #d6f66a;
+  --accent: #c8f03c;
+  --on-accent: #0c0c0d;
+  --accent-soft: #232b0c;
+  --accent-text: #c8f03c;
+  --success: #4ade80;
+  --success-soft: #11291b;
+  --danger: #ff6b5a;
+  --danger-soft: #331512;
+  --warning: #fbbf24;
+  --warning-soft: #33260a;
+  --info: #7fb0ff;
+  --info-soft: #101f38;
+  --focus: #c8f03c;
+  --scrim: rgb(0 0 0 / 0.6);
+  --shadow-1: 0 0 0 1px rgb(255 255 255 / 0.04);
+  --shadow-2: 0 0 0 1px rgb(255 255 255 / 0.05), 0 12px 28px rgb(0 0 0 / 0.5);
+  --shadow-3: 0 0 0 1px rgb(255 255 255 / 0.06), 0 24px 56px rgb(0 0 0 / 0.65);
+  --shadow-bar: 0 -1px 0 var(--border);
+}
+
+/* ---- Reduced motion: keep fades, remove movement -------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --dur-fast: 1ms;
+    --dur-base: 1ms;
+    --dur-slow: 1ms;
+    --dur-reveal: 1ms;
+    --reveal-distance: 0px;
+    --reveal-stagger: 0ms;
+  }
+}

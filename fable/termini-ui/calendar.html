@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="sq">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Kalendari · Berberi Arti</title>
+  <meta name="theme-color" content="#f6f6f3">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="termini.css">
+</head>
+<!--
+  SCREEN: owner daily calendar (home)  ·  route /app
+  Spec: 01-product-design.md §4.2, §3.5 (messages B, C).   Review: ?sheet=booking | ?sheet=new | ?state=empty | ?theme=dark
+  Components: <DayHeader> <WeekStrip> <DaySummary> <Timeline> <EventBlock> <NowLine> <BookingSheet> <NewBookingSheet> <Fab> <TabBar>
+  Timeline: opening 09:00 → closing 20:00, 80px per hour (15 min = 20px).
+  Each .event gets  style="--start: minutes after opening; --len: minutes".
+  Mock "now" is 14:10 on Friday 13 November 2026.
+-->
+<body class="page page--subtle">
+  <div class="app app--tabs">
+
+    <!-- DayHeader -->
+    <header class="topbar">
+      <div class="grow">
+        <p class="t-caption t-3">Berberi Arti</p>
+        <h1 class="t-h2">E premte, 13 nëntor</h1>
+      </div>
+      <button class="iconbtn" aria-label="Dita e kaluar"><i data-icon="chevron-left"></i></button>
+      <button class="iconbtn" aria-label="Dita tjetër"><i data-icon="chevron-right"></i></button>
+    </header>
+
+    <!-- WeekStrip: dot = the day has bookings -->
+    <div class="app__pad">
+      <div class="days days--week" data-select="day">
+        <button class="day" data-option="9"><span class="day__dow">Hën</span><span class="day__num">9</span><span class="day__dot"></span></button>
+        <button class="day" data-option="10"><span class="day__dow">Mar</span><span class="day__num">10</span><span class="day__dot"></span></button>
+        <button class="day" data-option="11"><span class="day__dow">Mër</span><span class="day__num">11</span><span class="day__dot"></span></button>
+        <button class="day" data-option="12"><span class="day__dow">Enj</span><span class="day__num">12</span><span class="day__dot"></span></button>
+        <button class="day is-selected" data-option="13" aria-pressed="true"><span class="day__dow">Sot</span><span class="day__num">13</span><span class="day__dot"></span></button>
+        <button class="day" data-option="14"><span class="day__dow">Sht</span><span class="day__num">14</span><span class="day__dot"></span></button>
+        <button class="day" data-option="15"><span class="day__dow">Die</span><span class="day__num">15</span><span class="day__dot day__dot--none"></span></button>
+      </div>
+    </div>
+
+    <main class="app__pad stack" style="padding-top: 20px;" data-state="day">
+
+      <!-- DaySummary -->
+      <section class="card stack stack--3" aria-label="Përmbledhja e ditës">
+        <div class="split">
+          <p class="t-h2 t-num">10 termine · 64 €</p>
+          <span class="badge badge--ok">4 erdhën</span>
+        </div>
+        <p class="t-small t-2">I radhës: <b style="color: var(--text); font-weight: 600;">Dren K.</b> në 15:30 · Qethje</p>
+      </section>
+
+      <!-- Timeline -->
+      <section class="timeline" aria-label="Terminet e ditës">
+        <div class="timeline__hour"><span>09:00</span></div>
+        <div class="timeline__hour"><span>10:00</span></div>
+        <div class="timeline__hour"><span>11:00</span></div>
+        <div class="timeline__hour"><span>12:00</span></div>
+        <div class="timeline__hour"><span>13:00</span></div>
+        <div class="timeline__hour"><span>14:00</span></div>
+        <div class="timeline__hour"><span>15:00</span></div>
+        <div class="timeline__hour"><span>16:00</span></div>
+        <div class="timeline__hour"><span>17:00</span></div>
+        <div class="timeline__hour"><span>18:00</span></div>
+        <div class="timeline__hour"><span>19:00</span></div>
+        <div class="timeline__hour timeline__hour--end"><span>20:00</span></div>
+
+        <div class="timeline__events">
+          <!-- status modifiers: (none) = confirmed · --done = Erdhi · --noshow = S'erdhi · --block = blocked time -->
+          <button class="event event--row event--done" style="--start:0; --len:30" data-sheet-open="booking">
+            <span class="event__time">09:00</span><span class="event__name">Driton M.</span><span class="event__svc">Qethje</span>
+          </button>
+          <button class="event event--done" style="--start:30; --len:45" data-sheet-open="booking">
+            <span class="event__line"><span class="event__name">Liridon B.</span></span>
+            <span class="event__svc"><span class="t-num">09:30</span> · Qethje + mjekër</span>
+          </button>
+          <button class="event event--row event--done" style="--start:90; --len:15" data-sheet-open="booking">
+            <span class="event__time">10:30</span><span class="event__name">Faton R.</span><span class="event__svc">Mjekër</span>
+          </button>
+          <button class="event event--row event--noshow" style="--start:120; --len:30" data-sheet-open="booking">
+            <span class="event__time">11:00</span><span class="event__name">Blerim H.</span><span class="badge badge--danger">S'erdhi</span>
+          </button>
+          <button class="event event--row event--done" style="--start:180; --len:20" data-sheet-open="booking">
+            <span class="event__time">12:00</span><span class="event__name">Noli H.</span><span class="event__svc">Qethje për fëmijë</span>
+          </button>
+          <div class="event event--row event--block" style="--start:240; --len:30">
+            <span class="event__time">13:00</span><span class="event__name">Pauzë</span>
+          </div>
+          <button class="event" style="--start:300; --len:45" data-sheet-open="booking">
+            <span class="event__line"><span class="event__name">Genc S.</span><span class="badge badge--info">Tani</span></span>
+            <span class="event__svc"><span class="t-num">14:00</span> · Qethje + mjekër</span>
+          </button>
+          <button class="event event--row" style="--start:390; --len:30" data-sheet-open="booking">
+            <span class="event__time">15:30</span><span class="event__name">Dren K.</span><span class="badge badge--new">i ri</span><span class="event__svc">Qethje</span>
+          </button>
+          <button class="event event--row" style="--start:450; --len:30" data-sheet-open="booking">
+            <span class="event__time">16:30</span><span class="event__name">Arben T.</span><span class="event__svc">Qethje</span>
+          </button>
+          <button class="event event--row" style="--start:495; --len:15" data-sheet-open="booking">
+            <span class="event__time">17:15</span><span class="event__name">Valon P.</span><span class="event__svc">Mjekër</span>
+          </button>
+          <button class="event" style="--start:540; --len:75" data-sheet-open="booking">
+            <span class="event__line"><span class="event__name">Ilir D.</span><span class="badge badge--danger">1 mosardhje</span></span>
+            <span class="event__svc"><span class="t-num">18:00 – 19:15</span> · Paketa e dhëndrit</span>
+          </button>
+        </div>
+
+        <div class="now" style="--start:310" role="img" aria-label="Tani, ora 14:10"></div>
+      </section>
+    </main>
+
+    <!-- Empty state: new account, no bookings yet (?state=empty) -->
+    <main class="app__pad stack" style="padding-top: 20px;" data-state="empty" hidden>
+      <section class="card empty">
+        <p class="empty__title">Ende s'ke termine.</p>
+        <p class="empty__text">Ndaje linkun që klientët të rezervojnë vetë.</p>
+        <button class="btn btn--primary" data-toast="Linku u kopjua.">Ndaje linkun</button>
+        <button class="btn btn--ghost btn--sm" data-sheet-open="new">Shto një termin vetë</button>
+      </section>
+      <!-- First-week checklist; stays until all three are done -->
+      <section class="list--card" aria-label="Për të filluar">
+        <a class="row" href="settings.html"><span class="row__main"><span class="row__title">Vendose linkun në bio të Instagramit</span><span class="row__meta t-mono">termini.app/berberi-arti</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+        <button class="row" data-sheet-open="new"><span class="row__main"><span class="row__title">Shto terminin e parë</span><span class="row__meta">Edhe ato që i merr me telefon</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></button>
+        <a class="row" href="settings.html"><span class="row__main"><span class="row__title">Shto një foto të lokalit</span><span class="row__meta">Klientët të njohin më lehtë</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+      </section>
+    </main>
+  </div>
+
+  <button class="fab" data-sheet-open="new"><i data-icon="plus"></i>Termin</button>
+
+  <!-- TabBar -->
+  <nav class="tabs" aria-label="Kryesore">
+    <div class="tabs__in">
+      <a class="tab is-active" href="calendar.html" aria-current="page"><i data-icon="calendar"></i>Kalendari</a>
+      <a class="tab" href="#" data-toast="Klientët: lista ndërtohet vetë nga terminet."><i data-icon="users"></i>Klientët</a>
+      <a class="tab" href="services.html"><i data-icon="scissors"></i>Shërbimet</a>
+      <a class="tab" href="settings.html"><i data-icon="settings"></i>Cilësimet</a>
+    </div>
+  </nav>
+
+  <!-- BookingSheet: tap on a booking -->
+  <section class="sheet" id="booking" role="dialog" aria-modal="true" aria-labelledby="bk-title" aria-hidden="true">
+    <span class="sheet__grab"></span>
+    <div class="sheet__head">
+      <span class="avatar avatar--lg" aria-hidden="true">D</span>
+      <div class="grow">
+        <h2 class="sheet__title" id="bk-title">Dren Kelmendi</h2>
+        <p class="cluster t-small t-2"><span class="badge badge--new">i ri</span><span>Vizita e parë</span></p>
+      </div>
+      <a class="iconbtn iconbtn--fill" href="tel:+38344123456" aria-label="Thirr Dren Kelmendin"><i data-icon="phone"></i></a>
+    </div>
+    <div class="sheet__body">
+      <dl class="summary">
+        <div class="summary__row"><dt>Shërbimi</dt><dd>Qethje · 30 min</dd></div>
+        <div class="summary__row"><dt>Ora</dt><dd class="t-num">sot, 15:30 – 16:00</dd></div>
+        <div class="summary__row"><dt>Çmimi</dt><dd class="t-num">5 €</dd></div>
+        <div class="summary__row"><dt>Telefoni</dt><dd class="t-num">044 123 456</dd></div>
+        <div class="summary__row"><dt>Shënim</dt><dd>Vij me djalin</dd></div>
+      </dl>
+    </div>
+    <div class="sheet__actions">
+      <!-- message C, §3.5 -->
+      <a class="btn btn--whatsapp" href="https://wa.me/38344123456?text=P%C3%ABrsh%C3%ABndetje%20Dren!%20T%C3%AB%20kujtojm%C3%AB%20terminin%20sot%20n%C3%AB%2015%3A30%20te%20Berberi%20Arti.%0AN%C3%ABse%20s'mund%20t%C3%AB%20vish%2C%20anuloje%20k%C3%ABtu%3A%20https%3A%2F%2Ftermini.app%2Fberberi-arti%2Ft%2Fk7Qm2x%0ARezervuar%20p%C3%ABrmes%20Termini"><i data-icon="whatsapp"></i>Dërgo kujtesë</a>
+      <div class="cluster" style="flex-wrap: nowrap;">
+        <button class="btn btn--secondary" data-sheet-close data-toast="Dren K. u shënua: erdhi." data-toast-action="Zhbëj"><i data-icon="check" class="icon--sm"></i>Erdhi</button>
+        <button class="btn btn--danger" data-sheet-close data-toast="Dren K. u shënua: s'erdhi." data-toast-action="Zhbëj">S'erdhi</button>
+      </div>
+      <div class="cluster" style="flex-wrap: nowrap;">
+        <button class="btn btn--ghost btn--sm" data-sheet-close><i data-icon="move" class="icon--sm"></i>Zhvendos</button>
+        <button class="btn btn--ghost btn--sm" style="color: var(--danger)" data-sheet-close data-toast="Termini u anulua." data-toast-action="Zhbëj">Anulo terminin</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- NewBookingSheet: FAB or tap on an empty time -->
+  <section class="sheet" id="new" role="dialog" aria-modal="true" aria-labelledby="new-title" aria-hidden="true">
+    <span class="sheet__grab"></span>
+    <div class="sheet__head">
+      <h2 class="sheet__title" id="new-title">Termin i ri</h2>
+      <button class="iconbtn iconbtn--fill" data-sheet-close aria-label="Mbyll"><i data-icon="x"></i></button>
+    </div>
+    <form class="sheet__body stack" onsubmit="return false">
+      <div class="stack stack--3">
+        <p class="field__label">Shërbimi</p>
+        <div class="chips" data-select="svc">
+          <button type="button" class="chip is-selected" data-option="qethje" aria-pressed="true">Qethje · 5 €</button>
+          <button type="button" class="chip" data-option="qm">Qethje + mjekër · 7 €</button>
+          <button type="button" class="chip" data-option="mjeker">Mjekër · 3 €</button>
+          <button type="button" class="chip" data-option="femije">Për fëmijë · 4 €</button>
+        </div>
+      </div>
+      <div class="cluster" style="flex-wrap: nowrap; align-items: flex-start;">
+        <div class="field grow">
+          <label class="field__label" for="nd">Dita</label>
+          <select class="input" id="nd"><option>Sot, 13 nëntor</option><option>Nesër, 14 nëntor</option><option>E hënë, 16 nëntor</option></select>
+        </div>
+        <div class="field" style="width: 120px;">
+          <label class="field__label" for="nt">Ora</label>
+          <select class="input input--time input--wide" id="nt" data-time="17:30" data-time-step="15"></select>
+        </div>
+      </div>
+      <div class="field">
+        <label class="field__label" for="nn">Emri i klientit</label>
+        <input class="input" id="nn" autocomplete="off" placeholder="Shkruaj emrin">
+      </div>
+      <div class="field">
+        <label class="field__label" for="np">Telefoni <small>(nëse e ke)</small></label>
+        <div class="inputgroup"><span class="inputgroup__ad">+383</span><input class="input t-num" id="np" inputmode="tel" placeholder="44 123 456"></div>
+        <p class="field__hint">Me numër, mund t'ia dërgosh konfirmimin në WhatsApp.</p>
+      </div>
+      <!-- overlap warning (§4.6); the owner may overbook
+      <p class="card card--flat t-small">Në këtë orë ke termin me Valon P. Ruaje gjithsesi?</p> -->
+    </form>
+    <div class="sheet__actions">
+      <button class="btn btn--primary" data-sheet-close data-toast="Termini u ruajt." data-toast-action="Dërgo në WhatsApp">Ruaj terminin</button>
+    </div>
+  </section>
+
+  <script src="termini.js"></script>
+  <script>
+    (function () {
+      var s = T.param('state');
+      if (s) T.all('main[data-state]').forEach(function (m) { m.hidden = m.getAttribute('data-state') !== s; });
+      /* open on "now" like the app would */
+      document.addEventListener('t:ready', function () {
+        var now = document.querySelector('.now');
+        if (now && !T.param('top') && now.offsetParent) window.scrollTo(0, now.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.45);
+      });
+    })();
+  </script>
+</body>
+</html>

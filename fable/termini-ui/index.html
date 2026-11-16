@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="sq">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Termini · prototype screens</title>
+  <meta name="robots" content="noindex">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="termini.css">
+</head>
+<!--
+  Prototype index (English on purpose: this page is for Roni and Opus, not for customers).
+  Every screen and every state worth reviewing, one tap away. Add ?theme=dark or ?theme=light to any link.
+-->
+<body class="page page--subtle">
+  <div class="app">
+    <header class="app__pad stack stack--2" style="padding-top: 32px; padding-bottom: 8px;">
+      <span class="wordmark" style="font-size: 1.75rem;">termini</span>
+      <p class="t-small t-2">Prototype screens. Open on a phone, or at 375px wide. Mock date: Friday 13 November 2026, 14:10.</p>
+    </header>
+
+    <main class="app__pad stack stack--6" style="padding-top: 16px; padding-bottom: 40px;">
+      <section class="group">
+        <h2 class="label-caps group__label">Customer</h2>
+        <div class="list--card">
+          <a class="row" href="booking.html"><span class="row__main"><span class="row__title row__title--plain">Booking · 1 service</span><span class="row__meta t-mono">booking.html</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="booking.html?step=2"><span class="row__main"><span class="row__title row__title--plain">Booking · 2 time</span><span class="row__meta t-mono">?step=2</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="booking.html?step=3"><span class="row__main"><span class="row__title row__title--plain">Booking · 3 details</span><span class="row__meta t-mono">?step=3 · ?step=3&amp;state=error</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="confirmation.html"><span class="row__main"><span class="row__title row__title--plain">Confirmation</span><span class="row__meta t-mono">confirmation.html</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="confirmation.html?sheet=cancel"><span class="row__main"><span class="row__title row__title--plain">Cancel sheet</span><span class="row__meta t-mono">?sheet=cancel</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="confirmation.html?state=cancelled"><span class="row__main"><span class="row__title row__title--plain">Cancelled booking</span><span class="row__meta t-mono">?state=cancelled</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+        </div>
+      </section>
+
+      <section class="group">
+        <h2 class="label-caps group__label">Business · onboarding</h2>
+        <div class="list--card">
+          <a class="row" href="onboarding.html"><span class="row__main"><span class="row__title row__title--plain">1 · Business</span><span class="row__meta t-mono">onboarding.html</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="onboarding.html?step=2"><span class="row__main"><span class="row__title row__title--plain">2 · Services</span><span class="row__meta t-mono">?step=2</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="onboarding.html?step=3"><span class="row__main"><span class="row__title row__title--plain">3 · Hours</span><span class="row__meta t-mono">?step=3</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="onboarding.html?step=4&amp;state=code"><span class="row__main"><span class="row__title row__title--plain">4 · Phone and code</span><span class="row__meta t-mono">?step=4&amp;state=code</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="onboarding.html?step=5"><span class="row__main"><span class="row__title row__title--plain">Done · the link</span><span class="row__meta t-mono">?step=5</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+        </div>
+      </section>
+
+      <section class="group">
+        <h2 class="label-caps group__label">Business · app</h2>
+        <div class="list--card">
+          <a class="row" href="calendar.html"><span class="row__main"><span class="row__title row__title--plain">Daily calendar</span><span class="row__meta t-mono">calendar.html</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="calendar.html?sheet=booking"><span class="row__main"><span class="row__title row__title--plain">Booking sheet</span><span class="row__meta t-mono">?sheet=booking</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="calendar.html?sheet=new"><span class="row__main"><span class="row__title row__title--plain">New booking sheet</span><span class="row__meta t-mono">?sheet=new</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="calendar.html?state=empty"><span class="row__main"><span class="row__title row__title--plain">Calendar · first day, empty</span><span class="row__meta t-mono">?state=empty</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="services.html"><span class="row__main"><span class="row__title row__title--plain">Services</span><span class="row__meta t-mono">services.html · ?sheet=service · ?state=empty</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="settings.html"><span class="row__main"><span class="row__title row__title--plain">Settings</span><span class="row__meta t-mono">settings.html</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="settings.html?view=orari"><span class="row__main"><span class="row__title row__title--plain">Settings · hours and days off</span><span class="row__meta t-mono">?view=orari · &amp;sheet=dayoff</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="settings.html?view=rezervimet"><span class="row__main"><span class="row__title row__title--plain">Settings · booking rules</span><span class="row__meta t-mono">?view=rezervimet</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+          <a class="row" href="settings.html?view=profili"><span class="row__main"><span class="row__title row__title--plain">Settings · profile</span><span class="row__meta t-mono">?view=profili</span></span><span class="row__end"><i data-icon="chevron-right"></i></span></a>
+        </div>
+      </section>
+
+      <p class="t-small t-3 t-center">Styles: <span class="t-mono">termini.css</span> + <span class="t-mono">../design-tokens.css</span>. Behaviour: <span class="t-mono">termini.js</span> (prototype only).</p>
+    </main>
+  </div>
+  <script src="termini.js"></script>
+</body>
+</html>

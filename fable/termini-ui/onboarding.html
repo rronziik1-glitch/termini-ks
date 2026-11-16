@@ -1,0 +1,308 @@
+<!doctype html>
+<html lang="sq">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Merre linkun tënd · Termini</title>
+  <meta name="theme-color" content="#ffffff">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="termini.css">
+</head>
+<!--
+  SCREEN: business onboarding  ·  route /fillo  ·  2 minutes, 4 steps, then "Gati!"
+  Spec: 01-product-design.md §4.1, §4.6.   Review: ?step=1|2|3|4|5  ?theme=dark
+  Components: <OnboardingShell> <StepBusiness> <StepServices> <StepHours> <StepPhone> <OnboardingDone>
+  Steps 1–3 are saved in localStorage; the phone is verified last (the owner has already built something).
+  Every field has a default, so "Vazhdo" can be pressed straight through steps 2 and 3.
+-->
+<body class="page">
+  <div class="app app--bar">
+
+    <header class="topbar" data-show-step="1,2,3,4">
+      <button class="iconbtn" data-back aria-label="Kthehu"><i data-icon="chevron-left"></i></button>
+      <div class="steps" role="progressbar" aria-valuemin="1" aria-valuemax="4" aria-valuenow="1" aria-label="Hapi"><span></span><span></span><span></span><span></span></div>
+      <span class="t-caption t-3 t-num" data-step-count style="min-width: 32px; text-align: right;">1 / 4</span>
+    </header>
+
+    <main class="app__pad">
+
+      <!-- STEP 1 · Biznesi yt -->
+      <section data-step="1" aria-labelledby="o1">
+        <div class="stack stack--6" style="padding-top: 16px;">
+          <div class="stack stack--2">
+            <h1 class="t-h1" id="o1">Si quhet biznesi yt?</h1>
+            <p class="t-2">Dy minuta dhe e ke linkun tënd për rezervime. Falas.</p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="biz">Emri i biznesit</label>
+            <input class="input" id="biz" autocomplete="organization" placeholder="P.sh. Berberi Arti" value="Berberi Arti">
+            <p class="slugline" aria-live="polite">termini.app/<b data-slug>berberi-arti</b></p>
+            <p class="field__error">Ky link është i zënë. Provo: berberi-arti-gjakove</p>
+          </div>
+
+          <div class="stack stack--3">
+            <p class="field__label" id="type-l">Lloji</p>
+            <div class="chips chips--wrap" data-select="type" role="group" aria-labelledby="type-l">
+              <button class="chip is-selected" data-option="berber" aria-pressed="true">Berber</button>
+              <button class="chip" data-option="sallon">Sallon bukurie</button>
+              <button class="chip" data-option="dentist">Dentist</button>
+              <button class="chip" data-option="klinike">Klinikë</button>
+              <button class="chip" data-option="tjeter">Tjetër</button>
+            </div>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="city">Qyteti</label>
+            <select class="input" id="city" autocomplete="address-level2">
+              <option>Gjakovë</option><option>Prishtinë</option><option>Prizren</option><option>Pejë</option><option>Ferizaj</option><option>Gjilan</option><option>Mitrovicë</option><option>Tjetër</option>
+            </select>
+          </div>
+        </div>
+      </section>
+
+      <!-- STEP 2 · Shërbimet (prefilled from category_presets) -->
+      <section data-step="2" aria-labelledby="o2">
+        <div class="stack stack--6" style="padding-top: 16px;">
+          <div class="stack stack--2">
+            <h1 class="t-h1" id="o2">Çfarë ofron?</h1>
+            <p class="t-2">I kemi shtuar shërbimet e zakonshme për berberë. Ndrysho çmimet ose fiki ato që s'i bën.</p>
+          </div>
+
+          <div class="list--card" data-services>
+            <div class="edit" data-toggles>
+              <div class="edit__top">
+                <input class="edit__name" value="Qethje" aria-label="Emri i shërbimit">
+                <button class="switch" role="switch" aria-checked="true" aria-label="Ofroj Qethje"></button>
+              </div>
+              <div class="edit__nums">
+                <label class="inputgroup inputgroup--sm"><span class="sr">Kohëzgjatja</span><input class="input" inputmode="numeric" value="30"><span class="inputgroup__ad inputgroup__ad--end">min</span></label>
+                <label class="inputgroup inputgroup--sm"><span class="sr">Çmimi</span><input class="input" inputmode="decimal" value="5"><span class="inputgroup__ad inputgroup__ad--end">€</span></label>
+              </div>
+            </div>
+            <div class="edit" data-toggles>
+              <div class="edit__top">
+                <input class="edit__name" value="Qethje + mjekër" aria-label="Emri i shërbimit">
+                <button class="switch" role="switch" aria-checked="true" aria-label="Ofroj Qethje + mjekër"></button>
+              </div>
+              <div class="edit__nums">
+                <label class="inputgroup inputgroup--sm"><span class="sr">Kohëzgjatja</span><input class="input" inputmode="numeric" value="45"><span class="inputgroup__ad inputgroup__ad--end">min</span></label>
+                <label class="inputgroup inputgroup--sm"><span class="sr">Çmimi</span><input class="input" inputmode="decimal" value="7"><span class="inputgroup__ad inputgroup__ad--end">€</span></label>
+              </div>
+            </div>
+            <div class="edit" data-toggles>
+              <div class="edit__top">
+                <input class="edit__name" value="Mjekër" aria-label="Emri i shërbimit">
+                <button class="switch" role="switch" aria-checked="true" aria-label="Ofroj Mjekër"></button>
+              </div>
+              <div class="edit__nums">
+                <label class="inputgroup inputgroup--sm"><span class="sr">Kohëzgjatja</span><input class="input" inputmode="numeric" value="15"><span class="inputgroup__ad inputgroup__ad--end">min</span></label>
+                <label class="inputgroup inputgroup--sm"><span class="sr">Çmimi</span><input class="input" inputmode="decimal" value="3"><span class="inputgroup__ad inputgroup__ad--end">€</span></label>
+              </div>
+            </div>
+            <div class="edit is-off" data-toggles>
+              <div class="edit__top">
+                <input class="edit__name" value="Qethje për fëmijë" aria-label="Emri i shërbimit">
+                <button class="switch" role="switch" aria-checked="false" aria-label="Ofroj Qethje për fëmijë"></button>
+              </div>
+              <div class="edit__nums">
+                <label class="inputgroup inputgroup--sm"><span class="sr">Kohëzgjatja</span><input class="input" inputmode="numeric" value="20"><span class="inputgroup__ad inputgroup__ad--end">min</span></label>
+                <label class="inputgroup inputgroup--sm"><span class="sr">Çmimi</span><input class="input" inputmode="decimal" value="4"><span class="inputgroup__ad inputgroup__ad--end">€</span></label>
+              </div>
+            </div>
+          </div>
+
+          <button class="btn btn--secondary" data-add-service><i data-icon="plus" class="icon--sm"></i>Shto shërbim</button>
+          <p class="t-small t-3 t-center">Mund t'i ndryshosh kur të duash.</p>
+        </div>
+      </section>
+
+      <!-- STEP 3 · Orari -->
+      <section data-step="3" aria-labelledby="o3">
+        <div class="stack stack--6" style="padding-top: 16px;">
+          <div class="stack stack--2">
+            <h1 class="t-h1" id="o3">Kur punon?</h1>
+            <p class="t-2">Klientët shohin vetëm orët brenda këtij orari.</p>
+          </div>
+
+          <div class="list--card">
+            <div class="hours" data-toggles>
+              <span class="hours__day"><span>Hënë</span><abbr title="E hënë">Hën</abbr></span>
+              <span class="hours__times"><select class="input input--sm input--time" data-time="09:00" aria-label="E hënë, nga"></select><span>–</span><select class="input input--sm input--time" data-time="20:00" aria-label="E hënë, deri"></select></span>
+              <span class="hours__closed">Mbyllur</span>
+              <button class="switch" role="switch" aria-checked="true" aria-label="E hënë, hapur"></button>
+            </div>
+            <div class="hours" data-toggles>
+              <span class="hours__day"><span>Martë</span><abbr title="E martë">Mar</abbr></span>
+              <span class="hours__times"><select class="input input--sm input--time" data-time="09:00" aria-label="E martë, nga"></select><span>–</span><select class="input input--sm input--time" data-time="20:00" aria-label="E martë, deri"></select></span>
+              <span class="hours__closed">Mbyllur</span>
+              <button class="switch" role="switch" aria-checked="true" aria-label="E martë, hapur"></button>
+            </div>
+            <div class="hours" data-toggles>
+              <span class="hours__day"><span>Mërkurë</span><abbr title="E mërkurë">Mër</abbr></span>
+              <span class="hours__times"><select class="input input--sm input--time" data-time="09:00" aria-label="E mërkurë, nga"></select><span>–</span><select class="input input--sm input--time" data-time="20:00" aria-label="E mërkurë, deri"></select></span>
+              <span class="hours__closed">Mbyllur</span>
+              <button class="switch" role="switch" aria-checked="true" aria-label="E mërkurë, hapur"></button>
+            </div>
+            <div class="hours" data-toggles>
+              <span class="hours__day"><span>Enjte</span><abbr title="E enjte">Enj</abbr></span>
+              <span class="hours__times"><select class="input input--sm input--time" data-time="09:00" aria-label="E enjte, nga"></select><span>–</span><select class="input input--sm input--time" data-time="20:00" aria-label="E enjte, deri"></select></span>
+              <span class="hours__closed">Mbyllur</span>
+              <button class="switch" role="switch" aria-checked="true" aria-label="E enjte, hapur"></button>
+            </div>
+            <div class="hours" data-toggles>
+              <span class="hours__day"><span>Premte</span><abbr title="E premte">Pre</abbr></span>
+              <span class="hours__times"><select class="input input--sm input--time" data-time="09:00" aria-label="E premte, nga"></select><span>–</span><select class="input input--sm input--time" data-time="20:00" aria-label="E premte, deri"></select></span>
+              <span class="hours__closed">Mbyllur</span>
+              <button class="switch" role="switch" aria-checked="true" aria-label="E premte, hapur"></button>
+            </div>
+            <div class="hours" data-toggles>
+              <span class="hours__day"><span>Shtunë</span><abbr title="E shtunë">Sht</abbr></span>
+              <span class="hours__times"><select class="input input--sm input--time" data-time="09:00" aria-label="E shtunë, nga"></select><span>–</span><select class="input input--sm input--time" data-time="18:00" aria-label="E shtunë, deri"></select></span>
+              <span class="hours__closed">Mbyllur</span>
+              <button class="switch" role="switch" aria-checked="true" aria-label="E shtunë, hapur"></button>
+            </div>
+            <div class="hours is-off" data-toggles>
+              <span class="hours__day"><span>Diel</span><abbr title="E diel">Die</abbr></span>
+              <span class="hours__times"><select class="input input--sm input--time" data-time="09:00" aria-label="E diel, nga"></select><span>–</span><select class="input input--sm input--time" data-time="14:00" aria-label="E diel, deri"></select></span>
+              <span class="hours__closed">Mbyllur</span>
+              <button class="switch" role="switch" aria-checked="false" aria-label="E diel, hapur"></button>
+            </div>
+          </div>
+
+          <button class="btn btn--secondary" data-toast="Orari i së hënës u kopjua në të gjitha ditët e hapura." data-toast-action="Zhbëj"><i data-icon="copy" class="icon--sm"></i>Kopjo të hënën në të gjitha ditët</button>
+          <p class="t-small t-3 t-center">Pauzën e drekës dhe ditët e pushimit i shton më vonë te Cilësimet.</p>
+        </div>
+      </section>
+
+      <!-- STEP 4 · Numri yt -->
+      <section data-step="4" aria-labelledby="o4">
+        <div class="stack stack--6" style="padding-top: 16px;">
+          <div class="stack stack--2">
+            <h1 class="t-h1" id="o4">Numri yt i telefonit</h1>
+            <p class="t-2">Me këtë numër hyn në Termini. Klientët ta dërgojnë konfirmimin këtu në WhatsApp.</p>
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="oname">Emri yt</label>
+            <input class="input" id="oname" autocomplete="given-name" placeholder="P.sh. Arti">
+          </div>
+
+          <div class="field">
+            <label class="field__label" for="ophone">Numri i telefonit</label>
+            <div class="inputgroup">
+              <span class="inputgroup__ad">+383</span>
+              <input class="input t-num" id="ophone" inputmode="tel" autocomplete="tel-national" placeholder="49 123 456">
+            </div>
+            <p class="field__error">Shkruaj një numër të vlefshëm, p.sh. 044 123 456.</p>
+          </div>
+
+          <!-- appears after "Dërgo kodin" -->
+          <div class="field" data-code hidden>
+            <label class="field__label" for="c1">Kodi që të erdhi me SMS</label>
+            <div class="code">
+              <input id="c1" inputmode="numeric" maxlength="1" autocomplete="one-time-code" aria-label="Shifra 1">
+              <input inputmode="numeric" maxlength="1" aria-label="Shifra 2">
+              <input inputmode="numeric" maxlength="1" aria-label="Shifra 3">
+              <input inputmode="numeric" maxlength="1" aria-label="Shifra 4">
+              <input inputmode="numeric" maxlength="1" aria-label="Shifra 5">
+              <input inputmode="numeric" maxlength="1" aria-label="Shifra 6">
+            </div>
+            <p class="field__hint">S'të erdhi? <button class="link" data-toast="Kodi u dërgua përsëri.">Dërgoje përsëri</button> <span class="t-num">(0:42)</span></p>
+            <p class="field__error">Kodi s'është i saktë. Provo përsëri.</p>
+          </div>
+        </div>
+      </section>
+
+      <!-- DONE · Gati! -->
+      <section data-step="5" aria-labelledby="o5">
+        <div class="stack stack--6" style="padding-top: 56px;">
+          <div class="success" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.25" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5 10 17.5 19 7.5"/></svg>
+          </div>
+          <div class="stack stack--2">
+            <h1 class="t-display" id="o5">Gati! Ky është linku yt</h1>
+            <p class="t-2">Vendose në bio të Instagramit. Kush e hap, rezervon vetë.</p>
+          </div>
+
+          <div class="linkbox">
+            <p class="linkbox__url">termini.app/<b data-slug>berberi-arti</b></p>
+          </div>
+
+          <div class="stack stack--2">
+            <button class="btn btn--primary" data-toast="Linku u kopjua."><i data-icon="copy" class="icon--sm"></i>Kopjo linkun</button>
+            <!-- message F, §3.5 -->
+            <a class="btn btn--whatsapp" href="https://wa.me/?text=Tani%20mund%20t%C3%AB%20rezervosh%20termin%20te%20Berberi%20Arti%20online%2C%20pa%20thirrur%3A%20https%3A%2F%2Ftermini.app%2Fberberi-arti"><i data-icon="whatsapp"></i>Ndaje në WhatsApp</a>
+            <div class="cluster" style="flex-wrap: nowrap;">
+              <button class="btn btn--secondary" data-toast="QR-kodi u shkarkua."><i data-icon="qr" class="icon--sm"></i>QR-kodi</button>
+              <a class="btn btn--secondary" href="booking.html"><i data-icon="eye" class="icon--sm"></i>Si e sheh klienti</a>
+            </div>
+          </div>
+
+          <a class="btn btn--ghost" href="calendar.html">Shko te kalendari<i data-icon="chevron-right" class="icon--sm"></i></a>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <div class="bar is-visible" data-show-step="1,2,3,4">
+    <div class="bar__in">
+      <button class="btn btn--primary" data-next>Vazhdo</button>
+    </div>
+  </div>
+
+  <script src="termini.js"></script>
+  <script>
+    /* Prototype only. App: <Onboarding> state in localStorage, POST /api/auth/otp, POST /api/businesses. */
+    (function () {
+      var $ = function (s) { return document.querySelector(s); };
+      var next = $('[data-next]'), codeSent = false;
+      function slugify(s) {
+        return s.toLowerCase().replace(/ë/g, 'e').replace(/ç/g, 'c').normalize('NFD').replace(/[̀-ͯ]/g, '')
+          .replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40) || 'biznesi-yt';
+      }
+      $('#biz').addEventListener('input', function () {
+        var slug = slugify(this.value);
+        T.all('[data-slug]').forEach(function (el) { el.textContent = slug; });
+      });
+      function label() {
+        var n = T.step();
+        next.textContent = n === 4 ? (codeSent ? 'Hap llogarinë' : 'Dërgo kodin') : 'Vazhdo';
+      }
+      next.addEventListener('click', function () {
+        var n = T.step();
+        if (n < 4) return T.go(n + 1);
+        if (!codeSent) {
+          var phone = $('#ophone'), bad = phone.value.replace(/\D/g, '').length < 8;
+          phone.closest('.field').classList.toggle('is-invalid', bad);
+          if (bad) return phone.focus();
+          codeSent = true; $('[data-code]').hidden = false; $('#c1').focus(); label();
+          return T.toast('Kodi u dërgua me SMS.');
+        }
+        T.go(5);
+      });
+      $('[data-back]').addEventListener('click', function () { if (T.step() > 1) T.go(T.step() - 1); else history.back(); });
+      $('[data-add-service]').addEventListener('click', function () {
+        var list = $('[data-services]'), row = list.lastElementChild.cloneNode(true);
+        row.classList.remove('is-off');
+        row.querySelector('.switch').setAttribute('aria-checked', 'true');
+        row.querySelector('.edit__name').value = '';
+        row.querySelector('.edit__name').placeholder = 'Emri i shërbimit';
+        T.all('.edit__nums input', row).forEach(function (i, k) { i.value = k ? '' : '30'; });
+        list.appendChild(row); row.querySelector('.edit__name').focus();
+      });
+      document.addEventListener('t:step', function (e) {
+        var n = e.detail;
+        if (n <= 4) { $('[data-step-count]').textContent = n + ' / 4'; $('.steps').setAttribute('aria-valuenow', n); }
+        label();
+      });
+      document.addEventListener('t:ready', function () {
+        if (T.param('state') === 'code') { $('#oname').value = 'Arti'; $('#ophone').value = '49 123 456'; codeSent = true; $('[data-code]').hidden = false; }
+        label();
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,0 +1,335 @@
+/* generated from content.json by tools/sync-content.mjs; do not edit */
+window.FG_CONTENT = {
+  "meta": {
+    "template": "restorant-kafe",
+    "lang": "sq",
+    "title": "Oda e Gjyshes · Restorant tradicional në Prizren",
+    "description": "Tavë Prizreni, flija në saç dhe pite të pjekura çdo mëngjes, buzë Lumbardhit në Prizren. Rezervo tavolinë online."
+  },
+  "theme": {
+    "accent": "",
+    "variant": ""
+  },
+  "brand": {
+    "name": "Oda e Gjyshes",
+    "category": "Restorant tradicional",
+    "city": "Prizren",
+    "since": "1998"
+  },
+  "hero": {
+    "eyebrow": "Restorant tradicional · Prizren",
+    "title": "Gatuar si në shtëpi",
+    "subtitle": "Tavë në furrë druri, flija në saç dhe bukë e ngrohtë, dy hapa nga Shadërvani.",
+    "image": {
+      "src": "",
+      "alt": "Tavë Prizreni në enë balte mbi tavolinë druri, avull, dritë e ngrohtë"
+    },
+    "video": {
+      "src": "",
+      "poster": ""
+    }
+  },
+  "highlights": [],
+  "about": {
+    "title": "Receta që s'kanë ndryshuar që nga 1998",
+    "text": "Odën e hapi gjyshja Hava në vitin 1998, në shtëpinë e vjetër të familjes buzë Lumbardhit. Sot gatuajmë të njëjtat receta: mishin e marrim nga Sharri, perimet nga tregu i Prizrenit dhe bukën e pjekim vetë çdo mëngjes.",
+    "points": [
+      "Furrë me dru",
+      "Oborr veror buzë lumit",
+      "Vende për 60 veta",
+      "Darka familjare dhe gëzime"
+    ],
+    "image": {
+      "src": "",
+      "alt": "Gjyshja duke nxjerrë bukën nga furra me dru"
+    }
+  },
+  "services": {
+    "title": "Çfarë gatuajmë",
+    "intro": "Gjithçka përgatitet në ditë. Për flija, na lajmëro një ditë më herët.",
+    "groups": [
+      {
+        "name": "Për fillim",
+        "items": [
+          {
+            "name": "Sallatë shope",
+            "description": "Domate, tranguj, djathë i bardhë",
+            "price": "2.50 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Speca në ajkë",
+            "description": "Speca të pjekur në ajkë shtëpie",
+            "price": "3 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Djathë Sharri i pjekur",
+            "description": "Me mjaltë dhe arra",
+            "price": "3.50 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Pite me spinaq",
+            "description": "E pjekur në mëngjes, me kos",
+            "price": "2 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "Nga furra",
+        "items": [
+          {
+            "name": "Tavë Prizreni",
+            "description": "Mish viçi, perime dhe djathë, në enë balte",
+            "price": "6.50 €",
+            "duration": null,
+            "tag": "E shtëpisë",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Flija në saç",
+            "description": "Me ajkë, mjaltë dhe turshi. Vetëm me porosi",
+            "price": "5 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Mish qengji në saç",
+            "description": "Pjekur ngadalë, me patate",
+            "price": "9 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Elbasan tavë",
+            "description": "Mish qengji me kos të pjekur",
+            "price": "6 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "Nga skara",
+        "items": [
+          {
+            "name": "Qebapa, 10 copë",
+            "description": "Me qepë, kajmak dhe somun",
+            "price": "4.50 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Pleskavicë Sharri",
+            "description": "E mbushur me djathë",
+            "price": "5 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Skarë e përzier për dy",
+            "description": "Qebapa, suxhuk, pulë dhe biftek",
+            "price": "14 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          }
+        ]
+      },
+      {
+        "name": "Ëmbëlsira dhe kafe",
+        "items": [
+          {
+            "name": "Bakllavë shtëpie",
+            "description": "Me arra, dy copë",
+            "price": "2 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Tespishte",
+            "description": "",
+            "price": "1.50 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Kafe turke",
+            "description": "",
+            "price": "0.80 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Makiato",
+            "description": "",
+            "price": "1 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          },
+          {
+            "name": "Çaj rusi",
+            "description": "",
+            "price": "0.70 €",
+            "duration": null,
+            "tag": "",
+            "image": {
+              "src": "",
+              "alt": ""
+            }
+          }
+        ]
+      }
+    ]
+  },
+  "gallery": {
+    "title": "Nga oda dhe oborri",
+    "images": [
+      {
+        "src": "",
+        "alt": "Oborri veror buzë Lumbardhit në mbrëmje, me drita"
+      },
+      {
+        "src": "",
+        "alt": "Flija duke u pjekur nën saç"
+      },
+      {
+        "src": "",
+        "alt": "Tavolinë e shtruar me pjata tradicionale"
+      },
+      {
+        "src": "",
+        "alt": "Oda e brendshme me tavan druri dhe qilima"
+      },
+      {
+        "src": "",
+        "alt": "Kafe turke në xhezve bakri"
+      },
+      {
+        "src": "",
+        "alt": "Bukë e sapopjekur në furrë"
+      }
+    ]
+  },
+  "reviews": {
+    "title": "Mysafirët tanë",
+    "rating": "4.8",
+    "count": "340 vlerësime",
+    "source": "Google",
+    "items": [
+      {
+        "name": "Mimoza S.",
+        "text": "Tava si e nënës. Çdo verë kur vijmë nga Gjermania, darka e parë është këtu.",
+        "rating": 5
+      },
+      {
+        "name": "Agron T.",
+        "text": "E rezervuam oborrin për 20 veta. Ushqimi doli i ngrohtë për të gjithë dhe askush s'u ngrit i uritur.",
+        "rating": 5
+      },
+      {
+        "name": "Sara L.",
+        "text": "Flija më e mirë që kam provuar në Prizren. Porosite një ditë më herët, ia vlen.",
+        "rating": 5
+      }
+    ]
+  },
+  "location": {
+    "title": "Dy hapa nga Shadërvani",
+    "address": "Rr. Sharri 8, buzë Lumbardhit",
+    "city": "Prizren",
+    "mapQuery": "Shadërvan, Prizren",
+    "note": "Parking te Ura e Gurit, 3 minuta në këmbë.",
+    "hours": [
+      {
+        "days": "E hënë – E enjte",
+        "time": "08:00 – 23:00"
+      },
+      {
+        "days": "E premte – E diel",
+        "time": "08:00 – 24:00"
+      }
+    ]
+  },
+  "contact": {
+    "phone": "38345345678",
+    "phoneDisplay": "045 345 678",
+    "whatsapp": "",
+    "whatsappMessage": "Përshëndetje! Dua të rezervoj një tavolinë.",
+    "email": "",
+    "instagram": "odaegjyshes",
+    "facebook": ""
+  },
+  "booking": {
+    "enabled": true,
+    "url": "https://termini.app/oda-e-gjyshes",
+    "label": "Rezervo tavolinë"
+  },
+  "footer": {
+    "note": "Për grupe mbi 10 veta, na shkruaj një ditë më herët."
+  }
+};

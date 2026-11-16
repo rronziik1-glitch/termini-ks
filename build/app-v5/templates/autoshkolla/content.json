@@ -1,0 +1,122 @@
+{
+  "meta": {
+    "template": "autoshkolla",
+    "lang": "sq",
+    "title": "Autoshkolla Timoni · Autoshkollë në Prishtinë",
+    "description": "Patentë shoferi për kategoritë A, B dhe C në Prishtinë. 9 nga 10 kandidatë kalojnë në provimin e parë. Rezervo orët e vozitjes online."
+  },
+  "theme": { "accent": "", "variant": "" },
+  "brand": { "name": "Autoshkolla Timoni", "category": "Autoshkollë", "city": "Prishtinë", "since": "2009" },
+  "hero": {
+    "eyebrow": "Autoshkollë · Prishtinë",
+    "title": "Merre patentën pa stres",
+    "subtitle": "Instruktorë të qetë, vetura të reja dhe orë vozitjeje që i rezervon vetë, kur të kesh kohë.",
+    "image": { "src": "", "alt": "Kandidate e qeshur në timon, instruktori pranë saj, veturë e bardhë me tabelën L" },
+    "video": { "src": "", "poster": "" }
+  },
+  "highlights": [
+    { "value": "91%", "label": "e kandidatëve kalojnë në provimin e parë" },
+    { "value": "4.200", "label": "shoferë të rinj që nga 2009" },
+    { "value": "6", "label": "instruktorë të licencuar" },
+    { "value": "7", "label": "ditë në javë orë vozitjeje" }
+  ],
+  "about": {
+    "title": "Mëson të vozitësh, jo vetëm ta kalosh provimin",
+    "text": "Autoshkolla Timoni punon në Prishtinë që nga viti 2009. Fillojmë në poligon, pastaj dalim në rrugë të qeta dhe vetëm në fund në trafikun e qendrës. Çdo orë e ke me të njëjtin instruktor, që ta dijë saktë ku ke nevojë për më shumë ushtrim.",
+    "points": ["Vetura të reja me komanda të dyfishta", "Edhe me ndërrues automatik", "Teste provuese online", "Pagesë me tri këste", "Instruktore femër sipas dëshirës", "Të marrim te shtëpia ose shkolla"],
+    "image": { "src": "", "alt": "Veturat e autoshkollës të parkuara në poligon, në dritë dite" }
+  },
+  "services": {
+    "title": "Zgjidh kategorinë",
+    "intro": "Çmimi përfshin teorinë, orët e vozitjes dhe materialet. Taksat e provimit paguhen veçmas në qendrën e provimeve.",
+    "groups": [
+      {
+        "name": "",
+        "items": [
+          { "name": "Kategoria B", "description": "Veturë. 20 orë teori dhe 20 orë vozitje.", "price": "320 €", "duration": null, "tag": "Më e kërkuara", "image": { "src": "", "alt": "" } },
+          { "name": "Kategoria B automatik", "description": "Veturë me ndërrues automatik. 20 orë vozitje.", "price": "350 €", "duration": null, "tag": "", "image": { "src": "", "alt": "" } },
+          { "name": "Kategoria A", "description": "Motoçikletë. Pajisjet mbrojtëse i japim ne.", "price": "220 €", "duration": null, "tag": "", "image": { "src": "", "alt": "" } },
+          { "name": "Kategoria C", "description": "Kamion mbi 3.5 tonë. Për ata që kanë kategorinë B.", "price": "480 €", "duration": null, "tag": "", "image": { "src": "", "alt": "" } },
+          { "name": "Kategoria CE", "description": "Kamion me rimorkio. 15 orë vozitje.", "price": "550 €", "duration": null, "tag": "", "image": { "src": "", "alt": "" } },
+          { "name": "Kategoria D", "description": "Autobus. Për shoferë profesionistë.", "price": "600 €", "duration": null, "tag": "", "image": { "src": "", "alt": "" } }
+        ]
+      },
+      {
+        "name": "Orë shtesë",
+        "items": [
+          { "name": "Orë vozitjeje shtesë", "description": "Kategoria B, në qytet ose në poligon", "price": "12 €", "duration": 45, "tag": "", "image": { "src": "", "alt": "" } },
+          { "name": "Orë para provimit", "description": "Në rrugët ku mbahet provimi", "price": "15 €", "duration": 60, "tag": "", "image": { "src": "", "alt": "" } },
+          { "name": "Vozitje natën ose në autostradë", "description": "", "price": "18 €", "duration": 60, "tag": "", "image": { "src": "", "alt": "" } }
+        ]
+      },
+      {
+        "name": "Për ata që kanë patentë",
+        "items": [
+          { "name": "Orë rifreskimi", "description": "Ke patentë, por s'ke vozitur prej kohësh", "price": "15 €", "duration": 60, "tag": "", "image": { "src": "", "alt": "" } },
+          { "name": "Parkimi në qytet", "description": "Paketë prej tri orësh", "price": "40 €", "duration": null, "tag": "", "image": { "src": "", "alt": "" } },
+          { "name": "Ndihma e parë", "description": "Kursi i obligueshëm, me certifikatë", "price": "25 €", "duration": null, "tag": "", "image": { "src": "", "alt": "" } }
+        ]
+      }
+    ]
+  },
+  "team": {
+    "title": "Njerëzit që ulen pranë teje",
+    "members": [
+      { "name": "Agron Shala", "role": "Themelues · Kategoritë B, C dhe CE", "image": { "src": "", "alt": "Portret i Agron Shalës pranë veturës së autoshkollës" } },
+      { "name": "Mimoza Gashi", "role": "Instruktore · Kategoria B", "image": { "src": "", "alt": "Portret i Mimoza Gashit" } },
+      { "name": "Leart Krasniqi", "role": "Instruktor · Kategoritë A dhe B", "image": { "src": "", "alt": "Portret i Leart Krasniqit me motoçikletë" } },
+      { "name": "Besa Morina", "role": "Ligjëruese e teorisë", "image": { "src": "", "alt": "Portret i Besa Morinës në klasë" } }
+    ]
+  },
+  "gallery": {
+    "title": "Me çka do të vozitësh",
+    "images": [
+      { "src": "", "alt": "Veturë e re e autoshkollës me tabelën L" },
+      { "src": "", "alt": "Poligoni me konat për parkim" },
+      { "src": "", "alt": "Klasa e teorisë" },
+      { "src": "", "alt": "Kamioni për kategorinë C" },
+      { "src": "", "alt": "Kandidat me patentën në dorë pas provimit" }
+    ]
+  },
+  "reviews": {
+    "title": "Çfarë thonë ata që e morën",
+    "rating": "4.9",
+    "count": "286 vlerësime",
+    "source": "Google",
+    "items": [
+      { "name": "Erona B.", "text": "Kisha shumë frikë nga trafiku. Mimoza nuk ma ngriti zërin asnjëherë dhe e kalova provimin në herën e parë.", "rating": 5 },
+      { "name": "Dardan K.", "text": "Orët i rezervoja në telefon pas punës, pa thirrur askënd. Për tetë javë e kisha patentën.", "rating": 5 },
+      { "name": "Arlind S.", "text": "Erdha nga Zvicra për pushime dhe e kreva kategorinë A brenda një muaji. Shumë korrektë me orarin.", "rating": 5 }
+    ]
+  },
+  "faq": [
+    { "q": "Sa zgjat deri sa ta marr patentën?", "a": "Për kategorinë B zakonisht 6 deri në 10 javë, varësisht sa shpesh vjen në orë dhe kur e cakton provimin." },
+    { "q": "Çfarë dokumentesh më duhen?", "a": "Letërnjoftimi, certifikata mjekësore dhe dy fotografi. Për të tjerat të ndihmojmë ne në ditën e regjistrimit." },
+    { "q": "A mund të paguaj me këste?", "a": "Po. Pagesa ndahet në tri këste: në regjistrim, në fillim të vozitjes dhe para provimit." },
+    { "q": "Nga cila moshë mund të regjistrohem?", "a": "Për kategorinë B mund të regjistrohesh disa muaj para se t'i mbushësh 18 vjet. Na shkruaj dhe ta tregojmë datën e saktë." },
+    { "q": "Jam në diasporë. A mund ta kryej gjatë pushimeve?", "a": "Po. Na lajmëro para se të vish, që t'i planifikojmë orët dendur dhe ta caktojmë provimin brenda qëndrimit tënd." }
+  ],
+  "location": {
+    "title": "Zyra dhe klasa, në Bregun e Diellit",
+    "address": "Rr. Enver Maloku 18",
+    "city": "Prishtinë",
+    "mapQuery": "Rruga Enver Maloku, Prishtinë",
+    "note": "Orët e vozitjes fillojnë nga zyra ose nga adresa jote.",
+    "hours": [
+      { "days": "E hënë – E premte", "time": "08:00 – 19:00" },
+      { "days": "E shtunë", "time": "09:00 – 15:00" },
+      { "days": "E diel", "time": "Vetëm orë vozitjeje" }
+    ]
+  },
+  "contact": {
+    "phone": "38344300450",
+    "phoneDisplay": "044 300 450",
+    "whatsapp": "",
+    "whatsappMessage": "Përshëndetje! Dua të regjistrohem në autoshkollë.",
+    "email": "info@autoshkollatimoni.com",
+    "instagram": "autoshkollatimoni",
+    "facebook": ""
+  },
+  "booking": { "enabled": true, "url": "https://termini.app/autoshkolla-timoni", "label": "Rezervo orën" },
+  "footer": { "note": "Kategoritë A, B, C, CE dhe D. E licencuar nga Ministria e Infrastrukturës." }
+}

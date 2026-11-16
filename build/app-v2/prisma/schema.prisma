@@ -1,0 +1,342 @@
+// Termini + Faqja Gati data model (fable/01-product-design.md §7).
+// SQLite now; written to move to Postgres/Supabase: change `provider` to "postgresql",
+// set DATABASE_URL, run `prisma migrate dev`. Enumerations are kept as strings (SQLite has no enums),
+// JSON as text. Times are UTC; "local" fields are HH:MM in the business time zone. Money is EUR cents.
+// On Postgres also add the exclusion constraint from §5:
+//   EXCLUDE USING gist (staff_id WITH =, tstzrange(starts_at, ends_at) WITH &&) WHERE (status = 'confirmed')
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+// ---------------------------------------------------------------- accounts
+model User {
+  id          String    @id @default(cuid())
+  phone       String    @unique // E.164
+  name        String    @default("")
+  role        String    @default("owner") // owner | admin
+  lastLoginAt DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  sessions   Session[]
+  businesses Business[]
+  pages      Page[]
+}
+
+model LoginCode {
+  id         String    @id @default(cuid())
+  phone      String
+  codeHash   String
+  expiresAt  DateTime
+  attempts   Int       @default(0)
+  consumedAt DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([phone])
+}
+
+model Session {
+  id        String   @id @default(cuid())
+  userId    String
+  tokenHash String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// -------------------------------------------------------------- businesses
+model Business {
+  id              String    @id @default(cuid())
+  ownerId         String
+  slug            String    @unique
+  name            String
+  category        String // berber | salon | dentist | klinike | bujtine | restorant | dyqan | dasma | autoshkolla | tjeter
+  city            String
+  address         String    @default("")
+  lat             Float?
+  lng             Float?
+  phone           String // E.164, public
+  whatsapp        String    @default("") // E.164; empty = phone
+  instagram       String    @default("")
+  description     String    @default("")
+  photoUrl        String    @default("")
+  timezone        String    @default("Europe/Belgrade")
+  slotStepMin     Int       @default(15)
+  minNoticeMin    Int       @default(60)
+  maxAdvanceDays  Int       @default(30)
+  cancelCutoffMin Int       @default(120)
+  bookingsPaused  Boolean   @default(false)
+  listedInFind    Boolean   @default(true)
+  onboardedAt     DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+
+  owner        User           @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  staff        Staff[]
+  services     Service[]
+  workingHours WorkingHours[]
+  timeOff      TimeOff[]
+  customers    Customer[]
+  bookings     Booking[]
+  pages        Page[]
+
+  @@index([city, category])
+}
+
+model Staff {
+  id         String   @id @default(cuid())
+  businessId String
+  name       String
+  photoUrl   String   @default("")
+  active     Boolean  @default(true)
+  sort       Int      @default(0)
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  business Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  services StaffService[]
+  bookings Booking[]
+}
+
+model Service {
+  id          String   @id @default(cuid())
+  businessId  String
+  name        String
+  description String   @default("")
+  durationMin Int
+  bufferMin   Int      @default(0)
+  priceCents  Int?
+  priceFrom   Boolean  @default(false)
+  active      Boolean  @default(true)
+  deleted     Boolean  @default(false) // removed by the owner; kept because bookings point to it
+  sort        Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  business Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  staff    StaffService[]
+  bookings Booking[]
+}
+
+// Empty for a staff member = "does everything".
+model StaffService {
+  staffId   String
+  serviceId String
+
+  staff   Staff   @relation(fields: [staffId], references: [id], onDelete: Cascade)
+  service Service @relation(fields: [serviceId], references: [id], onDelete: Cascade)
+
+  @@id([staffId, serviceId])
+}
+
+// Several rows per weekday express a pause (09:00–13:00 and 14:00–20:00).
+model WorkingHours {
+  id         String   @id @default(cuid())
+  businessId String
+  staffId    String? // null = whole business
+  weekday    Int // 1 = Monday … 7 = Sunday
+  startLocal String // HH:MM
+  endLocal   String // HH:MM
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, weekday])
+}
+
+model TimeOff {
+  id         String   @id @default(cuid())
+  businessId String
+  staffId    String?
+  startsAt   DateTime
+  endsAt     DateTime
+  reason     String   @default("")
+  kind       String   @default("holiday") // holiday | block
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  business Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  @@index([businessId, startsAt])
+}
+
+// ------------------------------------------------------ customers, bookings
+model Customer {
+  id          String    @id @default(cuid())
+  businessId  String
+  phone       String? // E.164; null for walk-ins
+  name        String
+  note        String    @default("")
+  visitsCount Int       @default(0)
+  noShowCount Int       @default(0)
+  lastVisitAt DateTime?
+  blocked     Boolean   @default(false)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  business Business  @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  bookings Booking[]
+
+  @@unique([businessId, phone])
+}
+
+model Booking {
+  id             String    @id @default(cuid())
+  businessId     String
+  staffId        String
+  serviceId      String
+  customerId     String
+  startsAt       DateTime
+  endsAt         DateTime
+  status         String    @default("confirmed") // confirmed | cancelled_customer | cancelled_business | completed | no_show
+  source         String    @default("link") // link | page | find | manual
+  serviceName    String // copied at booking time
+  priceCents     Int? // copied at booking time
+  customerNote   String    @default("")
+  token          String    @unique
+  cancelledAt    DateTime?
+  reminderSentAt DateTime?
+  createdIpHash  String    @default("")
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  business Business       @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  staff    Staff          @relation(fields: [staffId], references: [id])
+  service  Service        @relation(fields: [serviceId], references: [id])
+  customer Customer       @relation(fields: [customerId], references: [id])
+  events   BookingEvent[]
+
+  @@index([businessId, startsAt])
+  @@index([staffId, startsAt])
+}
+
+model BookingEvent {
+  id        String   @id @default(cuid())
+  bookingId String
+  type      String // created | cancelled | moved | no_show | completed | reminder_sent | whatsapp_opened
+  actor     String // customer | owner | system
+  metaJson  String   @default("{}")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  booking Booking @relation(fields: [bookingId], references: [id], onDelete: Cascade)
+}
+
+model CategoryPreset {
+  category     String   @id
+  servicesJson String
+  hoursJson    String
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+// ------------------------------------------------------------- Faqja Gati
+model Page {
+  id               String    @id // unguessable; it is the preview URL
+  businessId       String?
+  ownerUserId      String?
+  contactPhone     String    @default("")
+  template         String // berber | klinike-dentare | restorant-kafe | bujtine | salon-bukurie | dyqan | sallon-dasmash | autoshkolla
+  status           String    @default("draft") // draft | generating | preview | payment_pending | paid | live | failed | expired
+  stage            String    @default("") // progress stage while generating
+  inputName        String
+  inputCategory    String
+  inputCity        String
+  inputText        String    @default("")
+  inputOldUrl      String    @default("")
+  contentJson      String    @default("") // validated against templates/schema.json
+  themeVariant     String    @default("")
+  subdomain        String?   @unique
+  customDomain     String?
+  revisionsUsed    Int       @default(0)
+  notice           String    @default("") // message for the owner, e.g. old site could not be read
+  previewExpiresAt DateTime?
+  publishedAt      DateTime?
+  createdIpHash    String    @default("")
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+
+  business    Business?        @relation(fields: [businessId], references: [id], onDelete: SetNull)
+  owner       User?            @relation(fields: [ownerUserId], references: [id], onDelete: SetNull)
+  assets      PageAsset[]
+  generations PageGeneration[]
+  payments    Payment[]
+
+  @@index([status])
+}
+
+model PageAsset {
+  id         String   @id @default(cuid())
+  pageId     String
+  kind       String   @default("upload") // upload | enhanced | preview
+  slot       String   @default("gallery") // hero | about | gallery | service | logo
+  sort       Int      @default(0)
+  storageKey String // private path under storage/
+  previewKey String   @default("") // watermarked low-resolution derivative
+  width      Int      @default(0)
+  height     Int      @default(0)
+  alt        String   @default("")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId, sort])
+}
+
+model PageGeneration {
+  id           String   @id @default(cuid())
+  pageId       String
+  model        String
+  inputTokens  Int      @default(0)
+  outputTokens Int      @default(0)
+  costCents    Int      @default(0)
+  ok           Boolean  @default(false)
+  error        String   @default("")
+  revisionNote String   @default("")
+  durationMs   Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+}
+
+model Payment {
+  id             String    @id @default(cuid())
+  pageId         String
+  amountCents    Int
+  currency       String    @default("EUR")
+  method         String // paysera | bank | cash
+  status         String    @default("pending") // pending | paid | failed | refunded
+  reference      String    @default("") // shown to the customer for bank transfers
+  providerRef    String    @default("")
+  markedByUserId String?
+  paidAt         DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  page Page @relation(fields: [pageId], references: [id], onDelete: Cascade)
+
+  @@index([pageId])
+}
+
+model AuditLog {
+  id         String   @id @default(cuid())
+  userId     String?
+  action     String
+  targetType String
+  targetId   String
+  metaJson   String   @default("{}")
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}

@@ -1,0 +1,23 @@
+# Never upload these
+node_modules/
+.next/
+.vercel/
+*.tsbuildinfo
+next-env.d.ts
+
+# Secrets (keep only .env.example)
+.env
+.env.*
+!.env.example
+
+# Local databases and uploaded photos
+*.db
+*.db-journal
+storage/
+
+# Logs and machine stuff
+logs/
+*.log
+.DS_Store
+Thumbs.db
+.claude/settings.local.json

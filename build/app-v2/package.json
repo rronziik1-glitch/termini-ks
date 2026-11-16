@@ -1,0 +1,39 @@
+{
+  "name": "termini-faqja-gati",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "predev": "node scripts/ensure-setup.mjs",
+    "dev": "next dev",
+    "build": "node scripts/ensure-setup.mjs && next build",
+    "start": "next start",
+    "postinstall": "prisma generate",
+    "db:setup": "prisma db push --force-reset --skip-generate && tsx prisma/seed.ts",
+    "db:seed": "tsx prisma/seed.ts",
+    "test": "node scripts/test-db.mjs && vitest run",
+    "typecheck": "tsc --noEmit",
+    "smoke": "node scripts/smoke.mjs",
+    "admin:password": "node scripts/admin-password.mjs"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.19.0",
+    "ajv": "^8.17.1",
+    "jsdom": "^25.0.1",
+    "next": "^15.5.0",
+    "qrcode": "^1.5.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "sharp": "^0.34.0"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^21.1.7",
+    "@types/node": "^22.10.0",
+    "@types/qrcode": "^1.5.5",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "prisma": "^6.19.0",
+    "tsx": "^4.19.2",
+    "typescript": "^5.7.2",
+    "vitest": "^3.0.0"
+  }
+}

@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="sq" data-fg-loading data-fg-demo>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Lavazh dhe servis</title>
+  <meta name="description" content="">
+  <meta name="theme-color" content="#090c0f">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Albert+Sans:wght@400;500;600&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../base.css">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <header class="fg-header head">
+    <a class="head__brand" href="#top"><span class="head__mark" aria-hidden="true"></span><span data-t="brand.name"></span></a>
+    <nav class="head__nav" aria-label="Kryesore">
+      <a href="#sherbimet">Shërbimet</a>
+      <a href="#para-pas" data-if="gallery.images">Para dhe pas</a>
+      <a href="#pyetje" data-if="faq">Pyetje</a>
+      <a href="#lokacioni">Lokacioni</a>
+    </nav>
+    <a class="head__cta" data-cta data-attr="href:links.booking" data-t="booking.label"></a>
+  </header>
+
+  <main id="top">
+
+    <!-- HERO -->
+    <section class="hero" data-hero>
+      <div class="hero__media" data-parallax="0.14">
+        <img data-img="hero.image" fetchpriority="high" alt="">
+        <video data-video="hero.video" autoplay muted loop playsinline></video>
+      </div>
+      <div class="hero__shade"></div>
+      <div class="hero__body fg-wrap">
+        <p class="hero__eyebrow" data-reveal><span class="dot"></span><span data-t="hero.eyebrow"></span></p>
+        <h1 class="hero__title" data-reveal data-t="hero.title"></h1>
+        <p class="hero__sub" data-reveal data-t="hero.subtitle"></p>
+        <div class="hero__actions" data-reveal>
+          <a class="btn btn--accent" data-cta data-attr="href:links.booking"><i data-icon="calendar"></i><span data-t="booking.label"></span></a>
+          <a class="btn btn--glass" data-cta data-attr="href:links.tel"><i data-icon="phone"></i><span data-t="contact.phoneDisplay"></span></a>
+        </div>
+        <p class="hero__trust" data-if="reviews.rating" data-reveal>
+          <span class="stars" aria-hidden="true">★★★★★</span>
+          <b data-t="reviews.rating"></b><span data-t="reviews.summary"></span>
+        </p>
+      </div>
+    </section>
+
+    <!-- FACTS -->
+    <section class="facts" data-if="highlights">
+      <ul class="fg-wrap facts__list">
+        <template data-each="highlights">
+          <li class="fact" data-reveal><strong data-t=".value"></strong><span data-t=".label"></span></li>
+        </template>
+      </ul>
+    </section>
+
+    <!-- SERVICES: the first group is shown as package cards (the washes), the others as price lists (oil, tyres, diagnostics) -->
+    <section class="sec" id="sherbimet">
+      <div class="fg-wrap">
+        <header class="sec__head">
+          <p class="label" data-reveal>Shërbimet dhe çmimet</p>
+          <h2 class="title" data-reveal data-t="services.title"></h2>
+          <p class="sec__intro" data-if="services.intro" data-reveal data-t="services.intro"></p>
+        </header>
+        <div class="groups">
+          <template data-each="services.groups">
+            <section class="group">
+              <h3 class="group__name" data-if=".name" data-reveal data-t=".name"></h3>
+              <ul class="group__list">
+                <template data-each=".items">
+                  <li class="svc" data-reveal>
+                    <a class="svc__link" data-cta data-attr="href:.bookLink">
+                      <em class="svc__tag" data-if=".tag" data-t=".tag"></em>
+                      <div class="svc__main">
+                        <p class="svc__name" data-t=".name"></p>
+                        <p class="svc__desc" data-if=".description" data-t=".description"></p>
+                      </div>
+                      <div class="svc__side">
+                        <p class="svc__price" data-if=".price" data-t=".price"></p>
+                        <p class="svc__time" data-if=".durationText"><i data-icon="clock"></i><span data-t=".durationText"></span></p>
+                      </div>
+                      <span class="svc__go">Rezervo<i data-icon="arrow"></i></span>
+                    </a>
+                  </li>
+                </template>
+              </ul>
+            </section>
+          </template>
+        </div>
+      </div>
+    </section>
+
+    <!-- BEFORE / AFTER: gallery photos come in pairs (1 = para, 2 = pas, 3 = para, 4 = pas…) -->
+    <section class="sec sec--panel" id="para-pas" data-if="gallery.images">
+      <div class="fg-wrap">
+        <header class="sec__head">
+          <p class="label" data-reveal>Para dhe pas</p>
+          <h2 class="title" data-reveal data-t="gallery.title"></h2>
+        </header>
+        <div class="ba">
+          <template data-each="gallery.images">
+            <button class="ba__item fg-media" data-lightbox data-reveal><img data-img="." alt=""></button>
+          </template>
+        </div>
+      </div>
+    </section>
+
+    <!-- ABOUT -->
+    <section class="sec" data-if="about.text">
+      <div class="fg-wrap about">
+        <div class="about__media fg-media" data-reveal="clip"><img data-img="about.image" alt=""></div>
+        <div class="about__body">
+          <p class="label" data-reveal data-if="brand.since" data-t="brand.sinceText"></p>
+          <h2 class="title" data-reveal data-t="about.title"></h2>
+          <p class="about__text" data-reveal data-t="about.text"></p>
+          <ul class="checks" data-if="about.points">
+            <template data-each="about.points">
+              <li data-reveal><i data-icon="check"></i><span data-t="."></span></li>
+            </template>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- TEAM -->
+    <section class="sec sec--panel" data-if="team.members">
+      <div class="fg-wrap">
+        <header class="sec__head">
+          <p class="label" data-reveal>Ekipi</p>
+          <h2 class="title" data-reveal data-t="team.title"></h2>
+        </header>
+        <ul class="team">
+          <template data-each="team.members">
+            <li class="member" data-reveal>
+              <div class="member__media fg-media"><img data-img=".image" alt=""></div>
+              <p class="member__name" data-t=".name"></p>
+              <p class="member__role" data-t=".role"></p>
+            </li>
+          </template>
+        </ul>
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="sec" data-if="reviews.items">
+      <div class="fg-wrap">
+        <header class="sec__head">
+          <p class="label" data-reveal>Klientët</p>
+          <h2 class="title" data-reveal data-t="reviews.title"></h2>
+        </header>
+      </div>
+      <ul class="reviews" data-reveal="fade">
+        <template data-each="reviews.items">
+          <li class="review">
+            <span class="stars" data-t=".stars"></span>
+            <blockquote data-t=".text"></blockquote>
+            <p class="review__who"><span class="review__av" data-t=".initial"></span><cite data-t=".name"></cite></p>
+          </li>
+        </template>
+      </ul>
+    </section>
+
+    <!-- FAQ -->
+    <section class="sec sec--panel" id="pyetje" data-if="faq">
+      <div class="fg-wrap faq">
+        <header class="sec__head">
+          <p class="label" data-reveal>Pyetje të shpeshta</p>
+          <h2 class="title" data-reveal>Para se të vish</h2>
+        </header>
+        <div class="faq__list">
+          <template data-each="faq">
+            <details class="qa" data-reveal>
+              <summary><span data-t=".q"></span><span class="qa__plus" aria-hidden="true"></span></summary>
+              <p data-t=".a"></p>
+            </details>
+          </template>
+        </div>
+      </div>
+    </section>
+
+    <!-- LOCATION -->
+    <section class="sec" id="lokacioni">
+      <div class="fg-wrap place">
+        <div class="place__card" data-reveal>
+          <p class="label">Lokacioni dhe orari</p>
+          <h2 class="title" data-t="location.title"></h2>
+          <a class="place__addr" data-if="location.full" data-cta data-attr="href:links.map"><i data-icon="pin"></i><span><span data-t="location.full"></span><small data-if="location.note" data-t="location.note"></small></span></a>
+          <dl class="hours" data-if="location.hours">
+            <template data-each="location.hours">
+              <div><dt data-t=".days"></dt><dd data-t=".time"></dd></div>
+            </template>
+          </dl>
+          <div class="place__actions">
+            <a class="btn btn--line" data-cta data-attr="href:links.whatsapp"><i data-icon="whatsapp"></i>WhatsApp</a>
+            <a class="btn btn--line" data-cta data-attr="href:links.map"><i data-icon="arrow-up-right"></i>Si të vij</a>
+          </div>
+        </div>
+        <div class="fg-map" data-reveal="fade"><iframe title="Harta" loading="lazy" referrerpolicy="no-referrer-when-downgrade" data-attr="src:links.mapEmbed"></iframe></div>
+      </div>
+    </section>
+
+    <!-- CTA -->
+    <section class="end">
+      <div class="fg-wrap end__in" data-reveal>
+        <h2 class="end__title">Vetura e pastër, pa pritur në rend</h2>
+        <p class="end__text">Zgjidh shërbimin dhe orën online. Vjen, e lë veturën dhe e merr gati.</p>
+        <div class="end__actions">
+          <a class="btn btn--accent" data-cta data-attr="href:links.booking"><i data-icon="calendar"></i><span data-t="booking.label"></span></a>
+          <a class="btn btn--glass" data-cta data-attr="href:links.whatsapp"><i data-icon="whatsapp"></i>WhatsApp</a>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="fg-footer foot">
+    <div class="fg-wrap foot__in">
+      <p class="foot__brand"><span class="head__mark" aria-hidden="true"></span><span data-t="brand.name"></span></p>
+      <p class="foot__note" data-if="footer.note" data-t="footer.note"></p>
+      <p class="foot__legal">© <span data-t="year"></span> <span data-t="brand.name"></span><span data-if="location.full"> · <span data-t="location.full"></span></span></p>
+      <a class="fg-credit" href="https://faqjagati.com" rel="noopener">Faqe nga <b>Faqja Gati</b></a>
+    </div>
+  </footer>
+
+  <div class="fg-bar" data-actionbar>
+    <a class="fg-bar__btn fg-bar__btn--wa" data-attr="href:links.whatsapp" aria-label="Shkruaj në WhatsApp"><i data-icon="whatsapp"></i></a>
+    <a class="fg-bar__btn fg-bar__btn--book" data-attr="href:links.booking"><span data-t="booking.label"></span></a>
+  </div>
+
+  <script src="content.js"></script>
+  <script src="../fg.js"></script>
+</body>
+</html>
