@@ -1,5 +1,6 @@
 // Business set-up: onboarding, weekly hours document, slug checks, the "find" list.
 import type { Business, User, WorkingHours } from '@prisma/client';
+import { searchScore, searchWords } from './search';
 import { AppError, db } from './db';
 import { freeStarts, isClosed, loadCtx } from './availability';
 import { normalizePhone } from './phone';
@@ -140,33 +141,42 @@ export async function deleteBusinessAndUser(user: User) {
 export type FoundBusiness = {
   slug: string; name: string; category: string; city: string; address: string; photoUrl: string;
   nextDate: string | null; nextTime: string | null; priceFromCents: number | null; paused: boolean;
+  /** v6 search: the service that matched the search words (shown under the name), if the name did not. */
+  matchedService?: string | null;
 };
+const FIND_MAX = 60;
 
 /** v4 audit: the list costs about four database queries per business, on every visit of the home and "Gjej" pages.
  *  The result is kept for 30 seconds per city + category (per server instance). Tests pass their own `now` and skip it. */
 const findCache = new Map<string, { at: number; list: FoundBusiness[] }>();
-export async function findBusinesses(city?: string, category?: string, nowArg?: Date): Promise<FoundBusiness[]> {
-  const key = `${city || ''}|${category || ''}`;
+export async function findBusinesses(city?: string, category?: string, nowArg?: Date, q?: string): Promise<FoundBusiness[]> {
+  const words = searchWords(q || '');
+  const key = `${city || ''}|${category || ''}|${words.join(' ')}`;
   const hit = findCache.get(key);
   if (!nowArg && !process.env.VITEST && hit && Date.now() - hit.at < 30_000) return hit.list;
-  const list = await findBusinessesNow(city, category, nowArg ?? new Date());
+  const list = await findBusinessesNow(city, category, nowArg ?? new Date(), words);
   if (!nowArg) { if (findCache.size > 200) findCache.clear(); findCache.set(key, { at: Date.now(), list }); }
   return list;
 }
 
-async function findBusinessesNow(city: string | undefined, category: string | undefined, now: Date): Promise<FoundBusiness[]> {
-  const list = await db.business.findMany({
+async function findBusinessesNow(city: string | undefined, category: string | undefined, now: Date, words: string[] = []): Promise<FoundBusiness[]> {
+  const all = await db.business.findMany({
     where: { listedInFind: true, suspendedAt: null, onboardedAt: { not: null }, ...(city ? { city } : {}), ...(category ? { category } : {}) },
     include: { services: { where: { active: true, deleted: false }, orderBy: { sort: 'asc' } } },
-    take: 60,
+    orderBy: { createdAt: 'asc' },
+    take: words.length ? 2000 : FIND_MAX,
   });
-  const out: FoundBusiness[] = [];
-  for (const b of list) {
-    if (!b.services.length) continue;
+  // v6 global search: score every business on the words, keep the matches, best first (then the soonest free time).
+  const scored = all.filter((b) => b.services.length).map((b) => ({ b, ...searchScore(b, words) })).filter((x) => x.score > 0);
+  if (words.length) scored.sort((x, y) => y.score - x.score);
+  const list = scored.slice(0, FIND_MAX);
+  const out: (FoundBusiness & { _score: number })[] = [];
+  for (const { b, score, service } of list) {
     const prices = b.services.map((s) => s.priceCents).filter((p): p is number => p !== null);
-    const item: FoundBusiness = {
+    const item: FoundBusiness & { _score: number } = {
       slug: b.slug, name: b.name, category: b.category, city: b.city, address: b.address, photoUrl: b.photoUrl,
       nextDate: null, nextTime: null, priceFromCents: prices.length ? Math.min(...prices) : null, paused: b.bookingsPaused,
+      matchedService: service, _score: score,
     };
     if (!b.bookingsPaused) {
       const today = toLocal(now, b.timezone).date;
@@ -182,5 +192,7 @@ async function findBusinessesNow(city: string | undefined, category: string | un
     out.push(item);
   }
   const key = (f: FoundBusiness) => (f.nextDate ? `${f.nextDate} ${f.nextTime}` : f.paused ? 'zz' : 'z');
-  return out.sort((a, b) => key(a).localeCompare(key(b)));
+  // Without words: soonest free time first. With words: best match first, the soonest free time breaks ties.
+  out.sort((a, b) => (words.length ? b._score - a._score : 0) || key(a).localeCompare(key(b)));
+  return out.map(({ _score, ...f }) => f);
 }

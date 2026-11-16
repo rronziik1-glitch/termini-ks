@@ -86,7 +86,14 @@ export default async function Home() {
           <div className="stack stack--6 reveal">
             <h2 className="t-display">{t.customersTitle}</h2>
             <p className="t-2" style={{ fontSize: '1.125rem', maxWidth: '30rem' }}>{t.customersText}</p>
-            <div><Link className="btn btn--primary btn--auto" href="/gjej">{t.find}<Icon name="chevron-right" size="sm" /></Link></div>
+            <form className="searchbar" action="/gjej" method="get" role="search">
+              <label className="inputgroup searchbar__field">
+                <span className="inputgroup__ad"><Icon name="search" size="sm" /></span>
+                <input className="input" type="search" name="q" placeholder={sq.find.searchPh} aria-label={sq.find.searchLabel} autoComplete="off" enterKeyHint="search" maxLength={80} />
+              </label>
+              <button className="btn btn--primary btn--auto" type="submit">{sq.find.search}</button>
+            </form>
+            <div><Link className="link" href="/gjej">{t.find}</Link></div>
           </div>
           <ul className="mk-list reveal" style={{ ['--i' as string]: 1 }}>
             {[sq.booking.s1, sq.booking.s2, sq.confirmation.sendWa, `${sq.brand.bookedVia} Termini`].map((x) => <li key={x}><Icon name="check" size="sm" /><span>{x}</span></li>)}

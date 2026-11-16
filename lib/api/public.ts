@@ -79,7 +79,7 @@ route('GET', '/public/bookings/:token/calendar.ics', 'public', async (c) => {
   return new Response(bookingIcs(b, c.origin), { headers: { 'content-type': 'text/calendar; charset=utf-8', 'content-disposition': 'attachment; filename="termini.ics"' } });
 });
 
-route('GET', '/public/find', 'public', async (c) => ({ businesses: await findBusinesses(c.query.get('city') || undefined, c.query.get('category') || undefined) }));
+route('GET', '/public/find', 'public', async (c) => ({ businesses: await findBusinesses(c.query.get('city') || undefined, c.query.get('category') || undefined, undefined, (c.query.get('q') || '').slice(0, 80)) }));
 
 route('GET', '/public/businesses/:slug/photo', 'public', async (c) => {
   const b = await bizBySlug(c.params.slug);

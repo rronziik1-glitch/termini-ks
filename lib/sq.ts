@@ -188,6 +188,11 @@ export const sq = {
     city: 'Qyteti', all: 'Të gjitha', nextFree: 'E lira e radhës', from: 'nga',
     noFree: 'Plot për dy javë', paused: 'Me telefon',
     empty: (city: string) => `Ende s'ka biznese në ${city}.`, emptyAll: "Ende s'ka biznese këtu.", addYours: 'Ke biznes? Shtoje falas.',
+    // v6 global search
+    search: 'Kërko', searchPh: 'Berber, qethje, dentist, emri, qyteti…', searchLabel: 'Kërko biznes ose shërbim', clear: 'Pastro kërkimin',
+    results: (n: number, q: string) => `${n} ${n === 1 ? 'rezultat' : 'rezultate'} për “${q}”`,
+    noResults: (q: string) => `Asnjë rezultat për “${q}”.`, noResultsHint: 'Provo një fjalë tjetër, ose hiq qytetin dhe llojin.', showAll: 'Shiko të gjitha',
+    service: 'Shërbimi',
   },
 
   /* ---- onboarding (§4.1) --------------------------------------------------- */

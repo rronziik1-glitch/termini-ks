@@ -1,7 +1,7 @@
 // "Gjej": businesses by city and category, sorted by the soonest free time (01-product-design.md §3.6).
 import type { Metadata } from 'next';
 import Link from 'next/link';
-import { Wordmark } from '@/components/ui';
+import { Icon, Wordmark } from '@/components/ui';
 import { findBusinesses } from '@/lib/business';
 import { db } from '@/lib/db';
 import { sq } from '@/lib/sq';
@@ -18,9 +18,10 @@ export default async function FindPage({ searchParams }: { searchParams: Promise
   const cities = [...sq.cities.filter((c) => c !== sq.common.other), ...used.filter((c) => !sq.cities.includes(c))];
   const city = typeof q.qyteti === 'string' && cities.includes(q.qyteti) ? q.qyteti : '';
   const category = typeof q.lloji === 'string' && CATS.includes(q.lloji) ? q.lloji : '';
-  const list = await findBusinesses(city || undefined, category || undefined);
+  const search = typeof q.q === 'string' ? q.q.trim().slice(0, 80) : '';
+  const list = await findBusinesses(city || undefined, category || undefined, undefined, search);
   const today = toLocal(new Date()).date;
-  const href = (c: string, k: string) => { const p = new URLSearchParams(); if (c) p.set('qyteti', c); if (k) p.set('lloji', k); const s = p.toString(); return s ? `/gjej?${s}` : '/gjej'; };
+  const href = (c: string, k: string, s0 = search) => { const p = new URLSearchParams(); if (s0) p.set('q', s0); if (c) p.set('qyteti', c); if (k) p.set('lloji', k); const s = p.toString(); return s ? `/gjej?${s}` : '/gjej'; };
   const whenLabel = (date: string) => { const n = diffDays(today, date); return n === 0 ? sq.common.today : n === 1 ? sq.common.tomorrow : `${DAYS_SHORT[weekdayOf(date) - 1]} ${fmtDayMonth(date)}`; };
 
   return (
@@ -32,6 +33,18 @@ export default async function FindPage({ searchParams }: { searchParams: Promise
             <h1 className="t-h1">{t.title}</h1>
             <p className="t-2">{t.text}</p>
           </div>
+
+          {/* v6 global search: a normal GET form, works without JavaScript; city and type stay as chosen */}
+          <form className="searchbar" action="/gjej" method="get" role="search">
+            <label className="inputgroup searchbar__field">
+              <span className="inputgroup__ad"><Icon name="search" size="sm" /></span>
+              <input className="input" type="search" name="q" defaultValue={search} placeholder={t.searchPh} aria-label={t.searchLabel} autoComplete="off" enterKeyHint="search" maxLength={80} />
+              {search && <Link className="searchbar__clear" href={href(city, category, '')} aria-label={t.clear}><Icon name="x" size="sm" /></Link>}
+            </label>
+            {city && <input type="hidden" name="qyteti" value={city} />}
+            {category && <input type="hidden" name="lloji" value={category} />}
+            <button className="btn btn--primary btn--auto" type="submit">{t.search}</button>
+          </form>
 
           <div className="stack stack--3">
             <p className="label-caps">{t.city}</p>
@@ -45,11 +58,20 @@ export default async function FindPage({ searchParams }: { searchParams: Promise
             </div>
           </div>
 
+          {search && list.length > 0 && <p className="t-small t-2" aria-live="polite">{t.results(list.length, search)}</p>}
           {list.length === 0 ? (
-            <section className="card empty">
-              <p className="empty__title">{city ? t.empty(city) : t.emptyAll}</p>
-              <Link className="btn btn--primary" href="/fillo">{t.addYours}</Link>
-            </section>
+            search ? (
+              <section className="card empty" aria-live="polite">
+                <p className="empty__title">{t.noResults(search)}</p>
+                <p className="t-small t-2">{t.noResultsHint}</p>
+                <Link className="btn btn--primary" href="/gjej">{t.showAll}</Link>
+              </section>
+            ) : (
+              <section className="card empty">
+                <p className="empty__title">{city ? t.empty(city) : t.emptyAll}</p>
+                <Link className="btn btn--primary" href="/fillo">{t.addYours}</Link>
+              </section>
+            )
           ) : (
             <ul className="stack stack--3">
               {list.map((b) => (
@@ -59,6 +81,7 @@ export default async function FindPage({ searchParams }: { searchParams: Promise
                     <span className="row__main">
                       <span className="row__title">{b.name}</span>
                       <span className="row__meta">{sq.categoriesShort[b.category] || sq.common.other} · {b.city}{b.priceFromCents !== null ? ` · ${fmtPrice(b.priceFromCents, true)}` : ''}</span>
+                      {b.matchedService && <span className="row__meta found__match"><Icon name="scissors" size="xs" />{b.matchedService}</span>}
                     </span>
                     <span className="found__next">
                       {b.nextDate ? <><span>{t.nextFree}</span><b>{whenLabel(b.nextDate)} {b.nextTime}</b></> : <span>{b.paused ? t.paused : t.noFree}</span>}
