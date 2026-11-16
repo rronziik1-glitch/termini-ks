@@ -89,12 +89,13 @@ export function normalize(raw: unknown, i: FillInput): Content {
     }
   };
   strip(c);
+  if (c.hero && 'video' in c.hero) delete c.hero.video;   // v4 audit: the hero video is set by the admin only, never by the model
   return c;
 }
 
 type ApiResult = { input: unknown; inputTokens: number; outputTokens: number };
 
-async function callClaude(model: string, user: string): Promise<ApiResult> {
+async function callClaude(model: string, user: string, timeoutMs: number): Promise<ApiResult> {
   const res = await fetch('https://api.anthropic.com/v1/messages', {
     method: 'POST',
     headers: { 'content-type': 'application/json', 'x-api-key': config.anthropicKey(), 'anthropic-version': '2023-06-01' },
@@ -104,7 +105,7 @@ async function callClaude(model: string, user: string): Promise<ApiResult> {
       tool_choice: { type: 'tool', name: 'save_page_content' },
       messages: [{ role: 'user', content: user }],
     }),
-    signal: AbortSignal.timeout(120_000),
+    signal: AbortSignal.timeout(timeoutMs),
   });
   if (!res.ok) throw new Error(`Claude API ${res.status}: ${(await res.text()).slice(0, 300)}`);
   const data = (await res.json()) as { content?: { type: string; input?: unknown }[]; usage?: { input_tokens?: number; output_tokens?: number } };
@@ -115,16 +116,21 @@ async function callClaude(model: string, user: string): Promise<ApiResult> {
 
 export type FillResult = { content: Content; model: string; inputTokens: number; outputTokens: number; ok: boolean; error: string };
 
-export async function fillContent(i: FillInput): Promise<FillResult> {
-  if (!config.anthropicKey()) return { content: localFill(i), model: 'local-filler', inputTokens: 0, outputTokens: 0, ok: true, error: '' };
+/** v4 audit: the whole fill must fit inside one server call (Vercel stops a function after 60 seconds). The model
+ *  gets FG_AI_BUDGET_MS in total (default 45 s); when the time is used up the local writer builds the page instead. */
+export async function fillContent(i: FillInput, opts: { noAi?: boolean } = {}): Promise<FillResult> {
+  if (!config.anthropicKey() || opts.noAi) return { content: localFill(i), model: 'local-filler', inputTokens: 0, outputTokens: 0, ok: true, error: '' };
 
   let inputTokens = 0, outputTokens = 0, error = '';
   // Haiku for the fill; Sonnet when there is an old website to digest, and for the retry.
   let model = i.oldSiteText ? config.modelRetry() : config.modelFill();
   let user = userMessage(i);
+  const deadline = Date.now() + Math.max(5000, Number(process.env.FG_AI_BUDGET_MS) || 45_000);
   for (let attempt = 0; attempt < 2; attempt++) {
+    const left = deadline - Date.now();
+    if (left < 6000) { error = error || 'time budget used up'; break; }
     try {
-      const r = await callClaude(model, user);
+      const r = await callClaude(model, user, Math.min(left, 40_000));
       inputTokens += r.inputTokens; outputTokens += r.outputTokens;
       const content = normalize(r.input, i);
       const problems = validateContent(content);

@@ -7,6 +7,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ApiError, Field, Icon, PhoneInput, api, toastError } from '@/components/ui';
 import { normalizePhone } from '@/lib/phone';
 import { sq } from '@/lib/sq';
+import { shrinkPhoto } from '@/components/shrink';
 
 const t = sq.fg;
 const TYPES = ['berber', 'klinike-dentare', 'restorant-kafe', 'bujtine', 'salon-bukurie', 'dyqan', 'sallon-dasmash', 'autoshkolla', 'lavazh-servis', 'auto'];
@@ -15,22 +16,6 @@ type Photo = { key: number; file: File; url: string };
 type Prefill = { name: string; city: string; template: string; phone: string; text: string };
 let seq = 1;
 
-/** Downscale on the device; falls back to the original file when the browser cannot decode it (e.g. HEIC). */
-async function shrink(file: File): Promise<Blob> {
-  try {
-    const bmp = await createImageBitmap(file);
-    const scale = Math.min(1, 2000 / Math.max(bmp.width, bmp.height));
-    if (scale === 1 && file.size < 2.5e6 && file.type === 'image/jpeg') return file;
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.round(bmp.width * scale);
-    canvas.height = Math.round(bmp.height * scale);
-    canvas.getContext('2d')!.drawImage(bmp, 0, 0, canvas.width, canvas.height);
-    const blob = await new Promise<Blob | null>((r) => canvas.toBlob(r, 'image/jpeg', 0.86));
-    return blob || file;
-  } catch {
-    return file;
-  }
-}
 
 export default function FaqjaWizard({ prefill }: { prefill: Prefill }) {
   const router = useRouter();
@@ -92,7 +77,7 @@ export default function FaqjaWizard({ prefill }: { prefill: Prefill }) {
       for (let i = 0; i < photos.length; i++) {
         setProgress(t.uploading(i + 1, photos.length));
         const form = new FormData();
-        form.append('file', await shrink(photos[i].file), photos[i].file.name.replace(/\.\w+$/, '') + '.jpg');
+        form.append('file', await shrinkPhoto(photos[i].file), photos[i].file.name.replace(/\.\w+$/, '') + '.jpg');
         try { await api(`/pages/${id}/assets`, { form }); } catch (e) { if (!(e instanceof ApiError && e.code === 'photo_type')) throw e; }
       }
       setProgress('');

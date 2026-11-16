@@ -89,3 +89,8 @@ html[data-fg-preview] .fg-map::after {
     display: block; padding: 40px; font: 600 16px system-ui, sans-serif; color: #000;
   }
 }
+
+/* v4 audit: the hidden half of a list is shown as bars of "█". A long bar in a big font is one unbreakable word and
+   pushed three templates sideways at phone width. In a preview any long word may wrap. */
+html[data-fg-preview] body { overflow-wrap: anywhere; }
+html[data-fg-preview] { overflow-x: clip; }

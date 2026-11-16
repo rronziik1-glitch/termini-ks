@@ -4,7 +4,9 @@
 import type { Page, PageAsset } from '@prisma/client';
 import { after } from 'next/server';
 import { AppError, db } from './db';
-import { bookingUrl, config, ipHash, randomId, rateLimit } from './config';
+import { bookingUrl, config, ipHash, randomId } from './config';
+import { rateLimitDb } from './ratelimit';
+import { appHost, pagesDomain } from './site-lock';
 import { fillContent } from './ai';
 import { removePageFiles, saveUpload } from './fg/images';
 import { assignPhotos, renderLive, renderPreview } from './fg/render';
@@ -69,7 +71,10 @@ export async function getPage(id: string) {
   return page;
 }
 
-const editable = (p: Page) => ['draft', 'preview', 'failed', 'expired', 'payment_pending'].includes(p.status);
+const EDITABLE = ['draft', 'preview', 'failed', 'expired', 'payment_pending'];
+const editable = (p: Page) => EDITABLE.includes(p.status);
+/** A page that has been "generating" for this long was cut off (server function ended); it is set to "failed" so the owner can retry. */
+export const GENERATION_STALE_MS = 150_000;
 
 export async function addAsset(pageId: string, data: Buffer): Promise<PageAsset> {
   const page = await getPage(pageId);
@@ -140,7 +145,7 @@ export type GenerateOptions = { revisionNote?: string; text?: string; themeVaria
 
 /** Starts generation and returns at once; the progress screen polls getStatus. */
 export async function startGeneration(pageId: string, opts: GenerateOptions = {}, origin?: string): Promise<Page> {
-  const page = await getPage(pageId);
+  const page = await refreshExpiry(await getPage(pageId));
   if (!editable(page)) throw new AppError('forbidden', 403, sq.errors.forbidden);
 
   // "Provo stil tjetër": a colour variant of the same template; no regeneration needed.
@@ -158,10 +163,12 @@ export async function startGeneration(pageId: string, opts: GenerateOptions = {}
   if (text.length < 20) throw new AppError('about_short', 422, sq.fg.aboutError);
   // Audit M6: global daily cap on AI generations (each one is a paid Claude call).
   const cap = Number(process.env.FG_DAILY_CAP || 200);
-  if (!rateLimit('fg:generations', cap, 24 * 3600e3)) throw new AppError('daily_cap', 429, sq.errors.daily_cap);
+  // v4 audit: counted in the database (the in-memory counter was per server instance).
+  if (!(await rateLimitDb('fg:generations', cap, 24 * 3600e3))) throw new AppError('daily_cap', 429, sq.errors.daily_cap);
   // Audit S4: the revision limit is checked and counted in one atomic write (two quick taps can't both pass).
   const res = await db.page.updateMany({
-    where: { id: pageId, ...(isRevision ? { revisionsUsed: { lt: MAX_REVISIONS } } : {}) },
+    // v4 audit: the status is part of the condition, so a page that was paid (live) a moment ago cannot be pulled back.
+    where: { id: pageId, status: { in: EDITABLE }, ...(isRevision ? { revisionsUsed: { lt: MAX_REVISIONS } } : {}) },
     data: { status: 'generating', stage: 'read', inputText: text, notice: '', ...(isRevision ? { revisionsUsed: { increment: 1 } } : {}) },
   });
   if (res.count === 0) throw new AppError('revisions_used', 429, sq.errors.revisions_used);
@@ -172,7 +179,8 @@ export async function startGeneration(pageId: string, opts: GenerateOptions = {}
 
 /** The job itself. Exported for the seed and the tests (they await it). */
 export async function runGeneration(pageId: string, opts: GenerateOptions = {}, origin?: string): Promise<Page> {
-  const delay = config.stageDelayMs();
+  // The little pauses only make the four stages visible with the instant local writer; with the AI they are not needed.
+  const delay = config.anthropicKey() ? 0 : config.stageDelayMs();
   const setStage = (stage: string) => db.page.update({ where: { id: pageId }, data: { status: 'generating', stage } });
   for (let attempt = 1; ; attempt++) {
     const started = Date.now();
@@ -194,7 +202,7 @@ export async function runGeneration(pageId: string, opts: GenerateOptions = {}, 
         template: isTemplate(page.template) ? page.template : 'auto', name: page.inputName, city: page.inputCity, text: page.inputText,
         oldSiteText, photoCount: assets.length, contactPhone: page.contactPhone,
         bookingUrl: business ? bookingUrl(business.slug, origin) : '', revisionNote: opts.revisionNote, previous,
-      });
+      }, { noAi: attempt > 1 });   // the automatic retry uses the local writer, so the whole job fits in one server call
       const content = result.content;
       content.theme = { ...(content.theme || {}), variant: VARIANTS.includes(page.themeVariant) ? page.themeVariant : '' };
       const problems = validateContent(content);
@@ -211,14 +219,19 @@ export async function runGeneration(pageId: string, opts: GenerateOptions = {}, 
       renderPreview(assignPhotos(content, assets.map((a) => previewImageUrl(pageId, a.id))));   // must render without throwing
       await sleep(delay);
 
-      return await db.page.update({
-        where: { id: pageId },
+      // v4 audit: only a page that is still "generating" becomes a preview (never one that was paid meanwhile).
+      await db.page.updateMany({
+        where: { id: pageId, status: 'generating' },
         data: { status: 'preview', stage: '', template: content.meta.template, contentJson: JSON.stringify(content), notice, previewExpiresAt: new Date(Date.now() + PREVIEW_DAYS * 864e5) },
       });
+      return await getPage(pageId);
     } catch (e) {
       const message = e instanceof Error ? e.message : String(e);
       await db.pageGeneration.create({ data: { pageId, model: 'error', ok: false, error: message.slice(0, 500), durationMs: Date.now() - started } }).catch(() => undefined);
-      if (attempt >= 2) return db.page.update({ where: { id: pageId }, data: { status: 'failed', stage: '' } });   // one automatic retry
+      if (attempt >= 2) {                                                                                           // one automatic retry
+        await db.page.updateMany({ where: { id: pageId, status: 'generating' }, data: { status: 'failed', stage: '' } });
+        return getPage(pageId);
+      }
     }
   }
 }
@@ -227,6 +240,11 @@ export async function runGeneration(pageId: string, opts: GenerateOptions = {}, 
 export async function refreshExpiry(page: Page): Promise<Page> {
   if (page.status === 'preview' && page.previewExpiresAt && page.previewExpiresAt < new Date()) {
     return db.page.update({ where: { id: page.id }, data: { status: 'expired' } });
+  }
+  // v4 audit: a generation that was cut off (the server function ended) used to leave the page "generating" forever.
+  if (page.status === 'generating' && Date.now() - page.updatedAt.getTime() > GENERATION_STALE_MS) {
+    await db.page.updateMany({ where: { id: page.id, status: 'generating', updatedAt: page.updatedAt }, data: { status: 'failed', stage: '' } });
+    return getPage(page.id);
   }
   return page;
 }
@@ -302,7 +320,15 @@ export async function checkout(pageId: string, input: CheckoutInput, origin: str
   const wanted = slugify(input.subdomain || '');
   if (wanted && (!isValidSlug(wanted) || (await subdomainTaken(wanted, page.id)))) throw new AppError('subdomain_taken', 409, sq.errors.subdomain_taken);
   const subdomain = wanted || page.subdomain || (await freeSubdomain(page));
-  const customDomain = (input.customDomain || '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '').slice(0, 80) || null;
+  const customDomain = (input.customDomain || '').trim().toLowerCase().replace(/^https?:\/\//, '').replace(/\/.*$/, '').replace(/^www\./, '').slice(0, 80) || null;
+  // v4 audit: it must look like a real domain and can never be one of our own addresses.
+  if (customDomain) {
+    const ours = [appHost(), pagesDomain()];
+    const looksRight = /^[a-z0-9]([a-z0-9-]*[a-z0-9])?(\.[a-z0-9]([a-z0-9-]*[a-z0-9])?)+$/.test(customDomain) && customDomain.length >= 4;
+    if (!looksRight || ours.some((d) => customDomain === d || customDomain.endsWith('.' + d)) || customDomain.endsWith('.vercel.app')) {
+      throw new AppError('bad_domain', 422, sq.errors.bad_domain);
+    }
+  }
   const amountCents = config.pagePriceCents() + (customDomain ? config.domainPriceCents() : 0);
   const reference = paymentReference(page.id);
 

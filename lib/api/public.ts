@@ -2,6 +2,7 @@
 import { NextResponse } from 'next/server';
 import { SESSION_COOKIE, SESSION_DAYS, destroySession, requestCode, verifyCode } from '../auth';
 import { freeStarts, isClosed, loadCtx } from '../availability';
+import { otpProviderId } from '../otp';
 import { bookingIcs, cancelByToken, createPublicBooking, displayStatus, getByToken } from '../booking';
 import { findBusinesses } from '../business';
 import { AppError, db } from '../db';
@@ -89,7 +90,7 @@ route('GET', '/public/businesses/:slug/photo', 'public', async (c) => {
 route('POST', '/auth/code', 'public', async (c) => {
   const { phone } = await c.body<{ phone: string }>();
   const r = await requestCode(phone, c.ip);
-  return { phone: r.phone, dev_code: r.devCode };
+  return { phone: r.phone, dev_code: r.devCode, channel: otpProviderId() };
 });
 
 route('POST', '/auth/verify', 'public', async (c) => {

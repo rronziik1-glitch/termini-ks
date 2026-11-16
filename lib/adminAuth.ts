@@ -2,7 +2,8 @@
 // the admin must also type the admin password, which unlocks /admin for ADMIN_UNLOCK_HOURS on this session only.
 // The password is never stored, only an scrypt hash in ADMIN_PASSWORD_HASH (make it with: npm run admin:password).
 import { randomBytes, scryptSync, timingSafeEqual } from 'node:crypto';
-import { rateLimit, sha } from './config';
+import { sha } from './config';
+import { rateLimitDb } from './ratelimit';
 
 export const ADMIN_COOKIE = 't_admin';
 export const ADMIN_UNLOCK_HOURS = 8;
@@ -26,8 +27,9 @@ const storedHash = () => (process.env.ADMIN_PASSWORD_HASH || '').trim();
 export const adminPasswordRequired = () => !!storedHash() || process.env.NODE_ENV === 'production';
 
 /** Checks the password (max 5 tries per 15 min per IP, 20 per hour overall) and returns the cookie value to set. */
-export function unlockAdmin(sessionToken: string, password: string, ip: string): { ok: true; cookie: string } | { ok: false; reason: 'rate_limited' | 'wrong' | 'not_set' } {
-  if (!rateLimit(`adminpw:${ip}`, 5, 15 * 60e3) || !rateLimit('adminpw:all', 20, 3600e3)) return { ok: false, reason: 'rate_limited' };
+export async function unlockAdmin(sessionToken: string, password: string, ip: string): Promise<{ ok: true; cookie: string } | { ok: false; reason: 'rate_limited' | 'wrong' | 'not_set' }> {
+  // v4 audit: counted in the database, so the limit holds on every server instance.
+  if (!(await rateLimitDb(`adminpw:${ip}`, 5, 15 * 60e3)) || !(await rateLimitDb('adminpw:all', 20, 3600e3))) return { ok: false, reason: 'rate_limited' };
   const stored = storedHash();
   if (!stored) return { ok: false, reason: 'not_set' };
   if (!checkPassword(String(password || ''), stored)) return { ok: false, reason: 'wrong' };

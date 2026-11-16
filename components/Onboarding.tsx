@@ -137,7 +137,7 @@ export default function Onboarding({ linkPrefix, user, prefill }: {
       else if (!sent) {
         if (!normalizePhone(phone)) { setErrors({ phone: sq.errors.invalid_phone }); setBusy(false); return; }
         const r = await api<{ dev_code?: string }>('/auth/code', { body: { phone } });
-        setSent(true); setDevCode(r.dev_code || ''); toast(sq.login.codeSent);
+        setSent(true); setDevCode(r.dev_code || ''); toast(sq.login.codeSent((r as { channel?: string }).channel));
         setTimeout(() => document.getElementById('code-1')?.focus(), 50);
       } else await verify(code);
     } catch (e) { handle(e); }

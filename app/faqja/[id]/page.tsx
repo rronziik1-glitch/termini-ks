@@ -3,7 +3,7 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import FaqjaView from '@/components/FaqjaView';
-import { config, livePageUrl, pagesHostSuffix } from '@/lib/config';
+import { config, livePageUrl, pagesHostPrefix, pagesHostSuffix } from '@/lib/config';
 import { db } from '@/lib/db';
 import { MAX_REVISIONS, refreshExpiry } from '@/lib/pages';
 import { paysera } from '@/lib/payments';
@@ -43,7 +43,7 @@ export default async function FaqjaPage({ params, searchParams }: Props) {
       settings={{
         priceCents: config.pagePriceCents(), domainCents: config.domainPriceCents(), payseraOn: paysera.configured(),
         bank: { iban: bank.iban, name: bank.name, holder: bank.holder }, supportWa: config.supportWhatsapp(), supportName: config.supportName(),
-        hostSuffix: pagesHostSuffix(),
+        hostSuffix: pagesHostSuffix(), hostPrefix: pagesHostPrefix(),
       }}
     />
   );

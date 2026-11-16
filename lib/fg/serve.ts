@@ -6,8 +6,20 @@ import { readStored } from './images';
 
 const esc = (s: string) => s.replace(/[&<>"]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]!);
 
+/** v4 audit: generated pages hold text typed by strangers and are served from the app's own address (/p/…).
+ *  The policy allows only our own script file, our styles, Google Fonts, images and the Google map frame, so even
+ *  if some text ever slipped through as markup it could not run a script or send data anywhere. */
+export function pageCsp(kind: 'preview' | 'live'): string {
+  return [
+    "default-src 'none'", "script-src 'self'", "style-src 'self' 'unsafe-inline' https://fonts.googleapis.com",
+    "font-src 'self' https://fonts.gstatic.com", "img-src 'self' data: https:", "media-src 'self' https:",
+    'frame-src https://www.google.com https://maps.google.com', "connect-src 'none'", "object-src 'none'",
+    "base-uri 'none'", "form-action 'none'", `frame-ancestors ${kind === 'preview' ? "'self'" : "'none'"}`,
+  ].join('; ');
+}
+
 export function htmlResponse(html: string, kind: 'preview' | 'live') {
-  const headers: Record<string, string> = { 'content-type': 'text/html; charset=utf-8' };
+  const headers: Record<string, string> = { 'content-type': 'text/html; charset=utf-8', 'content-security-policy': pageCsp(kind) };
   if (kind === 'preview') {
     headers['cache-control'] = 'no-store';
     headers['x-frame-options'] = 'SAMEORIGIN';

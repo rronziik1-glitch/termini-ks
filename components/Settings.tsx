@@ -10,6 +10,7 @@ import { HoursList } from '@/components/Onboarding';
 import { ApiError, Field, Icon, PhoneInput, Sheet, Switch, TimeSelect, api, copyText, toast, toastError } from '@/components/ui';
 import type { SettingsData } from '@/lib/settings-data';
 import { sq } from '@/lib/sq';
+import { shrinkPhoto } from '@/components/shrink';
 import { DAYS, addDays, cap, fmtDayMonth, today as todayOf, weekdayOf } from '@/lib/time';
 
 const t = sq.settings;
@@ -399,7 +400,8 @@ function ProfileView({ data }: { data: SettingsData }) {
   }
   async function upload(fl: File | undefined) {
     if (!fl) return;
-    const form = new FormData(); form.append('file', fl);
+    // v4 audit: shrink on the phone first (a raw phone photo is larger than the 4.5 MB a Vercel request may carry).
+    const form = new FormData(); form.append('file', await shrinkPhoto(fl, 1200), 'photo.jpg');
     try { setPhoto((await api<{ photoUrl: string }>('/business/photo', { form })).photoUrl); toast(t.photoSaved); } catch (e) { toastError(e); }
     if (file.current) file.current.value = '';
   }

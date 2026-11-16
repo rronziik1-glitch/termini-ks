@@ -88,6 +88,12 @@ export function buildOtpRequest(provider: Exclude<OtpProviderId, 'dev'>, to: str
   };
 }
 
+/** Countries a login code may be sent to: OTP_ALLOWED_PREFIXES, comma separated (default Kosovo and Albania). "*" = any. */
+export function otpAllowedFor(phone: string): boolean {
+  const list = env('OTP_ALLOWED_PREFIXES', '+383,+355').split(',').map((s) => s.trim()).filter(Boolean);
+  return list.includes('*') || list.some((p) => phone.startsWith(p.startsWith('+') ? p : '+' + p));
+}
+
 export class OtpSendError extends Error {}
 
 /** Sends the login code. Returns false for "dev" (nothing sent). Throws OtpSendError when the provider refuses. */

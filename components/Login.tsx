@@ -20,9 +20,9 @@ export default function Login({ next }: { next: string }) {
     if (!normalizePhone(phone)) { setError({ phone: sq.errors.invalid_phone }); return; }
     setBusy(true); setError({});
     try {
-      const r = await api<{ dev_code?: string }>('/auth/code', { body: { phone } });
+      const r = await api<{ dev_code?: string; channel?: string }>('/auth/code', { body: { phone } });
       setSent(true); setCode(''); setDevCode(r.dev_code || '');
-      toast(again ? t.resent : t.codeSent);
+      toast(again ? t.resent : t.codeSent(r.channel));
       setTimeout(() => document.getElementById('code-1')?.focus(), 50);
     } catch (e) {
       if (e instanceof ApiError && e.code === 'invalid_phone') setError({ phone: e.message }); else toastError(e);

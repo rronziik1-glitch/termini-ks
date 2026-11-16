@@ -21,12 +21,21 @@ const WATERMARK = Buffer.from(
   </svg>`,
 );
 
+const PHOTO_FORMATS = ['jpeg', 'png', 'webp', 'avif', 'heif', 'gif', 'tiff'];
+/** v4 audit: sharp can also read SVG and other document formats; only photo formats are accepted. */
+async function assertPhoto(data: Buffer) {
+  let format: string | undefined;
+  try { format = (await sharp(data, { failOn: 'none' }).metadata()).format; } catch { format = undefined; }
+  if (!format || !PHOTO_FORMATS.includes(format)) throw new AppError('photo_type', 415, sq.errors.photo_type);
+}
+
 export async function saveUpload(pageId: string, data: Buffer): Promise<{ storageKey: string; previewKey: string; width: number; height: number }> {
   const id = randomId(12);
   const storageKey = path.posix.join('pages', pageId, `${id}.jpg`);
   const previewKey = path.posix.join('pages', pageId, `${id}.preview.jpg`);
   let full: { data: Buffer; info: sharp.OutputInfo };
   let preview: Buffer;
+  await assertPhoto(data);
   try {
     full = await sharp(data, { failOn: 'none' }).rotate().resize({ width: 2000, height: 2000, fit: 'inside', withoutEnlargement: true }).jpeg({ quality: 86, mozjpeg: true }).toBuffer({ resolveWithObject: true });
     const small = await sharp(full.data).resize({ width: 800, height: 800, fit: 'inside', withoutEnlargement: true }).toBuffer();
@@ -47,6 +56,7 @@ export async function saveUpload(pageId: string, data: Buffer): Promise<{ storag
 export async function saveBusinessPhoto(businessId: string, data: Buffer): Promise<string> {
   const key = path.posix.join('biz', `${businessId}.jpg`);
   let out: Buffer;
+  await assertPhoto(data);
   try {
     out = await sharp(data, { failOn: 'none' }).rotate().resize({ width: 480, height: 480, fit: 'cover' }).jpeg({ quality: 82 }).toBuffer();
   } catch {

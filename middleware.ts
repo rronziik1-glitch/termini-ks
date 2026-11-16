@@ -17,7 +17,11 @@ export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
   // --- 1. private launch password ------------------------------------------------
-  if (sitePassword() && !SITE_OPEN_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
+  // v4 audit: Paysera must open the home page once to see the ownership code (PAYSERA_VERIFY_CODE). Removing the
+  // whole password for that would also open the login and the test payments, so only the home page is let through,
+  // and only while the code is set.
+  const payseraCheck = !!(process.env.PAYSERA_VERIFY_CODE || '').trim() && pathname === '/' && (req.method === 'GET' || req.method === 'HEAD');
+  if (sitePassword() && !payseraCheck && !SITE_OPEN_PATHS.some((p) => pathname === p || pathname.startsWith(p + '/'))) {
     const cookie = req.cookies.get(SITE_COOKIE)?.value || '';
     if (!cookie || !sameText(cookie, await siteToken())) {
       if (pathname.startsWith('/api/')) {

@@ -156,7 +156,7 @@ describe('addresses: subdomains and customer domains', () => {
     setEnv({ APP_URL: 'https://termini.app', PAGES_DOMAIN: '' });
     expect(classifyHost('berberi-arti.termini.app')).toEqual({ kind: 'page', slug: 'berberi-arti' });
     expect(livePageUrl('berberi-arti')).toBe('https://termini.app/p/berberi-arti');
-    expect(pagesHostSuffix()).toBe('.faqjagati.com');
+    expect(pagesHostSuffix()).toBe('');   // v4: no made-up domain; the screen shows termini.app/p/emri
   });
   it('page links use the pages domain when it is set', () => {
     setEnv({ APP_URL: 'https://termini.app', PAGES_DOMAIN: 'faqjagati.com' });
@@ -192,6 +192,14 @@ describe('private launch password', () => {
     setEnv({ APP_URL: 'https://termini.app', SITE_PASSWORD: 'hapu-2026' });
     expect((await middleware(req('/api/payments/paysera/callback?data=x'))).headers.get('x-middleware-next')).toBe('1');
     expect((await middleware(req('/site-password'))).headers.get('x-middleware-next')).toBe('1');
+  });
+  it('v4: while PAYSERA_VERIFY_CODE is set, only the home page opens without the password', async () => {
+    setEnv({ APP_URL: 'https://termini.app', SITE_PASSWORD: 'hapu-2026', PAYSERA_VERIFY_CODE: 'abc123' });
+    expect((await middleware(req('/'))).headers.get('x-middleware-next')).toBe('1');
+    expect((await middleware(req('/hyr'))).status).toBe(307);
+    expect((await middleware(req('/api/me'))).status).toBe(401);
+    setEnv({ PAYSERA_VERIFY_CODE: '' });
+    expect((await middleware(req('/'))).status).toBe(307);
   });
   it('opens with the right cookie only', async () => {
     setEnv({ APP_URL: 'https://termini.app', SITE_PASSWORD: 'hapu-2026' });

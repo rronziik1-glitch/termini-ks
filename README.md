@@ -5,9 +5,24 @@
 
 Stack: Next.js 15 (App Router) + TypeScript, plain CSS with Fable's design tokens (`app/styles/`), SQLite through Prisma, PWA manifest. Everything runs locally **without any external account or key**.
 
+## v4: Fable audit fixes (16 Nov 2026)
+
+v4 = v3 + the fixes from the full audit in `fable/04-fable-audit.md` (short version for Roni: `REPORT-v4.md`, both in the TERMINI folder). What changed in the code:
+
+- **Dates** must be real calendar days (`lib/time.ts`): an impossible date such as `2026-11-31` could double-book a taken slot.
+- **Limits in the database** (`lib/ratelimit.ts`, table `RateHit`, migration `20261116000000_rate_hits`): login codes, admin password, launch password, AI pages and bookings per IP are now counted in the database, so they hold on every Vercel instance.
+- **Login codes** go only to the countries in `OTP_ALLOWED_PREFIXES` (default Kosovo + Albania), with a daily cap `OTP_DAILY_CAP`.
+- **Refuses to start** in production when `DEMO_SHOW_CODES_IN_PRODUCTION=1` or `PAYSERA_TEST=1` is used without `SITE_PASSWORD`.
+- **Paysera callback** counts what was really paid (`payamount`, `paycurrency`).
+- **Page building** fits one server call (`FG_AI_BUDGET_MS`), and a build that was cut off turns into "failed" after 2.5 minutes instead of hanging forever.
+- **Cross-site requests**: the API accepts writes only from its own origin (`sameOriginWrite` in `lib/http.ts`).
+- **Content-Security-Policy** on every generated page and preview (`pageCsp` in `lib/fg/serve.ts`).
+- Uploads accept photo formats only; custom domains are checked; the "Gjej" list is cached for 30 seconds.
+- Screens: examples on `/faqja` show the whole demo page; previews no longer scroll sideways on a phone; the payment screen shows the real page address; the login text names SMS or WhatsApp correctly.
+
 ## v3: ready to go online
 
-This folder is `build/app-v3`. It runs locally exactly like before (`npm install`, `npm run dev`, no accounts needed), and it is prepared so that going online is only a matter of pasting keys. **The step-by-step guide for Roni is `F:\TERMINI\GO-ONLINE.md`.** Nothing real is switched on.
+This folder is `build/app-v4`. It runs locally exactly like before (`npm install`, `npm run dev`, no accounts needed), and it is prepared so that going online is only a matter of pasting keys. **The step-by-step guide for Roni is `F:\TERMINI\GO-ONLINE.md`.** Nothing real is switched on.
 
 | Topic | Where | How it is chosen |
 |---|---|---|
@@ -42,7 +57,7 @@ Other commands:
 
 | Command | What it does |
 |---|---|
-| `npm test` | Vitest: slot calculation, double booking, booking rules, Faqja Gati filler, the preview/payment gate and the online-ready parts (75 tests, own `prisma/test.db`) |
+| `npm test` | Vitest: slot calculation, double booking, booking rules, Faqja Gati filler, the preview/payment gate and the online-ready parts (98 tests, own `prisma/test.db`) |
 | `npm run build` / `npm start` | Production build / server |
 | `npm run typecheck` | `tsc --noEmit` |
 | `npm run smoke -- http://localhost:3000` | End-to-end check against a running server (48 checks: public pages, full Faqja Gati flow up to the live page, admin, owner settings) |

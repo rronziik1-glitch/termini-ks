@@ -1,6 +1,6 @@
 // Private launch: the password form shown by middleware.ts while SITE_PASSWORD is set.
 // GET shows the form, POST checks the password and sets a cookie for 30 days.
-import { rateLimit } from '@/lib/config';
+import { rateLimitDb } from '@/lib/ratelimit';
 import { log } from '@/lib/log';
 import { SITE_COOKIE, SITE_COOKIE_DAYS, sameText, sitePassword, siteToken } from '@/lib/site-lock';
 
@@ -37,7 +37,7 @@ export async function POST(req: Request) {
   const expected = sitePassword();
   if (!expected) return Response.redirect(new URL(next, req.url), 303);
   const ip = (req.headers.get('x-forwarded-for') || '').split(',').map((s) => s.trim()).filter(Boolean).pop() || 'local';
-  if (!rateLimit(`sitepw:${ip}`, 10, 15 * 60e3)) return page(next, 'Shumë tentime. Provo përsëri pas pak minutash.', 429);
+  if (!(await rateLimitDb(`sitepw:${ip}`, 10, 15 * 60e3))) return page(next, 'Shumë tentime. Provo përsëri pas pak minutash.', 429);
   const given = form ? String(form.get('password') || '') : '';
   if (!sameText(await siteToken(given), await siteToken(expected))) {
     log.warn('site_password.wrong', { ip });

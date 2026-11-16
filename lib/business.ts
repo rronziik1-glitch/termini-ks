@@ -142,7 +142,19 @@ export type FoundBusiness = {
   nextDate: string | null; nextTime: string | null; priceFromCents: number | null; paused: boolean;
 };
 
-export async function findBusinesses(city?: string, category?: string, now = new Date()): Promise<FoundBusiness[]> {
+/** v4 audit: the list costs about four database queries per business, on every visit of the home and "Gjej" pages.
+ *  The result is kept for 30 seconds per city + category (per server instance). Tests pass their own `now` and skip it. */
+const findCache = new Map<string, { at: number; list: FoundBusiness[] }>();
+export async function findBusinesses(city?: string, category?: string, nowArg?: Date): Promise<FoundBusiness[]> {
+  const key = `${city || ''}|${category || ''}`;
+  const hit = findCache.get(key);
+  if (!nowArg && !process.env.VITEST && hit && Date.now() - hit.at < 30_000) return hit.list;
+  const list = await findBusinessesNow(city, category, nowArg ?? new Date());
+  if (!nowArg) { if (findCache.size > 200) findCache.clear(); findCache.set(key, { at: Date.now(), list }); }
+  return list;
+}
+
+async function findBusinessesNow(city: string | undefined, category: string | undefined, now: Date): Promise<FoundBusiness[]> {
   const list = await db.business.findMany({
     where: { listedInFind: true, onboardedAt: { not: null }, ...(city ? { city } : {}), ...(category ? { category } : {}) },
     include: { services: { where: { active: true, deleted: false }, orderBy: { sort: 'asc' } } },

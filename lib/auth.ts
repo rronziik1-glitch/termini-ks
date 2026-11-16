@@ -3,9 +3,10 @@
 import { randomInt } from 'node:crypto';
 import type { User } from '@prisma/client';
 import { AppError, db } from './db';
-import { config, randomId, rateLimit, sha } from './config';
+import { config, randomId, sha } from './config';
+import { rateLimitDb } from './ratelimit';
 import { log, maskPhoneForLog } from './log';
-import { otpProviderId, sendLoginCode } from './otp';
+import { otpAllowedFor, otpProviderId, sendLoginCode } from './otp';
 import { normalizePhone } from './phone';
 import { sq } from './sq';
 
@@ -20,9 +21,18 @@ const tokenHash = (token: string) => sha(`sess:${token}`);
 export async function requestCode(phoneRaw: unknown, ip = 'local'): Promise<{ phone: string; devCode?: string }> {
   const phone = normalizePhone(phoneRaw);
   if (!phone) throw new AppError('invalid_phone', 422, sq.errors.invalid_phone);
-  if (!rateLimit(`code:${phone}`, 5, 15 * 60e3)) throw new AppError('rate_limited', 429, sq.errors.rate_limited);
-  // Audit fix: also limit per IP, so one client cannot trigger SMS to thousands of numbers (SMS cost / pumping).
-  if (!rateLimit(`codeip:${ip}`, 20, 3600e3)) throw new AppError('rate_limited', 429, sq.errors.rate_limited);
+  // v4 audit: a real SMS/WhatsApp provider costs money per message. Codes go only to the allowed countries
+  // (OTP_ALLOWED_PREFIXES, default Kosovo + Albania), otherwise the form can be used to pump SMS to expensive numbers.
+  if (otpProviderId() !== 'dev' && !otpAllowedFor(phone)) throw new AppError('phone_country', 422, sq.errors.phone_country);
+  // v4 audit: these limits are counted in the database, so they hold on every server instance (the old in-memory
+  // counters started from zero on each new Vercel instance). Per IP first, so a blocked client cannot use up a
+  // victim's own allowance.
+  const limited = () => new AppError('rate_limited', 429, sq.errors.rate_limited);
+  if (!(await rateLimitDb(`codeip:${ip}`, 20, 3600e3))) throw limited();
+  if (!(await rateLimitDb(`code:${phone}`, 5, 15 * 60e3))) throw limited();
+  if (!(await rateLimitDb(`codeday:${phone}`, 20, 24 * 3600e3))) throw limited();
+  // Circuit breaker for the SMS bill: at most OTP_DAILY_CAP codes a day for the whole site.
+  if (!(await rateLimitDb('code:all', Math.max(1, Number(process.env.OTP_DAILY_CAP) || 1000), 24 * 3600e3))) throw new AppError('code_not_sent', 503, sq.errors.code_not_sent);
   const code = String(randomInt(0, 1_000_000)).padStart(6, '0');
   const row = await db.loginCode.create({ data: { phone, codeHash: codeHash(phone, code), expiresAt: new Date(Date.now() + CODE_MINUTES * 60e3) } });
   if (otpProviderId() !== 'dev') {

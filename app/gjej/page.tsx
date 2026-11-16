@@ -10,7 +10,7 @@ import { DAYS_SHORT, diffDays, fmtDayMonth, fmtPrice, toLocal, weekdayOf } from 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: sq.find.pageTitle, description: sq.find.text };
 const t = sq.find;
-const CATS = ['berber', 'salon', 'dentist', 'klinike', 'bujtine', 'tjeter'];
+const CATS = ['berber', 'salon', 'dentist', 'klinike', 'bujtine', 'dasma', 'autoshkolla', 'lavazh', 'tjeter'];
 
 export default async function FindPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const q = await searchParams;

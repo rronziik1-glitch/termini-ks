@@ -39,7 +39,8 @@ export function checkEnv(env: Env = process.env): EnvReport {
   const otp = (v('OTP_PROVIDER') || 'dev').toLowerCase();
   if (!['dev', 'sms', 'whatsapp'].includes(otp)) errors.push(`OTP_PROVIDER is "${otp}". Use dev, sms or whatsapp.`);
   if (otp === 'dev') {
-    if (v('DEMO_SHOW_CODES_IN_PRODUCTION') === '1') warnings.push('LOGIN CODES ARE SHOWN ON SCREEN (DEMO_SHOW_CODES_IN_PRODUCTION=1). Anyone can log in as anyone. Private demo only, never with real customers.');
+    if (v('DEMO_SHOW_CODES_IN_PRODUCTION') === '1' && !v('SITE_PASSWORD')) errors.push('DEMO_SHOW_CODES_IN_PRODUCTION is 1 but SITE_PASSWORD is empty: login codes would be shown to the whole internet. Set SITE_PASSWORD (private demo), or set OTP_PROVIDER to sms or whatsapp.');
+    else if (v('DEMO_SHOW_CODES_IN_PRODUCTION') === '1') warnings.push('LOGIN CODES ARE SHOWN ON SCREEN (DEMO_SHOW_CODES_IN_PRODUCTION=1). Anyone can log in as anyone. Private demo only, never with real customers.');
     else errors.push('OTP_PROVIDER is "dev", so nobody would receive a login code. Set OTP_PROVIDER to sms or whatsapp and fill in its keys.');
   }
   if (otp === 'sms') {
@@ -67,7 +68,8 @@ export function checkEnv(env: Env = process.env): EnvReport {
   const paysera = ['PAYSERA_PROJECT_ID', 'PAYSERA_SIGN_PASSWORD', 'PAYSERA_PUBLIC_KEY'];
   if (paysera.some((k) => v(k))) {
     need(paysera, 'Paysera needs all three: project id, sign password and public key.');
-    if ((v('PAYSERA_TEST') || '1') === '1') warnings.push('PAYSERA_TEST is "1": card payments are TEST payments, no real money arrives. Set it to 0 on launch day.');
+    if ((v('PAYSERA_TEST') || '1') === '1' && !v('SITE_PASSWORD')) errors.push('PAYSERA_TEST is "1" on a public site (SITE_PASSWORD is empty): anyone could publish a page with a free TEST payment. Set PAYSERA_TEST to 0, or keep the site private with SITE_PASSWORD while you test.');
+    else if ((v('PAYSERA_TEST') || '1') === '1') warnings.push('PAYSERA_TEST is "1": card payments are TEST payments, no real money arrives. Set it to 0 on launch day.');
   } else warnings.push('Paysera is not set up: the card option shows "së shpejti"; bank transfer and cash still work.');
   if (!v('BANK_IBAN') || v('BANK_IBAN') === PLACEHOLDER_IBAN) warnings.push('BANK_IBAN is still the placeholder: customers who choose bank transfer see a fake IBAN.');
 

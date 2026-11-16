@@ -80,7 +80,7 @@ export function scrubForPreview(content: Content): Content {
   for (const key of ['hero', 'about', 'services', 'faq', 'footer', 'highlights', 'meta', 'reviews'] as const) if (c[key]) walk(c[key]);
   // Audit H4: the preview must not contain the whole site. Keep the first half of every list
   // (enough to judge the design) and replace the rest with placeholder bars, not the real text.
-  const bar = (len: number) => '█'.repeat(Math.max(4, Math.min(len, 18)));
+  const bar = (len: number) => '█'.repeat(Math.max(4, Math.min(len, 12)));
   const hideFrom = (n: number) => Math.max(1, Math.ceil(n / 2));
   for (const g of c.services?.groups ?? []) {
     g.items = g.items.map((it, i) => (i < hideFrom(g.items.length) ? it : {
@@ -92,7 +92,7 @@ export function scrubForPreview(content: Content): Content {
   return c;
 }
 
-function build(content: Content, preview: boolean): string {
+function build(content: Content, preview: boolean, scrub = preview): string {
   const template = content.meta.template;
   const dom = new JSDOM(templateHtml(template));
   const doc = dom.window.document;
@@ -119,7 +119,7 @@ function build(content: Content, preview: boolean): string {
     doc.head.appendChild(robots);
   }
 
-  runtime().fill(doc, preview ? scrubForPreview(content) : content, { jsonLd: !preview });
+  runtime().fill(doc, scrub ? scrubForPreview(content) : content, { jsonLd: !preview });
 
   if (preview) {
     doc.querySelectorAll('a[href]').forEach((a) => { a.setAttribute('href', '#'); a.removeAttribute('target'); });
@@ -139,3 +139,6 @@ function build(content: Content, preview: boolean): string {
 
 export const renderPreview = (content: Content) => build(content, true);
 export const renderLive = (content: Content) => build(content, false);
+/** Our own demo content on /faqja: locked like a preview (watermark, no working links) but shown in full,
+ *  because an example with half of the price list blacked out sells nothing. Never used for a customer's page. */
+export const renderExample = (content: Content) => build(content, true, false);

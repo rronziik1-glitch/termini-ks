@@ -18,7 +18,8 @@ export const config = {
   // shown only with the explicit, loudly named DEMO_SHOW_CODES_IN_PRODUCTION=1 (for a private demo, never live).
   showLoginCodes: () =>
     process.env.NODE_ENV === 'production'
-      ? env('DEMO_SHOW_CODES_IN_PRODUCTION') === '1'
+      // v4 audit: and only while the whole site is behind SITE_PASSWORD (a public site must never show codes).
+      ? env('DEMO_SHOW_CODES_IN_PRODUCTION') === '1' && !!env('SITE_PASSWORD').trim()
       : env('SHOW_LOGIN_CODES', '1') === '1',
   adminPhones: () => env('ADMIN_PHONES').split(',').map((s) => s.trim()).filter(Boolean),
   supportWhatsapp: () => env('SUPPORT_WHATSAPP', '38349000000').replace(/\D/g, ''),
@@ -68,7 +69,10 @@ export const bookingTokenUrl = (slug: string, token: string, origin?: string) =>
 export const livePageUrl = (subdomain: string, origin?: string) =>
   config.pagesDomain() ? `https://${subdomain}.${config.pagesDomain()}` : `${origin || config.appUrl()}/p/${subdomain}`;
 /** What the payment screen shows after the name: ".faqjagati.com". */
-export const pagesHostSuffix = () => '.' + (config.pagesDomain() || 'faqjagati.com');
+export const pagesHostSuffix = () => (config.pagesDomain() ? '.' + config.pagesDomain() : '');
+/** v4 audit: without PAGES_DOMAIN the page lives at APP_URL/p/emri. The screen used to promise "emri.faqjagati.com",
+ *  a domain that is not ours. What comes before the name: "terminiks.com/p/" (empty when subdomains are on). */
+export const pagesHostPrefix = () => (config.pagesDomain() ? '' : config.appUrl().replace(/^https?:\/\//, '') + '/p/');
 
 /* ---- in-memory rate limiter (one process; move to Redis/Upstash with several instances) ---- */
 const hits = new Map<string, number[]>();

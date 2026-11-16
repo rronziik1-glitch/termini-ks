@@ -32,7 +32,13 @@ export function tzOffsetMin(d: Date, tz = TZ): number {
 export const pad2 = (n: number) => (n < 10 ? '0' + n : String(n));
 export const hmToMin = (hm: string) => { const [h, m] = hm.split(':').map(Number); return h * 60 + (m || 0); };
 export const minToHm = (min: number) => pad2(Math.floor(min / 60)) + ':' + pad2(min % 60);
-export const isDate = (s: unknown): s is string => typeof s === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(s) && !isNaN(Date.parse(s + 'T00:00:00Z'));
+// v4 audit: the date must be a real calendar day. "2026-11-31" used to pass (JavaScript reads it as 1 December) and
+// then every text comparison of dates was wrong, so taken slots looked free and could be booked twice.
+export const isDate = (s: unknown): s is string => {
+  if (typeof s !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+  const t = Date.parse(s + 'T00:00:00Z');
+  return !isNaN(t) && new Date(t).toISOString().slice(0, 10) === s;
+};
 export const isTime = (s: unknown): s is string => typeof s === 'string' && /^(([01]\d|2[0-3]):[0-5]\d|24:00)$/.test(s);
 
 /** A local date + minutes after local midnight → the UTC instant. */

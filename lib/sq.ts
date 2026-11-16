@@ -8,7 +8,7 @@ export const sq = {
     bookedVia: 'Rezervuar përmes',
     bookingVia: 'Rezervim përmes',
     haveBusiness: 'Ke biznes?',
-    getLink: 'Merre linkun tënd falas.',
+    getLink: 'Regjistroje falas.',
     tagCustomers: 'Rezervo terminin në 20 sekonda.',
     tagBusiness: 'Më pak thirrje. Më shumë klientë.',
     tagPage: 'Faqja e biznesit tënd, gati në 2 minuta.',
@@ -33,7 +33,7 @@ export const sq = {
     berber: 'Berber', salon: 'Sallon bukurie', dentist: 'Dentist', klinike: 'Klinikë', bujtine: 'Bujtinë',
     restorant: 'Restorant', dyqan: 'Dyqan', dasma: 'Sallon dasmash', autoshkolla: 'Autoshkollë', lavazh: 'Lavazh dhe servis', tjeter: 'Tjetër',
   } as Record<string, string>,
-  categoriesShort: { berber: 'Berber', salon: 'Sallon', dentist: 'Dentist', klinike: 'Klinikë', bujtine: 'Bujtinë', dasma: 'Sallon dasmash', autoshkolla: 'Autoshkollë', lavazh: 'Lavazh', tjeter: 'Tjetër' } as Record<string, string>,
+  categoriesShort: { berber: 'Berber', salon: 'Sallon', dentist: 'Dentist', klinike: 'Klinikë', bujtine: 'Bujtinë', restorant: 'Restorant', dyqan: 'Dyqan', dasma: 'Sallon dasmash', autoshkolla: 'Autoshkollë', lavazh: 'Lavazh', tjeter: 'Tjetër' } as Record<string, string>,
   /** "I kemi shtuar shërbimet e zakonshme për {…}." */
   categoriesFor: { berber: 'berberë', salon: 'sallone', dentist: 'dentistë', klinike: 'klinika', bujtine: 'bujtina', dasma: 'sallone dasmash', autoshkolla: 'autoshkolla', lavazh: 'lavazhe dhe servise', tjeter: 'biznesin tënd' } as Record<string, string>,
   cities: ['Gjakovë', 'Prishtinë', 'Prizren', 'Pejë', 'Ferizaj', 'Gjilan', 'Mitrovicë', 'Tjetër'],
@@ -45,6 +45,7 @@ export const sq = {
     name_required: 'Shkruaj emrin.',
     too_many_active: 'Ke tashmë 3 termine aktive këtu. Anulo një për të rezervuar tjetër.',
     rate_limited: 'Shumë tentime. Provo përsëri pas pak minutash.',
+    phone_country: 'Kodin e dërgojmë vetëm në numra të Kosovës dhe të Shqipërisë. Me numër tjetër, na shkruaj në WhatsApp.',
     code_not_sent: "S'e dërguam dot kodin. Provo përsëri pas pak ose na shkruaj në WhatsApp.",
     storage_failed: "S'e ruajtëm dot foton. Provo përsëri pas pak.",
     daily_cap: 'Sot kemi shumë kërkesa. Na shkruaj në WhatsApp dhe ta bëjmë faqen ne.',
@@ -73,6 +74,7 @@ export const sq = {
     pages_limit: 'Ke arritur kufirin e faqeve për sot. Provo nesër.',
     preview_expired: 'Parapamja skadoi. Rindërtoje falas.',
     has_business: 'Ke tashmë një biznes me këtë numër.',
+    bad_domain: 'Shkruaje domenin kështu: berberiarti.com',
     subdomain_taken: 'Kjo adresë është e zënë. Provo një tjetër.',
   },
 
@@ -129,7 +131,9 @@ export const sq = {
   login: {
     title: 'Hyr në Termini', text: 'Shkruaj numrin me të cilin u regjistrove.',
     phone: 'Numri i telefonit', sendCode: 'Dërgo kodin', enter: 'Hyr',
-    code: 'Kodi që të erdhi me SMS', codeSent: 'Kodi u dërgua me SMS.', resendQ: "S'të erdhi?", resend: 'Dërgoje përsëri', resent: 'Kodi u dërgua përsëri.',
+    code: 'Kodi me 6 shifra', resendQ: "S'të erdhi?", resend: 'Dërgoje përsëri', resent: 'Kodi u dërgua përsëri.',
+    // v4 audit: the text used to say "me SMS" even when the code goes out on WhatsApp.
+    codeSent: (channel?: string) => (channel === 'whatsapp' ? 'Kodi të erdhi në WhatsApp.' : channel === 'sms' ? 'Kodi të erdhi me SMS.' : 'Kodi është gati.'),
     devCode: (c: string) => `Kodi yt (vetëm në zhvillim, pa SMS): ${c}`,
     noAccount: "S'ke llogari?", haveAccount: 'Ke llogari?', digit: (n: number) => `Shifra ${n}`,
   },
@@ -181,7 +185,7 @@ export const sq = {
 
   /* ---- onboarding (§4.1) --------------------------------------------------- */
   onboarding: {
-    pageTitle: 'Merre linkun tënd · Termini',
+    pageTitle: 'Regjistro biznesin tënd · Termini',
     s1: 'Si quhet biznesi yt?', s1Text: 'Dy minuta dhe e ke linkun tënd për rezervime. Falas.',
     bizName: 'Emri i biznesit', bizPh: 'P.sh. Berberi Arti', type: 'Lloji', city: 'Qyteti',
     s2: 'Çfarë ofron?', s2Text: (forWhom: string) => `I kemi shtuar shërbimet e zakonshme për ${forWhom}. Ndrysho çmimet ose fiki ato që s'i bën.`,
@@ -320,8 +324,8 @@ export const sq = {
     ],
     includesTitle: 'Paguan një herë. Faqja është e jotja.',
     includes: [
-      'Faqja live pa watermark, me butonat që punojnë',
-      'Adresa emri.faqjagati.com falas, ose domeni yt (15 €/vit)',
+      'Faqja live pa mbishkrimin "Preview", me butonat që punojnë',
+      'Adresa e faqes falas, ose domeni yt (15 €/vit)',
       'Fotot e tua të përmirësuara',
       'Butoni "Rezervo termin" i lidhur me Termini',
       'Hosting pa pagesë mujore',
@@ -406,7 +410,7 @@ export const sq = {
     noPages: "Ende s'ka faqe.", noBusinesses: "Ende s'ka biznese.",
     contact: 'Kontakti', created: 'Krijuar', payment: 'Pagesa', noPayment: 'Pa pagesë',
     method: { paysera: 'Paysera', bank: 'Transfer', cash: 'Para në dorë' } as Record<string, string>,
-    markPaid: 'Shëno të paguar', markPaidTitle: 'Shëno të paguar', markPaidText: 'Faqja del live menjëherë dhe watermark-u hiqet.',
+    markPaid: 'Shëno të paguar', markPaidTitle: 'Shëno të paguar', markPaidText: 'Faqja del live menjëherë dhe mbishkrimi "Preview" hiqet.',
     methodLabel: 'Mënyra e pagesës', note: 'Shënim', notePh: 'P.sh. Mori Roni, 14 nëntor', confirmPaid: 'Po, u pagua',
     paidToast: 'U shënua e paguar. Faqja është live.', unpublish: 'Hiqe nga publikimi', unpublished: 'Faqja u hoq nga publikimi.', publish: 'Publikoje',
     openPreview: 'Parapamja', openLive: 'Faqja live', sendPreview: 'Dërgo parapamjen', details: 'Detajet',

@@ -7,6 +7,7 @@ import { NextResponse } from 'next/server';
 import { SESSION_COOKIE, businessOf, userFromToken } from './auth';
 import { ADMIN_COOKIE, adminUnlocked } from './adminAuth';
 import { AppError } from './db';
+import { classifyHost } from './site-lock';
 import { sq } from './sq';
 
 export type Auth = 'public' | 'user' | 'owner' | 'admin';
@@ -42,7 +43,7 @@ function match(method: string, parts: string[]): { route: Route; params: Record<
     const params: Record<string, string> = {};
     let ok = true, score = 0;
     for (let i = 0; i < parts.length; i++) {
-      if (r.parts[i].startsWith(':')) params[r.parts[i].slice(1)] = decodeURIComponent(parts[i]);
+      if (r.parts[i].startsWith(':')) { try { params[r.parts[i].slice(1)] = decodeURIComponent(parts[i]); } catch { ok = false; break; } }   // a broken % sequence is simply "not found"
       else if (r.parts[i] === parts[i]) score++;
       else { ok = false; break; }
     }
@@ -75,11 +76,30 @@ export function requestOrigin(req: Request): string {
   return `${proto}://${host}`;
 }
 
+/** v4 audit (cross-site request forgery): a browser always sends `Origin` with a cross-site POST/PUT/PATCH/DELETE.
+ *  Customer pages live on sibling addresses (emri.<domain>), which browsers treat as the SAME site, so the
+ *  SameSite cookie flag alone does not stop them. A write is accepted only from our own origin; requests
+ *  without the header (Paysera's server, scripts, the smoke test) are not browsers and carry no victim's cookie. */
+export function sameOriginWrite(req: Request): boolean {
+  if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') return true;
+  const origin = req.headers.get('origin');
+  if (!origin) return true;
+  let from: string;
+  try { from = new URL(origin).host.toLowerCase(); } catch { return false; }       // "null" (sandboxed page, redirect)
+  const own = new Set<string>();
+  try { own.add(new URL(config.appUrl()).host.toLowerCase()); } catch { /* bad APP_URL is reported at startup */ }
+  const host = (req.headers.get('host') || '').toLowerCase();
+  // The request's own host counts too (local development, Vercel preview addresses), except page addresses.
+  if (host && classifyHost(host).kind === 'app') own.add(host);
+  return own.has(from);
+}
+
 export async function dispatch(req: Request, parts: string[]): Promise<Response> {
   try {
     const m = match(req.method, parts);
     if (!m) return NextResponse.json({ error: { code: 'not_found', message: sq.errors.not_found } }, { status: 404 });
     const url = new URL(req.url);
+    if (!sameOriginWrite(req)) throw new AppError('forbidden', 403, sq.errors.forbidden);
     const sessionToken = cookieValue(req, SESSION_COOKIE);
     const user = await userFromToken(sessionToken);
     const business = user ? await businessOf(user.id) : null;

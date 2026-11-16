@@ -1,7 +1,7 @@
 // Bookings: create (customer and owner), cancel, status, move, WhatsApp links. Rules: 01-product-design.md §5.
 import type { Booking, Business, Customer, Prisma } from '@prisma/client';
 import { AppError, db, lockKey, withLock } from './db';
-import { bookingTokenUrl, bookingUrl, ipHash, randomId, rateLimit } from './config';
+import { bookingTokenUrl, bookingUrl, ipHash, randomId } from './config';
 import { freeStarts, loadCtx } from './availability';
 import { displayPhone, normalizePhone, waDigits } from './phone';
 import { sq } from './sq';
@@ -46,7 +46,11 @@ export async function createPublicBooking(business: Business, input: PublicBooki
   const now = input.now ?? new Date();
   if (input.website) throw new AppError('bad_request', 400, sq.errors.bad_request);                 // honeypot
   const iph = ipHash(input.ip || 'local');
-  if (!input.skipRateLimit && !rateLimit(`book:${iph}`, 5, 3600e3)) throw new AppError('rate_limited', 429, sq.errors.rate_limited);
+  // v4 audit: counted from the bookings table (the in-memory counter was per server instance). At most 5 an hour per IP.
+  if (!input.skipRateLimit && input.ip && input.ip !== 'local') {
+    const recent = await db.booking.count({ where: { createdIpHash: iph, createdAt: { gt: new Date(now.getTime() - 3600e3) } } });
+    if (recent >= 5) throw new AppError('rate_limited', 429, sq.errors.rate_limited);
+  }
   if (business.bookingsPaused) throw new AppError('paused', 409, sq.errors.paused(business.name, displayPhone(business.phone)));
   const name = (input.name || '').trim().replace(/\s+/g, ' ').slice(0, 80);
   if (name.length < 2) throw new AppError('name_required', 422, sq.errors.name_required);

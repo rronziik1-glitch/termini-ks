@@ -22,7 +22,7 @@ type PageData = {
 type Payment = { method: string; reference: string; amountCents: number } | null;
 type Settings = {
   priceCents: number; domainCents: number; payseraOn: boolean; bank: { iban: string; name: string; holder: string };
-  supportWa: string; supportName: string; hostSuffix: string;
+  supportWa: string; supportName: string; hostSuffix: string; hostPrefix: string;
 };
 
 const eur = (cents: number) => `${(cents / 100).toLocaleString('de-DE', { maximumFractionDigits: 2 })} €`;
@@ -200,14 +200,15 @@ export default function FaqjaView({ page, payment, settings, initialStep }: { pa
               <div className="stack stack--2">
                 <button type="button" className={`method${addr === 'free' ? ' is-selected' : ''}`} aria-pressed={addr === 'free'} onClick={() => setAddr('free')}>
                   <span className="method__radio" />
-                  <span className="row__main"><span className="row__title row__title--plain t-num">{(sub || 'emri') + settings.hostSuffix}</span></span>
+                  <span className="row__main"><span className="row__title row__title--plain t-num">{settings.hostPrefix + (sub || 'emri') + settings.hostSuffix}</span></span>
                   <span className="badge badge--ok">{t.addressFree}</span>
                 </button>
                 {addr === 'free' && (
                   <label className="inputgroup">
                     <span className="sr">{t.address}</span>
+                    {settings.hostPrefix && <span className="inputgroup__ad" style={{ fontSize: '0.875rem' }}>{settings.hostPrefix}</span>}
                     <input className="input" autoCapitalize="none" value={sub} maxLength={40} onChange={(e) => setSub(slugish(e.target.value))} />
-                    <span className="inputgroup__ad inputgroup__ad--end">{settings.hostSuffix}</span>
+                    {settings.hostSuffix && <span className="inputgroup__ad inputgroup__ad--end">{settings.hostSuffix}</span>}
                   </label>
                 )}
                 <button type="button" className={`method${addr === 'own' ? ' is-selected' : ''}`} aria-pressed={addr === 'own'} onClick={() => setAddr('own')}>

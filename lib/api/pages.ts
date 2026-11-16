@@ -73,7 +73,7 @@ route('POST', '/payments/paysera/callback', 'public', async (c) => payseraCallba
 route('POST', '/admin/unlock', 'user', async (c) => {
   if (c.me.role !== 'admin') throw new AppError('forbidden', 403, sq.errors.forbidden);
   const body = await c.body<{ password?: string }>();
-  const r = unlockAdmin(cookieValue(c.req, SESSION_COOKIE) || '', String(body.password || '').slice(0, 200), c.ip);
+  const r = await unlockAdmin(cookieValue(c.req, SESSION_COOKIE) || '', String(body.password || '').slice(0, 200), c.ip);
   if (!r.ok) {
     const msg = r.reason === 'rate_limited' ? sq.admin.tooManyTries : r.reason === 'not_set' ? sq.admin.notSet : sq.admin.wrongPassword;
     throw new AppError(r.reason === 'rate_limited' ? 'rate_limited' : 'wrong_password', r.reason === 'rate_limited' ? 429 : 422, msg);

@@ -50,6 +50,16 @@ model LoginCode {
   @@index([phone])
 }
 
+// One row per counted action (login code requested, wrong admin password, …). Used by lib/ratelimit.ts so the
+// limits hold across every server instance (in-memory counters do not on Vercel). The key is a hash, never a raw phone or IP.
+model RateHit {
+  id        String   @id @default(cuid())
+  key       String
+  createdAt DateTime @default(now())
+
+  @@index([key, createdAt])
+}
+
 model Session {
   id        String   @id @default(cuid())
   userId    String
@@ -226,6 +236,7 @@ model Booking {
 
   @@index([businessId, startsAt])
   @@index([staffId, startsAt])
+  @@index([createdIpHash, createdAt])
 }
 
 model BookingEvent {
