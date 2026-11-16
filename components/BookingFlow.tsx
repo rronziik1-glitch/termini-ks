@@ -10,7 +10,7 @@ import { DAYS_SHORT, dayName, dayNum, diffDays, fmtDateLong, fmtDayMonth, hmToMi
 
 type Biz = {
   slug: string; name: string; meta: string; address: string; mapsUrl: string; tel: string; phoneDisplay: string; photoUrl: string;
-  open: boolean; openText: string; paused: boolean; pausedText: string; waFull: string;
+  open: boolean; openText: string; paused: boolean; pausedText: string; waFull: string; approval?: boolean;
 };
 type Service = { id: string; name: string; meta: string; price: string };
 type Day = { date: string; closed: boolean; free_count: number };
@@ -283,8 +283,8 @@ export default function BookingFlow({ biz, services, staff, today, source, initi
         {step === 3 ? (
           <div className="bar--stack">
             <div className="bar__in">
-              <button className={`btn btn--primary${busy ? ' is-loading' : ''}`} onClick={confirm} disabled={busy}>{t.confirm}</button>
-              <p className="bar__note">{t.payOnSite} {service?.price}</p>
+              <button className={`btn btn--primary${busy ? ' is-loading' : ''}`} onClick={confirm} disabled={busy}>{biz.approval ? t.confirmRequest : t.confirm}</button>
+              <p className="bar__note">{biz.approval ? `${t.approvalNote} ` : ''}{t.payOnSite} {service?.price}</p>
             </div>
           </div>
         ) : (

@@ -1,6 +1,7 @@
 // Public API: customers (no account) and login. §8.1, §8.2.
 import { NextResponse } from 'next/server';
-import { SESSION_COOKIE, SESSION_DAYS, destroySession, requestCode, verifyCode } from '../auth';
+import { SESSION_COOKIE, SESSION_DAYS, consumeCode, destroySession, requestCode, verifyCode } from '../auth';
+import { CLIENT_COOKIE, CLIENT_HOURS, clientBookings, clientCookie, clientPhone } from '../client-session';
 import { freeStarts, isClosed, loadCtx } from '../availability';
 import { otpProviderId } from '../otp';
 import { bookingIcs, cancelByToken, createPublicBooking, displayStatus, getByToken } from '../booking';
@@ -13,7 +14,8 @@ import { addDays, isDate, toLocal } from '../time';
 
 async function bizBySlug(slug: string) {
   const b = await db.business.findUnique({ where: { slug } });
-  if (!b) throw new AppError('not_found', 404, sq.errors.not_found);
+  // v6: a business suspended by the super admin is invisible to the public.
+  if (!b || b.suspendedAt) throw new AppError('not_found', 404, sq.errors.not_found);
   return b;
 }
 
@@ -113,3 +115,30 @@ route('GET', '/me', 'public', async (c) => ({
   user: c.user ? { id: c.user.id, name: c.user.name, phone: c.user.phone, role: c.user.role } : null,
   business: c.business ? { id: c.business.id, slug: c.business.slug, name: c.business.name } : null,
 }));
+
+/* ---- v6: customers, "Rezervimet e mia" (no account: phone + code → signed cookie) ---- */
+route('POST', '/my/code', 'public', async (c) => {
+  const { phone } = await c.body<{ phone: string }>();
+  const r = await requestCode(phone, c.ip);
+  return { phone: r.phone, dev_code: r.devCode, channel: otpProviderId() };
+});
+
+route('POST', '/my/verify', 'public', async (c) => {
+  const body = await c.body<{ phone: string; code: string }>();
+  const phone = await consumeCode(body.phone, body.code);
+  const res = NextResponse.json({ ok: true, ...(await clientBookings(phone)) });
+  res.cookies.set(CLIENT_COOKIE, clientCookie(phone), { httpOnly: true, sameSite: 'lax', secure: c.origin.startsWith('https://'), path: '/', maxAge: CLIENT_HOURS * 3600 });
+  return res;
+});
+
+route('GET', '/my/bookings', 'public', async (c) => {
+  const phone = clientPhone(cookieValue(c.req, CLIENT_COOKIE));
+  if (!phone) throw new AppError('unauthorized', 401, sq.errors.unauthorized);
+  return clientBookings(phone);
+});
+
+route('POST', '/my/logout', 'public', async () => {
+  const res = NextResponse.json({ ok: true });
+  res.cookies.set(CLIENT_COOKIE, '', { httpOnly: true, sameSite: 'lax', path: '/', maxAge: 0 });
+  return res;
+});

@@ -3,6 +3,7 @@
 import '@/lib/api/public';
 import '@/lib/api/owner';
 import '@/lib/api/pages';
+import '@/lib/api/admin';
 import { dispatch } from '@/lib/http';
 
 export const dynamic = 'force-dynamic';

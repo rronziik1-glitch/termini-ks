@@ -78,7 +78,7 @@ describe('v5: "to confirm" bookings', () => {
   it(`an unanswered pending booking expires after ${PENDING_HOLD_MS / 3600e3} hours and frees the slot`, async () => {
     await fillWindow(times);
     const p = await createPublicBooking(biz, { serviceId: cut.id, date: day, time: '12:00', name: 'Klienti 7', phone: phone(), now });
-    await db.booking.update({ where: { id: p.id }, data: { createdAt: new Date(now.getTime() - PENDING_HOLD_MS - 60e3) } });
+    await db.booking.update({ where: { id: p.id }, data: { createdAt: new Date(now.getTime() - PENDING_HOLD_MS - 60e3), pendingUntil: new Date(now.getTime() - 60e3) } });
     const old = (await db.booking.findUnique({ where: { id: p.id } }))!;
     expect(displayStatus(old)).toBe('expired');
     const ctx = await loadCtx(biz, day, 1);

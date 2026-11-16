@@ -33,7 +33,8 @@ export async function settingsData(user: User, b: Business, origin: string) {
   return {
     business: {
       slug: b.slug, name: b.name, description: b.description, phone: nationalPart(b.phone), city: b.city, address: b.address, instagram: b.instagram,
-      photoUrl: b.photoUrl, bookingsPaused: b.bookingsPaused, listedInFind: b.listedInFind, slotStepMin: b.slotStepMin,
+      photoUrl: b.photoUrl, bookingsPaused: b.bookingsPaused, listedInFind: b.listedInFind, requireApproval: b.requireApproval, slotStepMin: b.slotStepMin,
+      suspended: !!b.suspendedAt, suspendedReason: b.suspendedReason,
       minNoticeMin: b.minNoticeMin, maxAdvanceDays: b.maxAdvanceDays, cancelCutoffMin: b.cancelCutoffMin, hasPin: b.lat !== null && b.lng !== null,
     },
     link: { prefix: link.prefix, url: bookingUrl(b.slug, origin) },

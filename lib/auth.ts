@@ -50,7 +50,8 @@ export async function requestCode(phoneRaw: unknown, ip = 'local'): Promise<{ ph
   return { phone, devCode: show ? code : undefined };
 }
 
-export async function verifyCode(phoneRaw: unknown, codeRaw: unknown, name?: string): Promise<{ user: User; token: string }> {
+/** Checks and uses up the latest login code for this phone. Returns the normalised phone. */
+export async function consumeCode(phoneRaw: unknown, codeRaw: unknown): Promise<string> {
   const phone = normalizePhone(phoneRaw);
   if (!phone) throw new AppError('invalid_phone', 422, sq.errors.invalid_phone);
   const code = String(codeRaw ?? '').replace(/\D/g, '');
@@ -64,14 +65,20 @@ export async function verifyCode(phoneRaw: unknown, codeRaw: unknown, name?: str
   if (row.codeHash !== codeHash(phone, code)) throw new AppError('wrong_code', 422, sq.errors.wrong_code);
   const consumed = await db.loginCode.updateMany({ where: { id: row.id, consumedAt: null }, data: { consumedAt: new Date() } });
   if (consumed.count === 0) throw new AppError('code_expired', 422, sq.errors.code_expired);
+  return phone;
+}
 
+export async function verifyCode(phoneRaw: unknown, codeRaw: unknown, name?: string): Promise<{ user: User; token: string }> {
+  const phone = await consumeCode(phoneRaw, codeRaw);
+  // Super admin = the phone is in ADMIN_PHONES right now. v6 fix: a number removed from ADMIN_PHONES loses the
+  // role at its next login (before, the stored role stayed "admin" forever).
   const isAdmin = config.adminPhones().includes(phone);
   const cleanName = (name || '').trim().slice(0, 60);
   const existing = await db.user.findUnique({ where: { phone } });
   const user = existing
     ? await db.user.update({
         where: { id: existing.id },
-        data: { lastLoginAt: new Date(), role: isAdmin ? 'admin' : existing.role, name: existing.name || cleanName },
+        data: { lastLoginAt: new Date(), role: isAdmin ? 'admin' : 'owner', name: existing.name || cleanName },
       })
     : await db.user.create({ data: { phone, name: cleanName, role: isAdmin ? 'admin' : 'owner', lastLoginAt: new Date() } });
   const token = await createSession(user.id);
@@ -96,3 +103,7 @@ export async function destroySession(token: string | undefined | null) {
 }
 
 export const businessOf = (userId: string) => db.business.findFirst({ where: { ownerId: userId }, orderBy: { createdAt: 'asc' } });
+
+/** v6: the super admin is a user whose phone is in ADMIN_PHONES right now (checked on every request, not only at login). */
+export const isSuperAdmin = (user: Pick<User, 'role' | 'phone'> | null | undefined) =>
+  !!user && user.role === 'admin' && config.adminPhones().includes(user.phone);

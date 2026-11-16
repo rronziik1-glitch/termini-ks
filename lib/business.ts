@@ -156,7 +156,7 @@ export async function findBusinesses(city?: string, category?: string, nowArg?: 
 
 async function findBusinessesNow(city: string | undefined, category: string | undefined, now: Date): Promise<FoundBusiness[]> {
   const list = await db.business.findMany({
-    where: { listedInFind: true, onboardedAt: { not: null }, ...(city ? { city } : {}), ...(category ? { category } : {}) },
+    where: { listedInFind: true, suspendedAt: null, onboardedAt: { not: null }, ...(city ? { city } : {}), ...(category ? { category } : {}) },
     include: { services: { where: { active: true, deleted: false }, orderBy: { sort: 'asc' } } },
     take: 60,
   });

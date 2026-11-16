@@ -4,7 +4,7 @@ import { config } from './config';
 // Errors always look like { error: { code, message } } with an Albanian message ready to show.
 import type { Business, User } from '@prisma/client';
 import { NextResponse } from 'next/server';
-import { SESSION_COOKIE, businessOf, userFromToken } from './auth';
+import { SESSION_COOKIE, businessOf, isSuperAdmin, userFromToken } from './auth';
 import { ADMIN_COOKIE, adminUnlocked } from './adminAuth';
 import { AppError } from './db';
 import { classifyHost } from './site-lock';
@@ -105,7 +105,7 @@ export async function dispatch(req: Request, parts: string[]): Promise<Response>
     const business = user ? await businessOf(user.id) : null;
     if (m.route.auth !== 'public' && !user) throw new AppError('unauthorized', 401, sq.errors.unauthorized);
     if (m.route.auth === 'owner' && !business) throw new AppError('forbidden', 403, sq.errors.forbidden);
-    if (m.route.auth === 'admin' && user?.role !== 'admin') throw new AppError('forbidden', 403, sq.errors.forbidden);
+    if (m.route.auth === 'admin' && !isSuperAdmin(user)) throw new AppError('forbidden', 403, sq.errors.forbidden);
     // Second lock: admin routes also need the admin password unlock for this session.
     if (m.route.auth === 'admin' && !adminUnlocked(sessionToken, cookieValue(req, ADMIN_COOKIE))) throw new AppError('admin_locked', 403, sq.admin.locked);
     const c: Ctx = {

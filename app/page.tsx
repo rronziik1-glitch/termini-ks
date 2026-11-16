@@ -114,6 +114,7 @@ export default async function Home() {
           <nav aria-label="Termini">
             <Link href="/fillo">{t.cta}</Link>
             <Link href="/gjej">{t.find}</Link>
+            <Link href="/rezervimet">{sq.my.title}</Link>
             {faqjaGatiOn() && <Link href="/faqja">{sq.brand.faqjaGati}</Link>}
             <Link href="/hyr">{t.login}</Link>
           </nav>

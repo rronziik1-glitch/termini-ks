@@ -17,7 +17,7 @@ type Booking = {
 };
 type DayInfo = { date: string; open: { start: number; end: number }[]; closed: boolean; dayOff: boolean; dayOffReason: string };
 type Block = { id: string; date: string; startMin: number; endMin: number; reason: string };
-type Data = { today: string; nowMin: number; days: DayInfo[]; blocks: Block[]; totalBookings: number; bookings: Booking[]; pending: { id: string; date: string }[] };
+type Data = { today: string; nowMin: number; days: DayInfo[]; blocks: Block[]; totalBookings: number; bookings: Booking[]; pending: { id: string; date: string }[]; requireApproval?: boolean; suspended?: { reason: string } | null };
 type Service = { id: string; name: string; durationMin: number; priceCents: number | null; priceFrom: boolean; active: boolean };
 
 const cancelled = (b: Booking) => b.status.startsWith('cancelled') || b.status === 'expired';
@@ -228,10 +228,16 @@ export default function Calendar({ biz, link, today: today0 }: {
             <button className={view === 'day' ? 'is-selected' : ''} aria-pressed={view === 'day'} onClick={() => setView('day')}>{t.dayView}</button>
             <button className={view === 'week' ? 'is-selected' : ''} aria-pressed={view === 'week'} onClick={() => setView('week')}>{t.weekView}</button>
           </div>
+          {data?.suspended && (
+            <div className="note note--danger stack stack--1" role="alert">
+              <strong>{t.suspendedTitle}</strong>
+              <span>{t.suspendedText(data.suspended.reason)}</span>
+            </div>
+          )}
           {!!data?.pending?.length && (
             <button className="pending-banner" onClick={() => { const p = data.pending[0]; setDate(p.date); setView('day'); }}>
               <span className="pending-banner__dot" aria-hidden="true" />
-              <span className="grow"><strong>{t.pendingBanner(data.pending.length)}</strong><span className="t-small t-2">{t.pendingHint}</span></span>
+              <span className="grow"><strong>{t.pendingBanner(data.pending.length)}</strong><span className="t-small t-2">{data.requireApproval ? t.pendingHintApproval : t.pendingHint}</span></span>
               <Icon name="chevron-right" />
             </button>
           )}

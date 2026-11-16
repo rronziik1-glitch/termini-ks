@@ -14,7 +14,7 @@ const CATS = ['berber', 'salon', 'dentist', 'klinike', 'bujtine', 'dasma', 'auto
 
 export default async function FindPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const q = await searchParams;
-  const used = (await db.business.findMany({ where: { listedInFind: true }, select: { city: true }, distinct: ['city'] })).map((b) => b.city);
+  const used = (await db.business.findMany({ where: { listedInFind: true, suspendedAt: null }, select: { city: true }, distinct: ['city'] })).map((b) => b.city);
   const cities = [...sq.cities.filter((c) => c !== sq.common.other), ...used.filter((c) => !sq.cities.includes(c))];
   const city = typeof q.qyteti === 'string' && cities.includes(q.qyteti) ? q.qyteti : '';
   const category = typeof q.lloji === 'string' && CATS.includes(q.lloji) ? q.lloji : '';

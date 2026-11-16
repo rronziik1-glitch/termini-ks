@@ -2,7 +2,7 @@
 import type { Booking, Business, Customer } from '@prisma/client';
 import QRCode from 'qrcode';
 import { rangeOnDate, workingOn } from '../availability';
-import { createManualBooking, displayStatus, ownerMessage, recordMessage, updateBooking, PENDING_HOLD_MS } from '../booking';
+import { createManualBooking, displayStatus, ownerMessage, recordMessage, updateBooking, pendingLive } from '../booking';
 import { cleanService, createBusiness, deleteBusinessAndUser, hoursToRows, rowsToHours, slugCheck, type HoursDoc, type ServiceInput } from '../business';
 import { bookingUrl } from '../config';
 import { AppError, containsText, db } from '../db';
@@ -53,6 +53,7 @@ route('PATCH', '/business', 'owner', async (c) => {
   pick('slotStepMin', [15, 30]); pick('minNoticeMin', [30, 60, 120, 1440]); pick('maxAdvanceDays', [7, 14, 30, 60]); pick('cancelCutoffMin', [60, 120, 360, 1440]);
   if (typeof body.bookingsPaused === 'boolean') data.bookingsPaused = body.bookingsPaused;
   if (typeof body.listedInFind === 'boolean') data.listedInFind = body.listedInFind;
+  if (typeof body.requireApproval === 'boolean') data.requireApproval = body.requireApproval;
   if (typeof body.lat === 'number' && typeof body.lng === 'number') { data.lat = body.lat; data.lng = body.lng; }
   const b = await db.business.update({ where: { id: c.biz.id }, data });
   return { ok: true, name: b.name };
@@ -212,7 +213,7 @@ route('GET', '/bookings', 'owner', async (c) => {
   ]);
   // v5: every live "to confirm" booking (any date), so the banner shows them even outside the visible week.
   const pendingRows = await db.booking.findMany({
-    where: { businessId: b.id, status: 'pending', createdAt: { gt: new Date(now.getTime() - PENDING_HOLD_MS) }, startsAt: { gt: now } },
+    where: { businessId: b.id, ...pendingLive(now) },
     orderBy: { startsAt: 'asc' }, take: 20,
   });
   const pending = pendingRows.map((p) => ({ id: p.id, date: toLocal(p.startsAt, tz).date }));
@@ -228,7 +229,11 @@ route('GET', '/bookings', 'owner', async (c) => {
       if (r) blocks.push({ id: t.id, date, startMin: r.start, endMin: r.end, reason: t.reason });
     }
   }
-  return { today: nowL.date, nowMin: nowL.minutes, days, blocks, totalBookings: total, pending, bookings: rows.map((r) => bookingJson(r, b, c.origin, now)) };
+  return {
+    today: nowL.date, nowMin: nowL.minutes, days, blocks, totalBookings: total, pending,
+    requireApproval: b.requireApproval, suspended: b.suspendedAt ? { reason: b.suspendedReason } : null,
+    bookings: rows.map((r) => bookingJson(r, b, c.origin, now)),
+  };
 });
 
 route('POST', '/bookings', 'owner', async (c) => {

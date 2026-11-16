@@ -28,7 +28,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function BookingPage({ params, searchParams }: Props) {
   const [{ slug }, query] = await Promise.all([params, searchParams]);
   const b = await load(slug);
-  if (!b) notFound();
+  if (!b || b.suspendedAt) notFound();
   const now = new Date();
   const today = toLocal(now, b.timezone).date;
   const state = openState(await loadCtx(b, today, 8), now);
@@ -41,7 +41,7 @@ export default async function BookingPage({ params, searchParams }: Props) {
       biz={{
         slug: b.slug, name: b.name, meta: `${sq.categories[b.category] || sq.common.other} · ${b.city}`, address: b.address, mapsUrl: mapsUrl(b),
         tel: b.phone, phoneDisplay: phone, photoUrl: b.photoUrl, open: state.open, openText,
-        paused: b.bookingsPaused, pausedText: sq.errors.paused(b.name, phone), waFull: waLink(b.whatsapp || b.phone, sq.wa.fullBusiness),
+        paused: b.bookingsPaused, approval: b.requireApproval, pausedText: sq.errors.paused(b.name, phone), waFull: waLink(b.whatsapp || b.phone, sq.wa.fullBusiness),
       }}
       services={b.services.map((s) => ({
         id: s.id, name: s.name, meta: [fmtDuration(s.durationMin), s.description].filter(Boolean).join(' · '),

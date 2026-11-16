@@ -4,7 +4,7 @@ import { AppError, db } from '../db';
 import { saveUpload } from '../fg/images';
 import { NextResponse } from 'next/server';
 import { ADMIN_COOKIE, ADMIN_UNLOCK_HOURS, unlockAdmin } from '../adminAuth';
-import { SESSION_COOKIE } from '../auth';
+import { SESSION_COOKIE, isSuperAdmin } from '../auth';
 import { cookieValue, route } from '../http';
 import {
   addAsset, checkout, createPage, deletePage, getPage, getStatus, markPaid, previewImageUrl, reorderAssets, saveContent, setPublished, startGeneration,
@@ -71,7 +71,7 @@ route('POST', '/payments/paysera/callback', 'public', async (c) => payseraCallba
 /* ---- admin -------------------------------------------------------------------------- */
 // Second lock: an admin who logged in with the SMS code must also give the admin password.
 route('POST', '/admin/unlock', 'user', async (c) => {
-  if (c.me.role !== 'admin') throw new AppError('forbidden', 403, sq.errors.forbidden);
+  if (!isSuperAdmin(c.me)) throw new AppError('forbidden', 403, sq.errors.forbidden);
   const body = await c.body<{ password?: string }>();
   const r = await unlockAdmin(cookieValue(c.req, SESSION_COOKIE) || '', String(body.password || '').slice(0, 200), c.ip);
   if (!r.ok) {
@@ -130,14 +130,4 @@ route('POST', '/admin/pages/:id/assets/:assetId/replace', 'admin', async (c) => 
 });
 
 route('DELETE', '/admin/pages/:id', 'admin', async (c) => { await deletePage(c.params.id, c.me.id); return { ok: true }; });
-
-route('GET', '/admin/businesses', 'admin', async (c) => {
-  const list = await db.business.findMany({ orderBy: { createdAt: 'desc' }, take: 200, include: { owner: { select: { phone: true, name: true } }, _count: { select: { bookings: true, customers: true } } } });
-  const out = [];
-  for (const b of list) {
-    const monday = mondayOf(toLocal(new Date(), b.timezone).date);
-    const week = await db.booking.count({ where: { businessId: b.id, startsAt: { gte: localMinToUtc(monday, 0, b.timezone), lt: localMinToUtc(addDays(monday, 7), 0, b.timezone) }, status: { in: ['confirmed', 'completed'] } } });
-    out.push({ id: b.id, slug: b.slug, name: b.name, category: b.category, city: b.city, url: bookingUrl(b.slug, c.origin), owner: b.owner.name, ownerPhone: displayPhone(b.owner.phone), bookingsWeek: week, bookingsTotal: b._count.bookings, customers: b._count.customers, paused: b.bookingsPaused, createdAt: b.createdAt.toISOString() });
-  }
-  return { businesses: out };
-});
+// v6: the business list moved to lib/api/admin.ts (Super Admin panel).

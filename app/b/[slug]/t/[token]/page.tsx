@@ -118,6 +118,7 @@ export default async function ConfirmationPage({ params }: Props) {
 
         <footer className="footnote mt-auto stack stack--2" style={{ alignItems: 'center' }}>
           <p>{sq.brand.bookedVia} <Link href="/"><Wordmark small /></Link></p>
+          <p><Link className="link" href="/rezervimet">{sq.my.title}</Link></p>
           <p>{sq.brand.haveBusiness} <Link className="link" href="/fillo">{sq.brand.getLink}</Link></p>
         </footer>
       </div>

@@ -66,6 +66,7 @@ function SubTop({ title }: { title: string }) {
 function MainView({ data }: { data: SettingsData }) {
   const b = data.business;
   const [paused, setPaused] = useState(b.bookingsPaused);
+  const [approval, setApproval] = useState(b.requireApproval);
   const [sheet, setSheet] = useState<'' | 'logout' | 'delete'>('');
   const [confirm, setConfirm] = useState('');
   const shareText = sq.wa.share({ business: b.name, link: data.link.url });
@@ -76,6 +77,14 @@ function MainView({ data }: { data: SettingsData }) {
       await api('/business', { method: 'PATCH', body: { bookingsPaused: !on } });
       if (!silent) toast(on ? t.onlineOpened : t.onlineStopped, { action: sq.common.undo, onAction: () => setOnline(!on, true) });
     } catch (e) { setPaused(on); toastError(e); }
+  }
+  // v6: every online booking waits for Konfirmo / Refuzo (holds the time 12 hours).
+  async function setApprove(on: boolean, silent = false) {
+    setApproval(on);
+    try {
+      await api('/business', { method: 'PATCH', body: { requireApproval: on } });
+      if (!silent) toast(on ? t.approvalOn : t.approvalOff, { action: sq.common.undo, onAction: () => setApprove(!on, true) });
+    } catch (e) { setApproval(!on); toastError(e); }
   }
   async function logout() {
     await api('/auth/logout', { body: {} }).catch(() => undefined);
@@ -91,6 +100,13 @@ function MainView({ data }: { data: SettingsData }) {
       <div className="app app--tabs">
         <header className="topbar"><h1 className="t-h2 grow">{t.title}</h1></header>
         <main className="app__pad stack stack--6" style={{ paddingTop: 12 }}>
+          {b.suspended && (
+            <section className="note note--danger stack stack--2" role="alert">
+              <strong>{sq.calendar.suspendedTitle}</strong>
+              <span>{sq.calendar.suspendedText(b.suspendedReason)}</span>
+              {data.supportWa && <a className="btn btn--whatsapp btn--sm btn--auto" href={`https://wa.me/${data.supportWa.replace(/\D/g, '')}`} target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" />{t.writeUs}</a>}
+            </section>
+          )}
           <section className="linkbox" aria-label={t.myLink}>
             <p className="t-caption" style={{ opacity: 0.6, marginBottom: 8 }}>{t.yourLink}</p>
             <p className="linkbox__url">{data.link.prefix}<b>{b.slug}</b></p>
@@ -105,6 +121,10 @@ function MainView({ data }: { data: SettingsData }) {
             <div className="row">
               <span className="row__main"><span className="row__title row__title--plain" id="online-l">{t.online}</span><span className="row__meta">{paused ? t.onlineOff : t.onlineOn}</span></span>
               <Switch checked={!paused} onChange={(v) => setOnline(v)} labelledBy="online-l" />
+            </div>
+            <div className="row">
+              <span className="row__main"><span className="row__title row__title--plain" id="approval-l">{t.approval}</span><span className="row__meta">{t.approvalMeta}</span></span>
+              <Switch checked={approval} onChange={(v) => setApprove(v)} labelledBy="approval-l" />
             </div>
           </section>
 

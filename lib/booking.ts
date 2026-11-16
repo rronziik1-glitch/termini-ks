@@ -5,8 +5,8 @@ import { bookingTokenUrl, bookingUrl, ipHash, randomId } from './config';
 import { freeStarts, loadCtx } from './availability';
 import { displayPhone, normalizePhone, waDigits } from './phone';
 import { sq } from './sq';
-import { holdsSlot, pendingAlive } from './pending';
-export { holdsSlot, pendingAlive, PENDING_HOLD_MS } from './pending';
+import { holdUntil, holdsSlot, pendingAlive } from './pending';
+export { APPROVAL_HOLD_MS, holdsSlot, pendingAlive, pendingLive, PENDING_HOLD_MS } from './pending';
 import { dayAcc, diffDays, fmtDateLong, fmtDayMonth, fmtDuration, isDate, isTime, localToUtc, toLocal } from './time';
 
 type Tx = Prisma.TransactionClient;
@@ -14,7 +14,7 @@ export const MAX_ACTIVE_PER_PHONE = 3;
 const AUTO_COMPLETE_MS = 2 * 3600e3;
 
 /** A confirmed booking that ended more than 2 hours ago is shown as completed; an expired "to confirm" one as expired. */
-export function displayStatus(b: Pick<Booking, 'status' | 'endsAt'> & Partial<Pick<Booking, 'createdAt' | 'startsAt'>>, now = new Date()): string {
+export function displayStatus(b: Pick<Booking, 'status' | 'endsAt'> & Partial<Pick<Booking, 'createdAt' | 'startsAt' | 'pendingUntil'>>, now = new Date()): string {
   if (b.status === 'confirmed' && b.endsAt.getTime() + AUTO_COMPLETE_MS < now.getTime()) return 'completed';
   if (b.status === 'pending' && b.createdAt && b.startsAt && !pendingAlive(b as Booking, now)) return 'expired';
   return b.status;
@@ -54,6 +54,7 @@ export async function createPublicBooking(business: Business, input: PublicBooki
     const recent = await db.booking.count({ where: { createdIpHash: iph, createdAt: { gt: new Date(now.getTime() - 3600e3) } } });
     if (recent >= 5) throw new AppError('rate_limited', 429, sq.errors.rate_limited);
   }
+  if (business.suspendedAt) throw new AppError('not_found', 404, sq.errors.not_found);
   if (business.bookingsPaused) throw new AppError('paused', 409, sq.errors.paused(business.name, displayPhone(business.phone)));
   const name = (input.name || '').trim().replace(/\s+/g, ' ').slice(0, 80);
   if (name.length < 2) throw new AppError('name_required', 422, sq.errors.name_required);
@@ -76,10 +77,11 @@ export async function createPublicBooking(business: Business, input: PublicBooki
       // Spam guard (audit H3, v5): a burst of bookings from brand-new numbers could fill a day with fake customers.
       // Real customers from an Instagram story must never be turned away, so above the limit the booking is accepted
       // as "pending" (holds the slot for PENDING_HOLD_MS) and the owner confirms or refuses it.
-      let pending = false;
-      if (!existing && !input.skipRateLimit) {
+      // v6: with "approve every booking" switched on, every online booking waits for the owner (longer hold).
+      let pending: false | 'spam' | 'approval' = business.requireApproval ? 'approval' : false;
+      if (!pending && !existing && !input.skipRateLimit) {
         const fresh = await tx.customer.count({ where: { businessId: business.id, createdAt: { gt: new Date(now.getTime() - NEW_NUMBER_WINDOW_MS) } } });
-        if (fresh >= MAX_NEW_NUMBERS_PER_WINDOW) pending = true;
+        if (fresh >= MAX_NEW_NUMBERS_PER_WINDOW) pending = 'spam';
       }
       // Re-check the slot inside the transaction: this is what prevents double bookings.
       const ctx = await loadCtx(business, input.date, 1, tx);
@@ -100,9 +102,10 @@ export async function createPublicBooking(business: Business, input: PublicBooki
           source, serviceName: service.name, priceCents: service.priceCents,
           customerNote: (input.note || '').trim().slice(0, 300), token: randomId(22), createdIpHash: iph,
           status: pending ? 'pending' : 'confirmed', createdAt: now,
+          pendingUntil: pending ? holdUntil(pending, startsAt, now) : null,
         },
       });
-      await logEvent(tx, booking.id, 'created', 'customer', { source, pending });
+      await logEvent(tx, booking.id, 'created', 'customer', { source, pending: pending || false });
       return booking;
     }),
   );
@@ -191,6 +194,7 @@ export async function updateBooking(business: Business, id: string, patch: { sta
     if (!OWNER_STATUSES.includes(patch.status)) throw new AppError('bad_request', 400, sq.errors.bad_request);
     data.status = patch.status;
     data.cancelledAt = patch.status === 'cancelled_business' ? new Date() : null;
+    if (patch.status === 'confirmed') data.pendingUntil = null;
     const kind = patch.status === 'cancelled_business' ? (b.status === 'pending' ? 'refused' : 'cancelled')
       : patch.status === 'confirmed' ? (b.status === 'pending' ? 'confirmed' : 'moved') : patch.status;
     events.push([kind, { from: b.status }]);

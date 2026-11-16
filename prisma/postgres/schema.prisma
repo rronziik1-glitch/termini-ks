@@ -27,7 +27,7 @@ model User {
   id          String    @id @default(cuid())
   phone       String    @unique // E.164
   name        String    @default("")
-  role        String    @default("owner") // owner | admin
+  role        String    @default("owner") // owner (business admin) | admin (super admin: phone in ADMIN_PHONES)
   lastLoginAt DateTime?
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
@@ -94,6 +94,9 @@ model Business {
   cancelCutoffMin Int       @default(120)
   bookingsPaused  Boolean   @default(false)
   listedInFind    Boolean   @default(true)
+  requireApproval Boolean   @default(false) // v6: every online booking waits for Konfirmo / Refuzo
+  suspendedAt     DateTime? // v6: paused by the super admin (hidden from the public; the owner cannot undo it)
+  suspendedReason String    @default("")
   onboardedAt     DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -216,7 +219,8 @@ model Booking {
   customerId     String
   startsAt       DateTime
   endsAt         DateTime
-  status         String    @default("confirmed") // confirmed | cancelled_customer | cancelled_business | completed | no_show
+  status         String    @default("confirmed") // pending | confirmed | cancelled_customer | cancelled_business | completed | no_show
+  pendingUntil   DateTime? // v6: a pending booking holds its slot until then (null = createdAt + 2 h, v5 rows)
   source         String    @default("link") // link | page | find | manual
   serviceName    String // copied at booking time
   priceCents     Int? // copied at booking time
@@ -358,4 +362,6 @@ model AuditLog {
   metaJson   String   @default("{}")
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
+
+  @@index([createdAt])
 }

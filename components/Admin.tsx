@@ -1,6 +1,6 @@
 'use client';
-// Admin panel: Faqja Gati pages (status filter, mark paid, publish/unpublish, send preview, edit content, replace photos)
-// and the Termini business overview. Uses /api/admin/* (§8.5).
+// Faqja Gati pages for the Super Admin panel (status filter, mark paid, publish/unpublish, send preview, edit content,
+// replace photos). Uses /api/admin/pages* (§8.5). v6: the panel itself is components/SuperAdmin.tsx.
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Field, Icon, Sheet, api, toast, toastError } from '@/components/ui';
 import { sq } from '@/lib/sq';
@@ -14,18 +14,16 @@ type AdminPage = {
   assets: { id: string; url: string; kind: string }[];
   generations: { model: string; ok: boolean; error: string; inputTokens: number; outputTokens: number; durationMs: number; note: string }[];
 };
-type Biz = { id: string; slug: string; name: string; category: string; city: string; url: string; owner: string; ownerPhone: string; bookingsWeek: number; bookingsTotal: number; customers: number; paused: boolean; createdAt: string };
 
 const STATUSES = ['', 'preview', 'payment_pending', 'live', 'paid', 'generating', 'failed', 'expired'];
 const eur = (c: number) => `${(c / 100).toLocaleString('de-DE')} €`;
 const date = (iso: string) => new Date(iso).toLocaleDateString('sq-AL', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 const badge = (s: string) => (s === 'live' ? 'badge--ok' : s === 'payment_pending' ? 'badge--new' : s === 'failed' || s === 'expired' ? 'badge--danger' : s === 'preview' ? 'badge--info' : '');
 
-export default function Admin({ hasBusiness, priceCents }: { hasBusiness: boolean; priceCents: number }) {
-  const [tab, setTab] = useState<'pages' | 'biz'>('pages');
+/** v6: the Faqja Gati pages tab of the Super Admin panel (only shown while Faqja Gati is switched on). */
+export function FgPagesTab({ priceCents }: { priceCents: number }) {
   const [filter, setFilter] = useState('');
   const [pages, setPages] = useState<AdminPage[] | null>(null);
-  const [biz, setBiz] = useState<Biz[] | null>(null);
   const [open, setOpen] = useState<string>('');
   const [paying, setPaying] = useState<AdminPage | null>(null);
   const [method, setMethod] = useState('bank');
@@ -36,7 +34,6 @@ export default function Admin({ hasBusiness, priceCents }: { hasBusiness: boolea
     api<{ pages: AdminPage[] }>(`/admin/pages${filter ? `?status=${filter}` : ''}`).then((r) => setPages(r.pages)).catch(toastError);
   }, [filter]);
   useEffect(() => { load(); }, [load]);
-  useEffect(() => { if (tab === 'biz' && !biz) api<{ businesses: Biz[] }>('/admin/businesses').then((r) => setBiz(r.businesses)).catch(toastError); }, [tab, biz]);
 
   async function markPaid() {
     if (!paying) return;
@@ -57,24 +54,7 @@ export default function Admin({ hasBusiness, priceCents }: { hasBusiness: boolea
   }
 
   return (
-    <div className="page page--subtle">
-      <div className="app app--wide">
-        <header className="topbar">
-          <h1 className="t-h2 grow">{t.title}</h1>
-          {hasBusiness && <a className="btn btn--secondary btn--sm btn--auto" href="/app">{sq.tabs.calendar}</a>}
-          <button className="btn btn--secondary btn--sm btn--auto" type="button"
-            onClick={async () => { await api('/auth/logout', { body: {} }).catch(() => undefined); window.location.href = '/hyr'; }}>
-            {sq.settings.logout}
-          </button>
-        </header>
-        <main className="app__pad stack stack--6" style={{ paddingTop: 8, paddingBottom: 40 }}>
-          <div className="segmented" role="group" aria-label={t.title}>
-            <button className={tab === 'pages' ? 'is-selected' : ''} aria-pressed={tab === 'pages'} onClick={() => setTab('pages')}>{t.pages}</button>
-            <button className={tab === 'biz' ? 'is-selected' : ''} aria-pressed={tab === 'biz'} onClick={() => setTab('biz')}>{t.businesses}</button>
-          </div>
-
-          {tab === 'pages' && (
-            <>
+    <>
               <div className="chips chips--wrap" role="group" aria-label={t.status.preview}>
                 {STATUSES.map((s) => <button key={s || 'all'} className={`chip${filter === s ? ' is-selected' : ''}`} aria-pressed={filter === s} onClick={() => { setPages(null); setFilter(s); }}>{s ? t.status[s] : t.all}</button>)}
               </div>
@@ -120,29 +100,6 @@ export default function Admin({ hasBusiness, priceCents }: { hasBusiness: boolea
                     })}
                   </div>
                 )}
-            </>
-          )}
-
-          {tab === 'biz' && (
-            biz === null ? <div className="skeleton" style={{ height: 240 }} />
-              : biz.length === 0 ? <section className="card empty"><p className="empty__title">{t.noBusinesses}</p></section>
-              : (
-                <ul className="list--card">
-                  {biz.map((b) => (
-                    <li className="row" key={b.id}>
-                      <span className="row__main">
-                        <span className="row__title">{b.name}{b.paused ? ` · ${sq.find.paused}` : ''}</span>
-                        <span className="row__meta">{sq.categories[b.category] || b.category} · {b.city} · {b.owner} {b.ownerPhone}</span>
-                        <span className="row__meta">{t.bookingsWeek(b.bookingsWeek)} · {t.bookingsTotal(b.bookingsTotal)} · {b.customers} {sq.tabs.customers.toLowerCase()}</span>
-                      </span>
-                      <a className="iconbtn" href={b.url} target="_blank" rel="noopener noreferrer" aria-label={b.name}><Icon name="external" size="sm" /></a>
-                    </li>
-                  ))}
-                </ul>
-              )
-          )}
-        </main>
-      </div>
 
       <Sheet open={!!paying} onClose={() => setPaying(null)} title={t.markPaidTitle} closeButton
         actions={<button className={`btn btn--primary${busy ? ' is-loading' : ''}`} disabled={busy} onClick={markPaid}>{t.confirmPaid}</button>}>
@@ -159,7 +116,7 @@ export default function Admin({ hasBusiness, priceCents }: { hasBusiness: boolea
           </Field>
         </div>
       </Sheet>
-    </div>
+    </>
   );
 }
 
