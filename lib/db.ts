@@ -19,7 +19,7 @@ export class AppError extends Error {
 /** Inside a transaction: makes every other transaction that locks the same key wait until this one ends.
  *  PostgreSQL only (several server instances); on SQLite writes are already one at a time. */
 export async function lockKey(tx: { $queryRawUnsafe: (query: string, ...values: unknown[]) => Promise<unknown> }, key: string) {
-  if (isPostgres()) await tx.$queryRawUnsafe('SELECT pg_advisory_xact_lock(hashtext($1))', key);
+  if (isPostgres()) await tx.$queryRawUnsafe('SELECT pg_advisory_xact_lock(hashtext($1))::text AS locked', key);
 }
 
 /** Run tasks with the same key one after another (in-process guard next to the DB transaction). */
