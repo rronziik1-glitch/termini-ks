@@ -25,11 +25,11 @@ export const sq = {
 
   categories: {
     berber: 'Berber', salon: 'Sallon bukurie', dentist: 'Dentist', klinike: 'Klinikë', bujtine: 'Bujtinë',
-    restorant: 'Restorant', dyqan: 'Dyqan', tjeter: 'Tjetër',
+    restorant: 'Restorant', dyqan: 'Dyqan', dasma: 'Sallon dasmash', autoshkolla: 'Autoshkollë', tjeter: 'Tjetër',
   } as Record<string, string>,
-  categoriesShort: { berber: 'Berber', salon: 'Sallon', dentist: 'Dentist', klinike: 'Klinikë', bujtine: 'Bujtinë', tjeter: 'Tjetër' } as Record<string, string>,
+  categoriesShort: { berber: 'Berber', salon: 'Sallon', dentist: 'Dentist', klinike: 'Klinikë', bujtine: 'Bujtinë', dasma: 'Sallon dasmash', autoshkolla: 'Autoshkollë', tjeter: 'Tjetër' } as Record<string, string>,
   /** "I kemi shtuar shërbimet e zakonshme për {…}." */
-  categoriesFor: { berber: 'berberë', salon: 'sallone', dentist: 'dentistë', klinike: 'klinika', bujtine: 'bujtina', tjeter: 'biznesin tënd' } as Record<string, string>,
+  categoriesFor: { berber: 'berberë', salon: 'sallone', dentist: 'dentistë', klinike: 'klinika', bujtine: 'bujtina', dasma: 'sallone dasmash', autoshkolla: 'autoshkolla', tjeter: 'biznesin tënd' } as Record<string, string>,
   cities: ['Gjakovë', 'Prishtinë', 'Prizren', 'Pejë', 'Ferizaj', 'Gjilan', 'Mitrovicë', 'Tjetër'],
 
   /* ---- errors returned by the API (code → text) ------------------------- */
@@ -321,7 +321,8 @@ export const sq = {
     ],
     templates: {
       berber: 'Berber', 'klinike-dentare': 'Klinikë dentare', 'restorant-kafe': 'Restorant / kafe',
-      bujtine: 'Bujtinë', 'salon-bukurie': 'Sallon bukurie', dyqan: 'Dyqan', auto: 'Tjetër',
+      bujtine: 'Bujtinë', 'salon-bukurie': 'Sallon bukurie', dyqan: 'Dyqan',
+      'sallon-dasmash': 'Sallon dasmash', autoshkolla: 'Autoshkollë', auto: 'Tjetër',
     } as Record<string, string>,
     // wizard
     w1: 'Çfarë biznesi ke?', w1Text: 'Zgjidh llojin. Secili ka stilin e vet.',
@@ -335,6 +336,8 @@ export const sq = {
       bujtine: 'Bujtinë në Rugovë, fshati Drelaj. Dhomë dyshe 45 € nata me mëngjes, kasolle 70 €. 8 dhoma. Hapur gjithë vitin. 049 123 456.',
       'salon-bukurie': 'Sallon bukurie në Prishtinë, Rr. Rexhep Luci 5. Fenirim 8 €, ngjyrosje nga 30 €, manikyr 10 €. Hapur 9–20, të dielën mbyllur. 044 123 456.',
       dyqan: 'Dyqan lulesh në Ferizaj, Rr. Dëshmorët e Kombit 41. Buqetë nga 15 €, bimë nga 8 €. Dërgesë brenda 60 minutave. Hapur 8–20. 049 123 456.',
+      'sallon-dasmash': 'Sallon dasmash në Gjakovë, Rr. Tirana. Salla e madhe deri në 600 mysafirë, salla e vogël deri në 200. Meny klasike 25 € për person, meny e plotë 32 € për person. Parking për 300 vetura. Vizita në sallë 10–18. 049 123 456. Që nga 2006.',
+      autoshkolla: 'Autoshkollë në Prishtinë, Rr. Enver Maloku 18. Kategoria B 320 €, kategoria A 220 €, kategoria C 480 €, orë shtesë 12 €. 6 instruktorë. Hapur 8–19, të shtunën 9–15. 044 123 456. Që nga 2009.',
       auto: 'Çfarë bën, ku je, sa kushton, kur je hapur dhe numri i telefonit.',
     } as Record<string, string>,
     oldUrl: 'Ke faqe të vjetër? Ngjite linkun', oldUrlPh: 'https://',

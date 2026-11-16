@@ -53,6 +53,22 @@ export const CATEGORY_PRESETS: Record<string, { services: PresetService[]; hours
     ],
     hours: [1, 2, 3, 4, 5, 6, 7].map((weekday) => ({ weekday, start: '10:00', end: '20:00' })),
   },
+  dasma: {
+    services: [
+      { name: 'Vizitë në sallë', durationMin: 45, priceCents: null },
+      { name: 'Takim për menynë dhe ofertën', durationMin: 60, priceCents: null },
+      { name: 'Rezervim i datës', durationMin: 30, priceCents: null },
+    ],
+    hours: week('10:00', '18:00'),
+  },
+  autoshkolla: {
+    services: [
+      { name: 'Orë vozitjeje', durationMin: 45, priceCents: 1200 },
+      { name: 'Orë para provimit', durationMin: 60, priceCents: 1500 },
+      { name: 'Regjistrim dhe informata', durationMin: 20, priceCents: null },
+    ],
+    hours: week('08:00', '19:00', '15:00'),
+  },
   tjeter: {
     services: [{ name: 'Termin', durationMin: 30, priceCents: null }],
     hours: week('09:00', '17:00'),

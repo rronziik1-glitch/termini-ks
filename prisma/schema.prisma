@@ -59,7 +59,7 @@ model Business {
   ownerId         String
   slug            String    @unique
   name            String
-  category        String // berber | salon | dentist | klinike | bujtine | restorant | dyqan | tjeter
+  category        String // berber | salon | dentist | klinike | bujtine | restorant | dyqan | dasma | autoshkolla | tjeter
   city            String
   address         String    @default("")
   lat             Float?
@@ -246,7 +246,7 @@ model Page {
   businessId       String?
   ownerUserId      String?
   contactPhone     String    @default("")
-  template         String // berber | klinike-dentare | restorant-kafe | bujtine | salon-bukurie | dyqan
+  template         String // berber | klinike-dentare | restorant-kafe | bujtine | salon-bukurie | dyqan | sallon-dasmash | autoshkolla
   status           String    @default("draft") // draft | generating | preview | payment_pending | paid | live | failed | expired
   stage            String    @default("") // progress stage while generating
   inputName        String

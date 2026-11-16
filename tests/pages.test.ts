@@ -2,7 +2,7 @@
 import sharp from 'sharp';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { db } from '../lib/db';
-import { localFill } from '../lib/fg/filler';
+import { guessTemplate, localFill } from '../lib/fg/filler';
 import { readStored, removePageFiles } from '../lib/fg/images';
 import { demoContent, renderLive, renderPreview } from '../lib/fg/render';
 import { TEMPLATES, validateContent } from '../lib/fg/schema';
@@ -61,7 +61,7 @@ describe('local filler (no API key)', () => {
 });
 
 describe('templates render on the server', () => {
-  it('all six demo contents are valid and render in both modes', () => {
+  it('all demo contents are valid and render in both modes', () => {
     for (const t of TEMPLATES) {
       const content = demoContent(t);
       expect(validateContent(content), t).toEqual([]);
@@ -170,5 +170,23 @@ describe('preview protection and the payment gate', () => {
     await db.page.update({ where: { id: page.id }, data: { previewExpiresAt: new Date(Date.now() - 1000) } });
     await expect(previewHtml(page.id)).rejects.toMatchObject({ code: 'preview_expired' });
     await expect(checkout(page.id, { method: 'cash' }, ORIGIN)).rejects.toBeInstanceOf(AppError);
+  });
+});
+
+describe('JOB A: wedding hall and driving school templates', () => {
+  it('guesses the two new templates from the owner words', () => {
+    expect(guessTemplate('Sallon dasmash në Gjakovë, deri në 600 mysafirë')).toBe('sallon-dasmash');
+    expect(guessTemplate('Autoshkollë në Prishtinë. Kategoria B 320 €')).toBe('autoshkolla');
+    expect(guessTemplate('Berber në Gjakovë, qethje 5 €')).toBe('berber');
+  });
+  it('fills them locally with their own booking label', () => {
+    const w = localFill({ template: 'sallon-dasmash', name: 'Salla Elita', city: 'Gjakovë', photoCount: 0, contactPhone: '+38349555120', text: 'Sallon dasmash në Gjakovë. Meny klasike 25 € për person, meny e plotë 32 € për person. Vizita 10–18.' });
+    expect(validateContent(w)).toEqual([]);
+    expect(w.booking.label).toBe('Rezervo datën');
+    expect(w.services.groups[0].items[0]).toMatchObject({ name: 'Meny klasike', price: '25 € / person' });
+    const a = localFill({ template: 'autoshkolla', name: 'Autoshkolla Timoni', city: 'Prishtinë', photoCount: 0, contactPhone: '+38344300450', text: 'Autoshkollë në Prishtinë. Kategoria B 320 €, kategoria A 220 €. Hapur 8–19.' });
+    expect(validateContent(a)).toEqual([]);
+    expect(a.booking.label).toBe('Rezervo orën');
+    expect(a.services.groups[0].items.map((i) => i.price)).toEqual(['320 €', '220 €']);
   });
 });

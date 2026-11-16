@@ -25,12 +25,16 @@ export const TEMPLATE_DEFAULTS: Record<Template, Defaults> = {
   'restorant-kafe': { category: 'Restorant', heroTitle: 'Ulu dhe shijo', servicesTitle: 'Menyja', aboutTitle: 'Rreth nesh', locationTitle: 'Ku ndodhemi', galleryTitle: 'Galeria', bookingLabel: 'Rezervo tavolinë' },
   bujtine: { category: 'Bujtinë', heroTitle: 'Pushim larg zhurmës', servicesTitle: 'Dhomat', aboutTitle: 'Rreth bujtinës', locationTitle: 'Si të vish', galleryTitle: 'Galeria', bookingLabel: 'Rezervo qëndrimin' },
   'salon-bukurie': { category: 'Sallon bukurie', heroTitle: 'Koha jote për vete', servicesTitle: 'Shërbimet', aboutTitle: 'Rreth sallonit', locationTitle: 'Lokacioni dhe orari', galleryTitle: 'Galeria', bookingLabel: 'Rezervo termin' },
+  'sallon-dasmash': { category: 'Sallon dasmash', heroTitle: 'Dita që nuk harrohet', servicesTitle: 'Sallat dhe menytë', aboutTitle: 'Rreth sallës', locationTitle: 'Ku ndodhemi', galleryTitle: 'Galeria', bookingLabel: 'Rezervo datën' },
+  autoshkolla: { category: 'Autoshkollë', heroTitle: 'Merre patentën pa stres', servicesTitle: 'Kategoritë dhe çmimet', aboutTitle: 'Rreth autoshkollës', locationTitle: 'Ku ndodhemi', galleryTitle: 'Veturat tona', bookingLabel: 'Rezervo orën' },
   dyqan: { category: 'Dyqan', heroTitle: 'Mirë se vjen', servicesTitle: 'Produktet', aboutTitle: 'Rreth nesh', locationTitle: 'Ku ndodhemi', galleryTitle: 'Galeria', bookingLabel: '' },
 };
 
 /** "Tjetër": the closest template by the words the owner used. */
 export function guessTemplate(text: string): Template {
   const t = text.toLowerCase();
+  if (/autoshkoll|auto\s*shkoll|patent[ëe]|vozitj|kategoria\s+[abcd]\b/.test(t)) return 'autoshkolla';
+  if (/dasm|fejes|kanagjeq/.test(t)) return 'sallon-dasmash';
   if (/berber|qethje|mjek[ëe]r\b/.test(t)) return 'berber';
   if (/dent|dh[ëe]mb|klinik|mjek|ordinanc|laborator/.test(t)) return 'klinike-dentare';
   if (/bujtin|dhom[ëe]|hotel|kasolle|vila|apartament|nat[ëa]\b/.test(t)) return 'bujtine';
@@ -159,9 +163,9 @@ export function localFill(input: FillInput): Content {
 
   const highlights: { value: string; label: string }[] = [];
   if (since) highlights.push({ value: since, label: 'viti i hapjes' });
-  const fact = /\b(\d{1,3})\s+(dhoma|berber[ëe]|mjek[ëe]|dentist[ëe]|tavolina|karrige|vende|shtretër)\b/i.exec(text);
+  const fact = /\b(\d{1,3})\s+(dhoma|berber[ëe]|mjek[ëe]|dentist[ëe]|tavolina|karrige|vende|shtretër|mysafir[ëe]|salla|instruktor[ëe]|vetura)\b/i.exec(text);
   if (fact) highlights.push({ value: fact[1], label: fact[2].toLowerCase() });
-  if (items.length >= 3) highlights.push({ value: String(items.length), label: template === 'dyqan' ? 'produkte' : template === 'bujtine' ? 'oferta' : 'shërbime' });
+  if (items.length >= 3) highlights.push({ value: String(items.length), label: template === 'dyqan' ? 'produkte' : template === 'bujtine' || template === 'sallon-dasmash' ? 'oferta' : 'shërbime' });
 
   const place = [category, city].filter(Boolean).join(' · ');
   const subtitle = `${category || name} në ${city}${address ? `, ${address}` : ''}${since ? `, që nga ${since}` : ''}.`;

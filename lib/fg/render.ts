@@ -37,7 +37,7 @@ export function demoContent(template: Template): Content {
   return JSON.parse(fs.readFileSync(path.join(root(), template, 'content.json'), 'utf8'));
 }
 
-/** Uploaded photos in order: first → hero, second → about, then product/room photos (dyqan, bujtine), the rest → gallery. */
+/** Uploaded photos in order: first → hero, second → about, then product/room/hall photos (dyqan, bujtine, sallon-dasmash), the rest → gallery. */
 export function assignPhotos(content: Content, urls: string[]): Content {
   const c: Content = JSON.parse(JSON.stringify(content));
   const queue = [...urls];
@@ -50,6 +50,10 @@ export function assignPhotos(content: Content, urls: string[]): Content {
   c.about.image = put(c.about.image, c.brand.name);
   if (c.meta.template === 'dyqan' || c.meta.template === 'bujtine') {
     for (const g of c.services.groups) for (const it of g.items) if (queue.length) it.image = put(it.image, it.name);
+  }
+  // sallon-dasmash: only the halls get a photo (first group, items the content gave a photo brief); menus stay a price list.
+  if (c.meta.template === 'sallon-dasmash') {
+    for (const it of c.services.groups[0]?.items || []) if (queue.length && it.image?.alt) it.image = put(it.image, it.name);
   }
   const gallery = (c.gallery?.images || []).filter((g) => g.src);          // keep images that already have a source
   while (queue.length && gallery.length < 8) gallery.push({ src: queue.shift()!, alt: `${c.brand.name}, foto ${gallery.length + 1}` });
