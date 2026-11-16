@@ -1,5 +1,6 @@
 // Marketing home (02-design-system.md §8): white and ink sections, lime once, on the main call to action.
 import Link from 'next/link';
+import { faqjaGatiOn } from '@/lib/features';
 import { Icon, Reveal, Wordmark } from '@/components/ui';
 import { getSession } from '@/lib/session';
 import { sq } from '@/lib/sq';
@@ -93,7 +94,7 @@ export default async function Home() {
         </div>
       </section>
 
-      <section className="mk-section mk-section--ink">
+      {faqjaGatiOn() && <section className="mk-section mk-section--ink">
         <div className="mk__in mk-split">
           <div className="stack stack--6 reveal">
             <p className="label-caps" style={{ color: 'rgb(255 255 255 / 0.6)' }}>{sq.brand.faqjaGati}</p>
@@ -105,7 +106,7 @@ export default async function Home() {
             {sq.fg.includes.slice(0, 4).map((x) => <li key={x}><Icon name="check" size="sm" /><span>{x}</span></li>)}
           </ul>
         </div>
-      </section>
+      </section>}
 
       <div className="mk__in">
         <footer className="mk-foot">
@@ -113,7 +114,7 @@ export default async function Home() {
           <nav aria-label="Termini">
             <Link href="/fillo">{t.cta}</Link>
             <Link href="/gjej">{t.find}</Link>
-            <Link href="/faqja">{sq.brand.faqjaGati}</Link>
+            {faqjaGatiOn() && <Link href="/faqja">{sq.brand.faqjaGati}</Link>}
             <Link href="/hyr">{t.login}</Link>
           </nav>
         </footer>

@@ -2,6 +2,7 @@
 // Rules: 01-product-design.md §5.
 import type { Business, Prisma, PrismaClient, Service, WorkingHours } from '@prisma/client';
 import { db } from './db';
+import { holdsSlot } from './pending';
 import { slotStarts, subtract, type Interval } from './slots';
 import { addDays, dayAcc, diffDays, hmToMin, localMinToUtc, minToHm, toLocal } from './time';
 
@@ -17,7 +18,7 @@ export async function loadCtx(business: Business, fromDate: string, days: number
     client.workingHours.findMany({ where: { businessId: business.id } }),
     client.timeOff.findMany({ where: { businessId: business.id, startsAt: { lt: end }, endsAt: { gt: start } } }),
     client.booking.findMany({
-      where: { businessId: business.id, status: 'confirmed', startsAt: { lt: end }, endsAt: { gt: new Date(start.getTime() - 6 * 3600e3) } },
+      where: { businessId: business.id, ...holdsSlot(), startsAt: { lt: end }, endsAt: { gt: new Date(start.getTime() - 6 * 3600e3) } },
       select: { id: true, staffId: true, startsAt: true, endsAt: true, service: { select: { bufferMin: true } } },
     }),
   ]);

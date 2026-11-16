@@ -174,6 +174,12 @@ export const sq = {
     sureTitle: 'A je i sigurt?',
     sureText: (svc: string, dayAcc: string, dm: string, time: string) => `Termini për ${svc}, ${dayAcc} më ${dm} në ${time}, do të anulohet dhe ora do t'i lirohet dikujt tjetër.`,
     yesCancel: 'Po, anulo', noKeep: 'Jo, mbaje',
+    // v5: "to confirm" bookings (spam guard accepts instead of refusing)
+    pendingBadge: 'Në pritje', pendingTitle: 'Kërkesa u dërgua',
+    pendingText: (biz: string) => `${biz} do ta konfirmojë së shpejti. Ora mbahet për ty deri atëherë.`,
+    pendingWa: 'Shkruaji biznesit në WhatsApp', pendingCancel: 'Anulo kërkesën',
+    expiredBadge: 'Skadoi', expiredTitle: 'Kërkesa nuk u konfirmua',
+    expiredText: (biz: string) => `${biz} nuk arriti ta konfirmojë në kohë. Zgjidh një orë tjetër.`,
   },
 
   find: {
@@ -212,6 +218,12 @@ export const sq = {
     summary: (n: number, eur: string) => `${n} ${n === 1 ? 'termin' : 'termine'}${eur ? ' · ' + eur : ''}`,
     came: (n: number) => `${n} ${n === 1 ? 'erdhi' : 'erdhën'}`,
     next: 'I radhës:', inAt: 'në', dayBookings: 'Terminet e ditës', daySummary: 'Përmbledhja e ditës',
+    // v5: "to confirm" bookings
+    pendingBadge: 'Për konfirmim',
+    pendingBanner: (n: number) => n === 1 ? '1 rezervim pret konfirmimin tënd' : `${n} rezervime presin konfirmimin tënd`,
+    pendingHint: 'Shumë numra të rinj njëherësh, prandaj presin konfirmimin tënd. Pa përgjigje brenda 2 orësh, ora lirohet.',
+    confirm1: 'Konfirmo', refuse1: 'Refuzo',
+    confirmedToast: (n: string) => `${n} u konfirmua`, refusedToast: 'Kërkesa u refuzua',
     nowBadge: 'Tani', newBadge: 'i ri', noShowBadge: "S'erdhi", noShows: (n: number) => `${n} mosardhje`,
     nowLabel: (t: string) => `Tani, ora ${t}`,
     emptyNew: "Ende s'ke termine.", emptyNewText: 'Ndaje linkun që klientët të rezervojnë vetë.', shareLink: 'Ndaje linkun', addOwn: 'Shto një termin vetë',
@@ -326,7 +338,7 @@ export const sq = {
     includes: [
       'Faqja live pa mbishkrimin "Preview", me butonat që punojnë',
       'Adresa e faqes falas, ose domeni yt (15 €/vit)',
-      'Fotot e tua të përmirësuara',
+      'Fotot e tua, në madhësinë e duhur për çdo ekran',
       'Butoni "Rezervo termin" i lidhur me Termini',
       'Hosting pa pagesë mujore',
       'Ndryshimet: 1 falas në 30 ditët e para, pastaj 20 € secili (ose 5 €/muaj pa limit)',

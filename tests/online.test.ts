@@ -16,7 +16,8 @@ import { getFile, putFile, removeFiles, signS3, storageDriverId } from '../lib/s
 import { middleware } from '../middleware';
 import { postgresSchemaText } from '../scripts/lib.mjs';
 
-const setEnv = (vars: Record<string, string>) => { for (const [k, v] of Object.entries(vars)) vi.stubEnv(k, v); };
+// v5: these middleware tests describe the site with Faqja Gati switched on (it is off until April/May 2027).
+const setEnv = (vars: Record<string, string>) => { vi.stubEnv('FAQJA_GATI_ENABLED', '1'); for (const [k, v] of Object.entries(vars)) vi.stubEnv(k, v); };
 afterEach(() => { vi.unstubAllEnvs(); vi.restoreAllMocks(); });
 
 const READY = {
@@ -209,6 +210,20 @@ describe('private launch password', () => {
   it('is off when SITE_PASSWORD is empty', async () => {
     setEnv({ APP_URL: 'https://termini.app', SITE_PASSWORD: '' });
     expect((await middleware(req('/faqja'))).headers.get('x-middleware-next')).toBe('1');
+  });
+});
+
+describe('v5: Faqja Gati switched off', () => {
+  const req = (pathname: string, host = 'termini.app') => new NextRequest('https://' + host + pathname, { headers: { host } });
+  it('sends its addresses home, answers 404 on its API, keeps Termini and the Paysera callback open', async () => {
+    vi.stubEnv('APP_URL', 'https://termini.app'); vi.stubEnv('SITE_PASSWORD', ''); vi.stubEnv('FAQJA_GATI_ENABLED', '0');
+    const fg = await middleware(req('/faqja/krijo'));
+    expect(fg.status).toBe(307);
+    expect(fg.headers.get('location')).toBe('https://termini.app/');
+    expect((await middleware(req('/api/pages/abc/status'))).status).toBe(404);
+    for (const p of ['/', '/b/berberi-arti', '/gjej', '/fillo', '/api/payments/paysera/callback']) {
+      expect((await middleware(req(p))).headers.get('x-middleware-next')).toBe('1');
+    }
   });
 });
 

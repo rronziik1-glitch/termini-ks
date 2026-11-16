@@ -5,6 +5,7 @@
 //     The same page always stays reachable at /p/<name>.
 import { NextResponse, type NextRequest } from 'next/server';
 import { SITE_COOKIE, SITE_OPEN_PATHS, classifyHost, sameText, sitePassword, siteToken } from './lib/site-lock';
+import { faqjaGatiOn, isFgPath } from './lib/features';
 
 export const config = {
   // Everything except Next's own static files.
@@ -36,10 +37,19 @@ export async function middleware(req: NextRequest) {
     }
   }
 
+  // --- v5: Faqja Gati is off until it opens (FAQJA_GATI_ENABLED) ------------------
+  if (!faqjaGatiOn() && isFgPath(pathname)) {
+    if (pathname.startsWith('/api/')) return NextResponse.json({ error: { code: 'not_found', message: 'Nuk u gjet.' } }, { status: 404 });
+    const url = req.nextUrl.clone();
+    url.pathname = '/';
+    url.search = '';
+    return NextResponse.redirect(url, 307);
+  }
+
   // --- 2. page hosts -------------------------------------------------------------
   const host = classifyHost(req.headers.get('host') || req.nextUrl.host);
   if (host.kind === 'www') return NextResponse.redirect(appUrl() + pathname + search, 308);
-  if (host.kind === 'page') {
+  if (host.kind === 'page' && faqjaGatiOn()) {
     if (pathname === '/' || pathname === '') {
       const url = req.nextUrl.clone();
       url.pathname = `/p/${host.slug}`;

@@ -5,15 +5,18 @@ import { bookingTokenUrl, bookingUrl, ipHash, randomId } from './config';
 import { freeStarts, loadCtx } from './availability';
 import { displayPhone, normalizePhone, waDigits } from './phone';
 import { sq } from './sq';
+import { holdsSlot, pendingAlive } from './pending';
+export { holdsSlot, pendingAlive, PENDING_HOLD_MS } from './pending';
 import { dayAcc, diffDays, fmtDateLong, fmtDayMonth, fmtDuration, isDate, isTime, localToUtc, toLocal } from './time';
 
 type Tx = Prisma.TransactionClient;
 export const MAX_ACTIVE_PER_PHONE = 3;
 const AUTO_COMPLETE_MS = 2 * 3600e3;
 
-/** A confirmed booking that ended more than 2 hours ago is shown as completed. */
-export function displayStatus(b: Pick<Booking, 'status' | 'endsAt'>, now = new Date()): string {
+/** A confirmed booking that ended more than 2 hours ago is shown as completed; an expired "to confirm" one as expired. */
+export function displayStatus(b: Pick<Booking, 'status' | 'endsAt'> & Partial<Pick<Booking, 'createdAt' | 'startsAt'>>, now = new Date()): string {
   if (b.status === 'confirmed' && b.endsAt.getTime() + AUTO_COMPLETE_MS < now.getTime()) return 'completed';
+  if (b.status === 'pending' && b.createdAt && b.startsAt && !pendingAlive(b as Booking, now)) return 'expired';
   return b.status;
 }
 
@@ -67,14 +70,16 @@ export async function createPublicBooking(business: Business, input: PublicBooki
       const existing = await tx.customer.findUnique({ where: { businessId_phone: { businessId: business.id, phone } } });
       if (existing?.blocked) throw new AppError('blocked', 403, sq.errors.blocked);
       if (existing) {
-        const active = await tx.booking.count({ where: { customerId: existing.id, status: 'confirmed', startsAt: { gt: now } } });
+        const active = await tx.booking.count({ where: { customerId: existing.id, startsAt: { gt: now }, ...holdsSlot(now) } });
         if (active >= MAX_ACTIVE_PER_PHONE) throw new AppError('too_many_active', 429, sq.errors.too_many_active);
-      } else if (!input.skipRateLimit) {
-        // Spam guard (audit H3): a burst of bookings from brand-new numbers can fill a day with fake customers.
+      }
+      // Spam guard (audit H3, v5): a burst of bookings from brand-new numbers could fill a day with fake customers.
+      // Real customers from an Instagram story must never be turned away, so above the limit the booking is accepted
+      // as "pending" (holds the slot for PENDING_HOLD_MS) and the owner confirms or refuses it.
+      let pending = false;
+      if (!existing && !input.skipRateLimit) {
         const fresh = await tx.customer.count({ where: { businessId: business.id, createdAt: { gt: new Date(now.getTime() - NEW_NUMBER_WINDOW_MS) } } });
-        if (fresh >= MAX_NEW_NUMBERS_PER_WINDOW) {
-          throw new AppError('too_many_new', 429, sq.errors.too_many_new(displayPhone(business.phone)));
-        }
+        if (fresh >= MAX_NEW_NUMBERS_PER_WINDOW) pending = true;
       }
       // Re-check the slot inside the transaction: this is what prevents double bookings.
       const ctx = await loadCtx(business, input.date, 1, tx);
@@ -94,9 +99,10 @@ export async function createPublicBooking(business: Business, input: PublicBooki
           startsAt, endsAt: new Date(startsAt.getTime() + service.durationMin * 60000),
           source, serviceName: service.name, priceCents: service.priceCents,
           customerNote: (input.note || '').trim().slice(0, 300), token: randomId(22), createdIpHash: iph,
+          status: pending ? 'pending' : 'confirmed', createdAt: now,
         },
       });
-      await logEvent(tx, booking.id, 'created', 'customer', { source });
+      await logEvent(tx, booking.id, 'created', 'customer', { source, pending });
       return booking;
     }),
   );
@@ -126,7 +132,7 @@ export async function createManualBooking(business: Business, input: ManualBooki
       await lockKey(tx, `biz:${business.id}`);
       if (!input.force) {
         const clash = await tx.booking.findFirst({
-          where: { businessId: business.id, staffId: staff.id, status: 'confirmed', startsAt: { lt: endsAt }, endsAt: { gt: startsAt } },
+          where: { businessId: business.id, staffId: staff.id, startsAt: { lt: endsAt }, endsAt: { gt: startsAt }, ...holdsSlot() },
           include: { customer: true },
         });
         if (clash) throw new AppError('overlap', 409, sq.errors.overlap(clash.customer.name));
@@ -160,7 +166,7 @@ export async function getByToken(token: string) {
 export async function cancelByToken(token: string, now = new Date()) {
   const b = await getByToken(token);
   if (!b) throw new AppError('not_found', 404, sq.errors.not_found);
-  if (b.status !== 'confirmed') return b;
+  if (b.status !== 'confirmed' && !pendingAlive(b, now)) return b;
   const cutoff = b.business.cancelCutoffMin;
   if (b.startsAt.getTime() - now.getTime() < cutoff * 60000) {
     throw new AppError('too_late', 409, sq.errors.too_late(fmtDuration(cutoff), displayPhone(b.business.phone)));
@@ -185,7 +191,9 @@ export async function updateBooking(business: Business, id: string, patch: { sta
     if (!OWNER_STATUSES.includes(patch.status)) throw new AppError('bad_request', 400, sq.errors.bad_request);
     data.status = patch.status;
     data.cancelledAt = patch.status === 'cancelled_business' ? new Date() : null;
-    events.push([patch.status === 'cancelled_business' ? 'cancelled' : patch.status === 'confirmed' ? 'moved' : patch.status, { from: b.status }]);
+    const kind = patch.status === 'cancelled_business' ? (b.status === 'pending' ? 'refused' : 'cancelled')
+      : patch.status === 'confirmed' ? (b.status === 'pending' ? 'confirmed' : 'moved') : patch.status;
+    events.push([kind, { from: b.status }]);
   }
   if (patch.date !== undefined || patch.time !== undefined) {
     if (!isDate(patch.date) || !isTime(patch.time)) throw new AppError('bad_request', 400, sq.errors.bad_request);
@@ -198,14 +206,14 @@ export async function updateBooking(business: Business, id: string, patch: { sta
   // Audit fix: moving a booking, or restoring a cancelled/no-show one to "confirmed" (undo), used to skip the overlap
   // check, so the slot could already belong to a customer who booked it in the meantime → silent double booking.
   const finalStatus = (data.status as string | undefined) ?? b.status;
-  const needsCheck = finalStatus === 'confirmed' && (data.startsAt !== undefined || b.status.startsWith('cancelled'));
+  const needsCheck = finalStatus === 'confirmed' && (data.startsAt !== undefined || b.status.startsWith('cancelled') || b.status === 'pending');
   const startsAt = (data.startsAt as Date | undefined) ?? b.startsAt;
   const endsAt = (data.endsAt as Date | undefined) ?? b.endsAt;
   return withLock(`biz:${business.id}`, () => db.$transaction(async (tx) => {
     await lockKey(tx, `biz:${business.id}`);
     if (needsCheck) {
       const clash = await tx.booking.findFirst({
-        where: { businessId: business.id, staffId: b.staffId, status: 'confirmed', id: { not: id }, startsAt: { lt: endsAt }, endsAt: { gt: startsAt } },
+        where: { businessId: business.id, staffId: b.staffId, id: { not: id }, startsAt: { lt: endsAt }, endsAt: { gt: startsAt }, ...holdsSlot() },
         include: { customer: true },
       });
       if (clash) throw new AppError('overlap', 409, sq.errors.overlap(clash.customer.name));

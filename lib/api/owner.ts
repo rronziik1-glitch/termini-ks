@@ -2,7 +2,7 @@
 import type { Booking, Business, Customer } from '@prisma/client';
 import QRCode from 'qrcode';
 import { rangeOnDate, workingOn } from '../availability';
-import { createManualBooking, displayStatus, ownerMessage, recordMessage, updateBooking } from '../booking';
+import { createManualBooking, displayStatus, ownerMessage, recordMessage, updateBooking, PENDING_HOLD_MS } from '../booking';
 import { cleanService, createBusiness, deleteBusinessAndUser, hoursToRows, rowsToHours, slugCheck, type HoursDoc, type ServiceInput } from '../business';
 import { bookingUrl } from '../config';
 import { AppError, containsText, db } from '../db';
@@ -84,7 +84,7 @@ route('GET', '/business/qr.svg', 'owner', async (c) => {
 async function serviceList(businessId: string) {
   const [services, future] = await Promise.all([
     db.service.findMany({ where: { businessId, deleted: false }, orderBy: [{ sort: 'asc' }, { createdAt: 'asc' }] }),
-    db.booking.groupBy({ by: ['serviceId'], where: { businessId, status: 'confirmed', startsAt: { gt: new Date() } }, _count: true }),
+    db.booking.groupBy({ by: ['serviceId'], where: { businessId, status: { in: ['confirmed', 'pending'] }, startsAt: { gt: new Date() } }, _count: true }),
   ]);
   return services.map((s) => ({
     id: s.id, name: s.name, description: s.description, durationMin: s.durationMin, priceCents: s.priceCents, priceFrom: s.priceFrom, active: s.active,
@@ -165,7 +165,7 @@ route('POST', '/time-off', 'owner', async (c) => {
   const from = body.from, to = body.to || body.from;
   if (!isDate(from) || !isDate(to) || to < from || diffDays(from, to) > 120) throw bad();
   const startsAt = localMinToUtc(from, 0, tz), endsAt = localMinToUtc(addDays(to, 1), 0, tz);
-  const clash = await db.booking.findMany({ where: { businessId: c.biz.id, status: 'confirmed', startsAt: { gte: startsAt, lt: endsAt } }, orderBy: { startsAt: 'asc' } });
+  const clash = await db.booking.findMany({ where: { businessId: c.biz.id, status: { in: ['confirmed', 'pending'] }, startsAt: { gte: startsAt, lt: endsAt } }, orderBy: { startsAt: 'asc' } });
   if (clash.length) throw new AppError('day_has_bookings', 409, sq.errors.day_has_bookings(clash.length), { date: toLocal(clash[0].startsAt, tz).date });
   await db.timeOff.create({ data: { businessId: c.biz.id, kind: 'holiday', reason, startsAt, endsAt } });
   return { daysOff: await daysOffList(c.biz) };
@@ -210,6 +210,12 @@ route('GET', '/bookings', 'owner', async (c) => {
     db.timeOff.findMany({ where: { businessId: b.id, startsAt: { lt: end }, endsAt: { gt: start } } }),
     db.booking.count({ where: { businessId: b.id } }),
   ]);
+  // v5: every live "to confirm" booking (any date), so the banner shows them even outside the visible week.
+  const pendingRows = await db.booking.findMany({
+    where: { businessId: b.id, status: 'pending', createdAt: { gt: new Date(now.getTime() - PENDING_HOLD_MS) }, startsAt: { gt: now } },
+    orderBy: { startsAt: 'asc' }, take: 20,
+  });
+  const pending = pendingRows.map((p) => ({ id: p.id, date: toLocal(p.startsAt, tz).date }));
   const days = [];
   const blocks: { id: string; date: string; startMin: number; endMin: number; reason: string }[] = [];
   for (let date = from; date <= to; date = addDays(date, 1)) {
@@ -222,7 +228,7 @@ route('GET', '/bookings', 'owner', async (c) => {
       if (r) blocks.push({ id: t.id, date, startMin: r.start, endMin: r.end, reason: t.reason });
     }
   }
-  return { today: nowL.date, nowMin: nowL.minutes, days, blocks, totalBookings: total, bookings: rows.map((r) => bookingJson(r, b, c.origin, now)) };
+  return { today: nowL.date, nowMin: nowL.minutes, days, blocks, totalBookings: total, pending, bookings: rows.map((r) => bookingJson(r, b, c.origin, now)) };
 });
 
 route('POST', '/bookings', 'owner', async (c) => {
@@ -285,7 +291,7 @@ route('PATCH', '/customers/:id', 'owner', async (c) => {
   let cancelled = 0;
   if (body.blocked === true) {
     const res = await db.booking.updateMany({
-      where: { businessId: c.biz.id, customerId: r.id, status: 'confirmed', startsAt: { gt: new Date() } },
+      where: { businessId: c.biz.id, customerId: r.id, status: { in: ['confirmed', 'pending'] }, startsAt: { gt: new Date() } },
       data: { status: 'cancelled_business', cancelledAt: new Date() },
     });
     cancelled = res.count;

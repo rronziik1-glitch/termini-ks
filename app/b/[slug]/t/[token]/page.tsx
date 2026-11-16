@@ -17,7 +17,7 @@ const t = sq.confirmation;
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const b = await getByToken((await params).token);
-  return { title: b ? t.pageTitle(b.business.name) : sq.booking.notFoundTitle, robots: { index: false, follow: false } };
+  return { title: b ? (b.status === 'pending' ? `${t.pendingTitle} · ${b.business.name}` : t.pageTitle(b.business.name)) : sq.booking.notFoundTitle, robots: { index: false, follow: false } };
 }
 
 export default async function ConfirmationPage({ params }: Props) {
@@ -34,6 +34,7 @@ export default async function ConfirmationPage({ params }: Props) {
   const duration = Math.round((b.endsAt.getTime() - b.startsAt.getTime()) / 60000);
   const tooLate = b.startsAt.getTime() - now.getTime() < biz.cancelCutoffMin * 60000;
   const confirmed = status === 'confirmed';
+  const pending = status === 'pending';
   const cancelled = status === 'cancelled_customer' || status === 'cancelled_business';
   const bookAgain = `/b/${biz.slug}`;
 
@@ -46,6 +47,20 @@ export default async function ConfirmationPage({ params }: Props) {
               <SuccessMark />
               <h1 className="t-display fade-up" style={{ ['--i' as string]: 0 }}>{t.title}</h1>
               <p className="t-2 fade-up" style={{ ['--i' as string]: 1 }}>{t.text(whenAcc, l.time)}</p>
+            </div>
+          )}
+          {pending && (
+            <div className="stack">
+              <span className="badge badge--new" style={{ alignSelf: 'flex-start' }}>{t.pendingBadge}</span>
+              <h1 className="t-display fade-up" style={{ ['--i' as string]: 0 }}>{t.pendingTitle}</h1>
+              <p className="t-2 fade-up" style={{ ['--i' as string]: 1 }}>{t.pendingText(biz.name)}</p>
+            </div>
+          )}
+          {status === 'expired' && (
+            <div className="stack">
+              <span className="badge badge--danger" style={{ alignSelf: 'flex-start' }}>{t.expiredBadge}</span>
+              <h1 className="t-display">{t.expiredTitle}</h1>
+              <p className="t-2">{t.expiredText(biz.name)}</p>
             </div>
           )}
           {cancelled && (
@@ -79,13 +94,23 @@ export default async function ConfirmationPage({ params }: Props) {
                   <a className="btn btn--secondary" href={mapsUrl(biz)} target="_blank" rel="noopener noreferrer"><Icon name="navigation" size="sm" />{t.directions}</a>
                 </div>
               </div>
-              <p className="t-center fade-up" style={{ ['--i' as string]: 4 }}>
+              <div className="t-center fade-up" style={{ ['--i' as string]: 4 }}>
                 <CancelBooking token={b.token}
                   sureText={t.sureText(b.serviceName, dayAcc(l.date), fmtDayMonth(l.date), l.time)}
                   tooLateText={tooLate ? sq.errors.too_late(fmtDuration(biz.cancelCutoffMin), displayPhone(biz.phone)) : ''}
                   tel={biz.phone} />
-              </p>
+              </div>
             </>
+          ) : pending ? (
+            <div className="stack stack--2">
+              <a className="btn btn--whatsapp" href={customerConfirmLink(b, await getOrigin())} target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" />{t.pendingWa}</a>
+              <div className="t-center">
+                <CancelBooking token={b.token}
+                  sureText={t.sureText(b.serviceName, dayAcc(l.date), fmtDayMonth(l.date), l.time)}
+                  tooLateText={tooLate ? sq.errors.too_late(fmtDuration(biz.cancelCutoffMin), displayPhone(biz.phone)) : ''}
+                  tel={biz.phone} />
+              </div>
+            </div>
           ) : (
             <Link className="btn btn--primary" href={bookAgain}>{t.rebook}</Link>
           )}

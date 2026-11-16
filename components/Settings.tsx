@@ -141,14 +141,14 @@ function MainView({ data }: { data: SettingsData }) {
             </div>
           </section>
 
-          <a className="banner" href={page ? (page.liveUrl || `/faqja/${page.id}`) : '/faqja/krijo'} target={page?.liveUrl ? '_blank' : undefined} rel="noopener">
+          {data.faqjaGati && <a className="banner" href={page ? (page.liveUrl || `/faqja/${page.id}`) : '/faqja/krijo'} target={page?.liveUrl ? '_blank' : undefined} rel="noopener">
             <Icon name="sparkles" />
             <span className="banner__text">
               <b>{page ? (page.status === 'live' ? t.bannerLive : t.bannerPreview) : t.bannerTitle}</b>
               <span>{page ? (page.status === 'live' ? page.liveUrl.replace(/^https?:\/\//, '') : t.bannerPreviewText) : t.bannerText}</span>
             </span>
             <Icon name="chevron-right" style={{ color: '#fff', opacity: 0.6 }} />
-          </a>
+          </a>}
 
           <section className="group">
             <h2 className="label-caps group__label">{t.groupAccount}</h2>

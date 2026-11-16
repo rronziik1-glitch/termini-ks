@@ -26,18 +26,18 @@ beforeAll(async () => {
 });
 afterAll(async () => { await db.$disconnect(); });
 
-describe('H3: burst of bookings from new numbers', () => {
-  it(`stops after ${MAX_NEW_NUMBERS_PER_WINDOW} new numbers in 30 minutes`, async () => {
+describe('H3 (v5): burst of bookings from new numbers', () => {
+  it(`after ${MAX_NEW_NUMBERS_PER_WINDOW} new numbers in 30 minutes the next ones become "to confirm", never refused`, async () => {
     const times = ['09:00', '09:30', '10:00', '10:30', '11:00', '11:30', '12:00', '12:30'];
     const results: string[] = [];
     for (let i = 0; i < times.length; i++) {
       try {
-        await createPublicBooking(biz, { serviceId: cut.id, date: monday, time: times[i], name: 'Spam Bot', phone: `+38345${String(200000 + i)}`, now, ip: `10.0.0.${i}` });
-        results.push('ok');
+        const b = await createPublicBooking(biz, { serviceId: cut.id, date: monday, time: times[i], name: 'Spam Bot', phone: `+38345${String(200000 + i)}`, now, ip: `10.0.0.${i}` });
+        results.push(b.status === 'pending' ? 'pending' : 'ok');
       } catch (e) { results.push(e instanceof AppError ? e.code : String(e)); }
     }
     expect(results.filter((r) => r === 'ok').length).toBe(MAX_NEW_NUMBERS_PER_WINDOW);
-    expect(results.at(-1)).toBe('too_many_new');
+    expect(results.slice(MAX_NEW_NUMBERS_PER_WINDOW).every((r) => r === 'pending')).toBe(true);
   });
 });
 

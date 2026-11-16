@@ -1,5 +1,6 @@
 // Server data for the Cilësimet screens (fable/termini-ui/settings.html).
 import type { Business, User } from '@prisma/client';
+import { faqjaGatiOn } from './features';
 import { daysOffList } from './api/owner';
 import { rowsToHours } from './business';
 import { bookingUrl, config, displayLink, livePageUrl } from './config';
@@ -39,6 +40,7 @@ export async function settingsData(user: User, b: Business, origin: string) {
     user: { name: user.name, phone: displayPhone(user.phone), role: user.role },
     hoursSummary: hoursSummary(hours.days),
     nextDayOff: daysOff[0] ? fmtDayMonth(daysOff[0].from) : '',
+    faqjaGati: faqjaGatiOn(),
     page: page ? { id: page.id, status: page.status, liveUrl: page.status === 'live' && page.subdomain ? livePageUrl(page.subdomain, origin) : '' } : null,
     supportWa: config.supportWhatsapp(),
   };

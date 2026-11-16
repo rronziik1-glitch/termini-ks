@@ -413,3 +413,12 @@ button.row:active, a.row:active { background: var(--surface-2); }
 .btn--sm { position: relative; }
 .btn--sm::after { content: ""; position: absolute; inset: -6px 0; }
 .site-footer nav a, footer nav a { display: inline-block; padding-block: 12px; }
+
+/* v5: "to confirm" bookings */
+.event--pending { background: var(--warning-soft); border-left-color: var(--warning); border-style: dashed; }
+.pending-banner { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 12px 14px; text-align: left;
+  background: var(--warning-soft); color: inherit; border: 1px solid var(--warning); border-radius: 14px; cursor: pointer; font: inherit; }
+.pending-banner strong { display: block; color: var(--warning); }
+.pending-banner__dot { width: 10px; height: 10px; border-radius: 50%; background: var(--warning); flex: none; animation: pendingPulse 1.6s ease-in-out infinite; }
+@keyframes pendingPulse { 0%, 100% { opacity: 1 } 50% { opacity: .35 } }
+@media (prefers-reduced-motion: reduce) { .pending-banner__dot { animation: none; } }

@@ -17,10 +17,10 @@ type Booking = {
 };
 type DayInfo = { date: string; open: { start: number; end: number }[]; closed: boolean; dayOff: boolean; dayOffReason: string };
 type Block = { id: string; date: string; startMin: number; endMin: number; reason: string };
-type Data = { today: string; nowMin: number; days: DayInfo[]; blocks: Block[]; totalBookings: number; bookings: Booking[] };
+type Data = { today: string; nowMin: number; days: DayInfo[]; blocks: Block[]; totalBookings: number; bookings: Booking[]; pending: { id: string; date: string }[] };
 type Service = { id: string; name: string; durationMin: number; priceCents: number | null; priceFrom: boolean; active: boolean };
 
-const cancelled = (b: Booking) => b.status.startsWith('cancelled');
+const cancelled = (b: Booking) => b.status.startsWith('cancelled') || b.status === 'expired';
 const shortName = (n: string) => { const p = n.trim().split(/\s+/); return p.length > 1 ? `${p[0]} ${p[p.length - 1].charAt(0)}.` : n; };
 const css = (v: Record<string, string | number>) => v as React.CSSProperties;
 
@@ -143,6 +143,17 @@ export default function Calendar({ biz, link, today: today0 }: {
     } catch (e) { toastError(e); }
   }
 
+  /** v5: owner accepts a "to confirm" booking, then can tell the customer on WhatsApp. */
+  async function confirmPending(b: Booking) {
+    setSheet('');
+    try {
+      await api(`/bookings/${b.id}`, { method: 'PATCH', body: { status: 'confirmed' } });
+      await load();
+      if (b.wa.confirm) toast(t.confirmedToast(shortName(b.customer.name)), { action: t.tellCustomer, onAction: () => { window.open(b.wa.confirm, '_blank', 'noopener'); api(`/bookings/${b.id}/whatsapp?type=confirm`).catch(() => undefined); } });
+      else toast(t.confirmedToast(shortName(b.customer.name)));
+    } catch (e) { toastError(e); }
+  }
+
   async function saveMove() {
     if (!open) return;
     const b = open;
@@ -180,12 +191,13 @@ export default function Calendar({ biz, link, today: today0 }: {
   const badges = (b: Booking) => (
     <>
       {b.status === 'no_show' && <span className="badge badge--danger">{t.noShowBadge}</span>}
+      {b.status === 'pending' && <span className="badge badge--new">{t.pendingBadge}</span>}
       {b.status === 'confirmed' && date === today && b.startMin <= (data?.nowMin ?? -1) && (data?.nowMin ?? 0) < b.endMin && <span className="badge badge--info">{t.nowBadge}</span>}
       {b.status === 'confirmed' && b.customer.isNew && b.customer.phone && <span className="badge badge--new">{t.newBadge}</span>}
       {b.status === 'confirmed' && b.customer.noShows > 0 && <span className="badge badge--danger">{t.noShows(b.customer.noShows)}</span>}
     </>
   );
-  const eventClass = (b: Booking) => `event${b.durationMin <= 30 ? ' event--row' : ''}${b.status === 'completed' ? ' event--done' : b.status === 'no_show' ? ' event--noshow' : ''}`;
+  const eventClass = (b: Booking) => `event${b.durationMin <= 30 ? ' event--row' : ''}${b.status === 'completed' ? ' event--done' : b.status === 'no_show' ? ' event--noshow' : b.status === 'pending' ? ' event--pending' : ''}`;
   const showBooking = (b: Booking) => { setOpen(b); setMove({ date: b.date, time: b.time }); setSheet('booking'); };
 
   const b = open;
@@ -216,6 +228,13 @@ export default function Calendar({ biz, link, today: today0 }: {
             <button className={view === 'day' ? 'is-selected' : ''} aria-pressed={view === 'day'} onClick={() => setView('day')}>{t.dayView}</button>
             <button className={view === 'week' ? 'is-selected' : ''} aria-pressed={view === 'week'} onClick={() => setView('week')}>{t.weekView}</button>
           </div>
+          {!!data?.pending?.length && (
+            <button className="pending-banner" onClick={() => { const p = data.pending[0]; setDate(p.date); setView('day'); }}>
+              <span className="pending-banner__dot" aria-hidden="true" />
+              <span className="grow"><strong>{t.pendingBanner(data.pending.length)}</strong><span className="t-small t-2">{t.pendingHint}</span></span>
+              <Icon name="chevron-right" />
+            </button>
+          )}
         </div>
 
         {!data ? (
@@ -250,7 +269,7 @@ export default function Calendar({ biz, link, today: today0 }: {
                         <button key={x.id} className={`row${x.status === 'completed' ? ' row--done' : x.status === 'no_show' ? ' row--noshow' : ''}`} onClick={() => showBooking(x)}>
                           <span className="row__time">{x.time}</span>
                           <span className="row__main"><span className="row__title">{x.customer.name}</span><span className="row__meta">{x.serviceName}</span></span>
-                          {x.status === 'no_show' ? <span className="badge badge--danger">{t.noShowBadge}</span> : x.status === 'completed' ? <span className="badge badge--ok">{t.statusDone}</span> : <span className="row__price">{fmtPrice(x.priceCents)}</span>}
+                          {x.status === 'pending' ? <span className="badge badge--new">{t.pendingBadge}</span> : x.status === 'no_show' ? <span className="badge badge--danger">{t.noShowBadge}</span> : x.status === 'completed' ? <span className="badge badge--ok">{t.statusDone}</span> : <span className="row__price">{fmtPrice(x.priceCents)}</span>}
                         </button>
                       ))}
                     </div>
@@ -327,6 +346,7 @@ export default function Calendar({ biz, link, today: today0 }: {
           before: <span className="avatar avatar--lg" aria-hidden="true">{b?.customer.name.charAt(0).toUpperCase()}</span>,
           sub: b && (
             <p className="cluster t-small t-2">
+              {b.status === 'pending' && <span className="badge badge--new">{t.pendingBadge}</span>}
               {b.status === 'completed' && <span className="badge badge--ok">{t.statusDone}</span>}
               {b.status === 'no_show' && <span className="badge badge--danger">{t.noShowBadge}</span>}
               {b.customer.isNew && b.customer.phone ? <><span className="badge badge--new">{t.newBadge}</span><span>{t.firstVisit}</span></> : <span>{b.customer.phone ? t.visits(b.customer.visits) : t.walkIn}</span>}
@@ -335,7 +355,15 @@ export default function Calendar({ biz, link, today: today0 }: {
           ),
           after: b?.customer.phone ? <a className="iconbtn iconbtn--fill" href={`tel:${b.customer.phone}`} aria-label={t.callName(b.customer.name)}><Icon name="phone" /></a> : undefined,
         }}
-        actions={b && (
+        actions={b && (b.status === 'pending' ? (
+          <>
+            <p className="t-small t-2">{t.pendingHint}</p>
+            <div className="cluster" style={{ flexWrap: 'nowrap' }}>
+              <button className="btn btn--primary" onClick={() => confirmPending(b)}><Icon name="check" size="sm" />{t.confirm1}</button>
+              <button className="btn btn--danger" onClick={() => setStatus(b, 'cancelled_business', t.refusedToast)}>{t.refuse1}</button>
+            </div>
+          </>
+        ) : (
           <>
             {b.status === 'confirmed' && b.wa.reminder && (
               <a className="btn btn--whatsapp" href={b.wa.reminder} target="_blank" rel="noopener noreferrer"
@@ -352,7 +380,7 @@ export default function Calendar({ biz, link, today: today0 }: {
               <button className="btn btn--ghost btn--sm" style={{ color: 'var(--danger)' }} onClick={() => setStatus(b, 'cancelled_business', t.cancelled)}>{t.cancel}</button>
             </div>
           </>
-        )}>
+        ))}>
         {b && (
           <dl className="summary">
             <div className="summary__row"><dt>{t.service}</dt><dd>{b.serviceName} · {fmtDuration(b.durationMin)}</dd></div>
