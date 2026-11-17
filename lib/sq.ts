@@ -80,6 +80,8 @@ export const sq = {
 
   /* ---- WhatsApp messages (§3.5, exact text) ------------------------------ */
   wa: {
+    /** Login code did not arrive after two resends */
+    codeHelp: 'Përshëndetje, nuk po më vjen kodi për hyrje në Termini.',
     /** A. Customer → business, after booking */
     customerConfirm: (p: { service: string; date: string; time: string; name: string; link: string }) =>
       `Përshëndetje! Sapo rezervova termin:\n${p.service}, ${p.date}, ora ${p.time}\nEmri: ${p.name}\n${p.link}`,
@@ -136,6 +138,7 @@ export const sq = {
     title: 'Hyr në Termini', text: 'Shkruaj numrin me të cilin u regjistrove.',
     phone: 'Numri i telefonit', sendCode: 'Dërgo kodin', enter: 'Hyr',
     code: 'Kodi me 6 shifra', resendQ: "S'të erdhi?", resend: 'Dërgoje përsëri', resent: 'Kodi u dërgua përsëri.',
+    resendIn: (s: number) => `Dërgoje përsëri pas ${s} s`, helpWa: 'Na shkruaj në WhatsApp',
     // v4 audit: the text used to say "me SMS" even when the code goes out on WhatsApp.
     codeSent: (channel?: string) => (channel === 'whatsapp' ? 'Kodi të erdhi në WhatsApp.' : channel === 'sms' ? 'Kodi të erdhi me SMS.' : 'Kodi është gati.'),
     devCode: (c: string) => `Kodi yt (vetëm në zhvillim, pa SMS): ${c}`,

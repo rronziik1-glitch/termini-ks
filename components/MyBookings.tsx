@@ -7,6 +7,7 @@ import { useState } from 'react';
 import { ApiError, CodeInput, Field, Icon, PhoneInput, Wordmark, api, toast, toastError } from '@/components/ui';
 import { displayPhone, normalizePhone } from '@/lib/phone';
 import { sq } from '@/lib/sq';
+import ResendCode from '@/components/ResendCode';
 import { DAYS_SHORT, diffDays, fmtDayMonth, fmtPrice, toLocal, weekdayOf } from '@/lib/time';
 
 const t = sq.my;
@@ -22,14 +23,18 @@ export default function MyBookings({ initial }: { initial: Data | null }) {
   const [code, setCode] = useState('');
   const [sent, setSent] = useState(false);
   const [devCode, setDevCode] = useState('');
+  const [sentAt, setSentAt] = useState(0);
+  const [resends, setResends] = useState(0);
+  const [support, setSupport] = useState('');
   const [error, setError] = useState<{ phone?: string; code?: string }>({});
   const [busy, setBusy] = useState(false);
 
-  async function send() {
+  async function send(again = false) {
     if (!normalizePhone(phone)) { setError({ phone: sq.errors.invalid_phone }); return; }
     setBusy(true); setError({});
     try {
-      const r = await api<{ dev_code?: string }>('/my/code', { body: { phone } });
+      const r = await api<{ dev_code?: string; support?: string }>('/my/code', { body: { phone } });
+      setSentAt(Date.now()); setResends((n) => (again ? n + 1 : 0)); setSupport(r.support || '');
       setSent(true); setCode(''); setDevCode(r.dev_code || '');
       toast(t.codeSent(displayPhone(normalizePhone(phone))));
       setTimeout(() => document.getElementById('code-1')?.focus(), 50);
@@ -75,7 +80,7 @@ export default function MyBookings({ initial }: { initial: Data | null }) {
               </Field>
               {sent && (
                 <Field label={t.codeTitle} htmlFor="code-1" error={error.code}
-                  hint={<>{sq.login.resendQ} <button type="button" className="link" onClick={() => send()}>{sq.login.resend}</button></>}>
+                  hint={<ResendCode sentAt={sentAt} resends={resends} onResend={() => send(true)} supportWa={support} />}>
                   <CodeInput value={code} onChange={setCode} onComplete={verify} />
                 </Field>
               )}

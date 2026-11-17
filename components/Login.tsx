@@ -5,6 +5,7 @@ import { useState } from 'react';
 import { ApiError, CodeInput, Field, PhoneInput, Wordmark, api, toast, toastError } from '@/components/ui';
 import { normalizePhone } from '@/lib/phone';
 import { sq } from '@/lib/sq';
+import ResendCode from '@/components/ResendCode';
 
 const t = sq.login;
 
@@ -13,6 +14,9 @@ export default function Login({ next }: { next: string }) {
   const [code, setCode] = useState('');
   const [sent, setSent] = useState(false);
   const [devCode, setDevCode] = useState('');
+  const [sentAt, setSentAt] = useState(0);
+  const [resends, setResends] = useState(0);
+  const [support, setSupport] = useState('');
   const [error, setError] = useState<{ phone?: string; code?: string }>({});
   const [busy, setBusy] = useState(false);
 
@@ -20,7 +24,8 @@ export default function Login({ next }: { next: string }) {
     if (!normalizePhone(phone)) { setError({ phone: sq.errors.invalid_phone }); return; }
     setBusy(true); setError({});
     try {
-      const r = await api<{ dev_code?: string; channel?: string }>('/auth/code', { body: { phone } });
+      const r = await api<{ dev_code?: string; channel?: string; support?: string }>('/auth/code', { body: { phone } });
+      setSentAt(Date.now()); setResends((n) => (again ? n + 1 : 0)); setSupport(r.support || '');
       setSent(true); setCode(''); setDevCode(r.dev_code || '');
       toast(again ? t.resent : t.codeSent(r.channel));
       setTimeout(() => document.getElementById('code-1')?.focus(), 50);
@@ -57,7 +62,7 @@ export default function Login({ next }: { next: string }) {
             </Field>
             {sent && (
               <Field label={t.code} htmlFor="code-1" error={error.code}
-                hint={<>{t.resendQ} <button type="button" className="link" onClick={() => send(true)}>{t.resend}</button></>}>
+                hint={<ResendCode sentAt={sentAt} resends={resends} onResend={() => send(true)} supportWa={support} />}>
                 <CodeInput value={code} onChange={setCode} onComplete={verify} />
               </Field>
             )}

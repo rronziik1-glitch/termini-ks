@@ -6,6 +6,7 @@ import { ApiError, CodeInput, Field, Icon, PhoneInput, SuccessMark, Switch, Time
 import { normalizePhone } from '@/lib/phone';
 import { slugify } from '@/lib/slug';
 import { sq } from '@/lib/sq';
+import ResendCode from '@/components/ResendCode';
 import { DAYS, DAYS_NAME, DAYS_SHORT, cap } from '@/lib/time';
 
 const t = sq.onboarding;
@@ -44,6 +45,9 @@ export default function Onboarding({ linkPrefix, user, prefill }: {
   const [code, setCode] = useState('');
   const [sent, setSent] = useState(false);
   const [devCode, setDevCode] = useState('');
+  const [sentAt, setSentAt] = useState(0);
+  const [resends, setResends] = useState(0);
+  const [support, setSupport] = useState('');
   const [errors, setErrors] = useState<{ name?: string; services?: string; hours?: string; phone?: string; code?: string }>({});
   const [busy, setBusy] = useState(false);
   const [done, setDone] = useState<{ slug: string; url: string } | null>(null);
@@ -136,7 +140,8 @@ export default function Onboarding({ linkPrefix, user, prefill }: {
       if (user) await createBusiness();
       else if (!sent) {
         if (!normalizePhone(phone)) { setErrors({ phone: sq.errors.invalid_phone }); setBusy(false); return; }
-        const r = await api<{ dev_code?: string }>('/auth/code', { body: { phone } });
+        const r = await api<{ dev_code?: string; support?: string }>('/auth/code', { body: { phone } });
+        setSentAt(Date.now()); setResends(0); setSupport(r.support || '');
         setSent(true); setDevCode(r.dev_code || ''); toast(sq.login.codeSent((r as { channel?: string }).channel));
         setTimeout(() => document.getElementById('code-1')?.focus(), 50);
       } else await verify(code);
@@ -288,7 +293,8 @@ export default function Onboarding({ linkPrefix, user, prefill }: {
                 )}
                 {sent && !user && (
                   <Field label={sq.login.code} htmlFor="code-1" error={errors.code}
-                    hint={<>{sq.login.resendQ} <button type="button" className="link" onClick={() => api<{ dev_code?: string }>('/auth/code', { body: { phone } }).then((r) => { setDevCode(r.dev_code || ''); toast(sq.login.resent); }).catch(toastError)}>{sq.login.resend}</button></>}>
+                    hint={<ResendCode sentAt={sentAt} resends={resends} supportWa={support}
+                      onResend={() => api<{ dev_code?: string }>('/auth/code', { body: { phone } }).then((r) => { setDevCode(r.dev_code || ''); setSentAt(Date.now()); setResends((n) => n + 1); toast(sq.login.resent); }).catch(toastError)} />}>
                     <CodeInput value={code} onChange={setCode} onComplete={verify} />
                   </Field>
                 )}

@@ -94,6 +94,9 @@ export function otpAllowedFor(phone: string): boolean {
   return list.includes('*') || list.some((p) => phone.startsWith(p.startsWith('+') ? p : '+' + p));
 }
 
+/** Worth trying again: no answer at all (network/timeout), rate limited, or a server error at the provider. */
+export const isTemporaryFailure = (status: number) => status === 0 || status === 429 || status >= 500;
+
 export class OtpSendError extends Error {}
 
 /** Sends the login code. Returns false for "dev" (nothing sent). Throws OtpSendError when the provider refuses. */
@@ -102,16 +105,26 @@ export async function sendLoginCode(phone: string, code: string): Promise<boolea
   if (provider === 'dev') return false;
   const req = buildOtpRequest(provider, phone, code);
   const started = Date.now();
-  let status = 0, detail = '';
-  try {
-    const res = await fetch(req.url, { method: req.method, headers: req.headers, body: req.method === 'GET' ? undefined : req.body, signal: AbortSignal.timeout(12_000) });
-    status = res.status;
-    if (!res.ok) detail = (await res.text()).slice(0, 300);
-  } catch (e) {
-    detail = String(e);
+  let status = 0, detail = '', attempts = 0;
+  // Retry logic: a network error, a timeout, "too many requests" (429) or a provider error (5xx) is usually
+  // temporary, so the same message is tried up to 3 times (pauses of 0.6 s and 1.5 s). A 4xx answer (wrong key,
+  // account not approved, number refused) will not change by retrying, so it fails at once.
+  for (const pause of [0, 600, 1500]) {
+    if (pause) await new Promise((r) => setTimeout(r, pause));
+    attempts++;
+    status = 0; detail = '';
+    try {
+      const res = await fetch(req.url, { method: req.method, headers: req.headers, body: req.method === 'GET' ? undefined : req.body, signal: AbortSignal.timeout(8_000) });
+      status = res.status;
+      if (!res.ok) detail = (await res.text()).slice(0, 300);
+    } catch (e) {
+      detail = String(e);
+    }
+    if (status >= 200 && status < 300) break;
+    if (!isTemporaryFailure(status)) break;
   }
   const ok = status >= 200 && status < 300;
-  log[ok ? 'info' : 'error'](ok ? 'otp.sent' : 'otp.failed', { provider, style: provider === 'sms' ? env('SMS_STYLE', 'generic') : undefined, to: maskPhoneForLog(phone), status, ms: Date.now() - started, detail: detail || undefined });
+  log[ok ? 'info' : 'error'](ok ? 'otp.sent' : 'otp.failed', { provider, style: provider === 'sms' ? env('SMS_STYLE', 'generic') : undefined, to: maskPhoneForLog(phone), status, attempts, ms: Date.now() - started, detail: detail || undefined });
   if (!ok) throw new OtpSendError(`login code not sent (${provider}, HTTP ${status})`);
   return true;
 }

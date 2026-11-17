@@ -4,6 +4,7 @@ import { SESSION_COOKIE, SESSION_DAYS, consumeCode, destroySession, requestCode,
 import { CLIENT_COOKIE, CLIENT_HOURS, clientBookings, clientCookie, clientPhone } from '../client-session';
 import { freeStarts, isClosed, loadCtx } from '../availability';
 import { otpProviderId } from '../otp';
+import { config } from '../config';
 import { bookingIcs, cancelByToken, createPublicBooking, displayStatus, getByToken } from '../booking';
 import { findBusinesses } from '../business';
 import { AppError, db } from '../db';
@@ -92,7 +93,7 @@ route('GET', '/public/businesses/:slug/photo', 'public', async (c) => {
 route('POST', '/auth/code', 'public', async (c) => {
   const { phone } = await c.body<{ phone: string }>();
   const r = await requestCode(phone, c.ip);
-  return { phone: r.phone, dev_code: r.devCode, channel: otpProviderId() };
+  return { phone: r.phone, dev_code: r.devCode, channel: otpProviderId(), support: config.supportWhatsapp() };
 });
 
 route('POST', '/auth/verify', 'public', async (c) => {
@@ -120,7 +121,7 @@ route('GET', '/me', 'public', async (c) => ({
 route('POST', '/my/code', 'public', async (c) => {
   const { phone } = await c.body<{ phone: string }>();
   const r = await requestCode(phone, c.ip);
-  return { phone: r.phone, dev_code: r.devCode, channel: otpProviderId() };
+  return { phone: r.phone, dev_code: r.devCode, channel: otpProviderId(), support: config.supportWhatsapp() };
 });
 
 route('POST', '/my/verify', 'public', async (c) => {
