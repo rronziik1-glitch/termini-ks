@@ -1,6 +1,7 @@
 // Customer booking page (01-product-design.md §3.1). Profile and services are rendered on the server;
 // free times are fetched by the client component.
 import type { Metadata } from 'next';
+import AccountBar from '@/components/AccountBar';
 import { notFound } from 'next/navigation';
 import BookingFlow from '@/components/BookingFlow';
 import { loadCtx, openState } from '@/lib/availability';
@@ -37,6 +38,8 @@ export default async function BookingPage({ params, searchParams }: Props) {
   const phone = displayPhone(b.phone);
 
   return (
+    <>
+    <AccountBar where="public" />
     <BookingFlow
       biz={{
         slug: b.slug, name: b.name, meta: `${sq.categories[b.category] || sq.common.other} · ${b.city}`, address: b.address, mapsUrl: mapsUrl(b),
@@ -52,5 +55,6 @@ export default async function BookingPage({ params, searchParams }: Props) {
       source={from}
       initialDate={isDate(query.dita) ? query.dita : null}
     />
+    </>
   );
 }

@@ -466,6 +466,15 @@ export const sq = {
     visits: (n: number) => `${n} ${n === 1 ? 'vizitë' : 'vizita'}`, noShowsN: (n: number) => `${n} mosardhje`, blocked: 'i bllokuar',
   },
 
+  // v6: who is logged in (account bar on every page)
+  account: {
+    label: 'Llogaria jote',
+    role: { admin: 'Super Admin', owner: 'Biznes', client: 'Klient' } as Record<string, string>,
+    panel: 'Paneli', myBusiness: 'Biznesi im', asClient: 'Shiko si klient', calendar: 'Kalendari', myPage: 'Faqja ime si klient',
+    finishSetup: 'Përfundo regjistrimin', myBookings: 'Rezervimet e mia',
+    viewingAsClient: 'po e sheh si klient',
+  },
+
   // v6: customers, "Rezervimet e mia"
   my: {
     pageTitle: 'Rezervimet e mia · Termini', title: 'Rezervimet e mia',

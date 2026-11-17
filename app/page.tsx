@@ -1,5 +1,6 @@
 // Marketing home (02-design-system.md §8): white and ink sections, lime once, on the main call to action.
 import Link from 'next/link';
+import AccountBar from '@/components/AccountBar';
 import { faqjaGatiOn } from '@/lib/features';
 import { Icon, Reveal, Wordmark } from '@/components/ui';
 import { getSession } from '@/lib/session';
@@ -43,6 +44,7 @@ export default async function Home() {
   const appHref = business ? '/app' : user?.role === 'admin' ? '/admin' : '/hyr';
   return (
     <div className="mk">
+      <AccountBar where="public" />
       <Reveal />
       <div className="mk__in">
         <nav className="mk-nav" aria-label={sq.tabs.main}>

@@ -240,3 +240,18 @@ button:disabled { cursor: default; }
 .searchbar__clear:hover { background: var(--surface-3); color: var(--text); }
 .searchbar .btn { flex: none; }
 .found__match { display: inline-flex; align-items: center; gap: 6px; color: var(--text); }
+
+/* v6 account bar: who is logged in, on every page (components/AccountBar.tsx) */
+.acct { position: relative; z-index: calc(var(--z-sticky) + 1); border-bottom: 1px solid var(--border); background: var(--surface); font: var(--text-small); }
+.acct__in { display: flex; align-items: center; justify-content: space-between; gap: var(--space-2) var(--space-3); flex-wrap: wrap; max-width: var(--page-max-wide); margin-inline: auto; padding: 6px var(--page-gutter); min-height: 40px; }
+.acct__who { display: inline-flex; align-items: center; gap: var(--space-2); min-width: 0; flex-wrap: wrap; }
+.acct__badge { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: var(--radius-full); font: 600 0.75rem/1 var(--font-sans); letter-spacing: 0.01em; white-space: nowrap; }
+.acct--admin .acct__badge { background: var(--accent); color: var(--on-accent); }
+.acct--owner .acct__badge { background: var(--info-soft); color: var(--info); }
+.acct--client .acct__badge { background: var(--success-soft); color: var(--success); }
+.acct__name { font-weight: 600; color: var(--text); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; max-width: 14rem; }
+.acct__hint { color: var(--text-3); }
+.acct__links { display: inline-flex; flex-wrap: wrap; gap: 4px; }
+.acct__link { display: inline-flex; align-items: center; min-height: 30px; padding: 0 10px; border-radius: var(--radius-full); background: var(--surface-2); color: var(--text); font-weight: 500; white-space: nowrap; }
+.acct__link:hover { background: var(--surface-3); }
+.mk > .acct { margin-bottom: 0; }

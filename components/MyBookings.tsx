@@ -2,6 +2,7 @@
 // v6 "Rezervimet e mia": the customer types their number, gets a code, and sees every booking made with that number
 // (upcoming first, then history). Each booking opens its own page (/b/<slug>/t/<token>), where it can be cancelled.
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { ApiError, CodeInput, Field, Icon, PhoneInput, Wordmark, api, toast, toastError } from '@/components/ui';
 import { displayPhone, normalizePhone } from '@/lib/phone';
@@ -15,6 +16,7 @@ type Data = { phone: string; upcoming: Item[]; past: Item[] };
 const statusBadge = (s: string) => (s === 'confirmed' ? 'badge--ok' : s === 'pending' ? 'badge--new' : s === 'no_show' || s.startsWith('cancelled') || s === 'expired' ? 'badge--danger' : '');
 
 export default function MyBookings({ initial }: { initial: Data | null }) {
+  const router = useRouter();
   const [data, setData] = useState<Data | null>(initial);
   const [phone, setPhone] = useState('');
   const [code, setCode] = useState('');
@@ -39,7 +41,7 @@ export default function MyBookings({ initial }: { initial: Data | null }) {
   async function verify(value = code) {
     if (value.length < 6) { setError({ code: sq.errors.wrong_code }); return; }
     setBusy(true); setError({});
-    try { setData(await api<Data>('/my/verify', { body: { phone, code: value } })); }
+    try { setData(await api<Data>('/my/verify', { body: { phone, code: value } })); router.refresh(); }
     catch (e) {
       if (e instanceof ApiError && (e.code === 'wrong_code' || e.code === 'code_expired')) { setError({ code: e.message }); setCode(''); } else toastError(e);
     }
@@ -47,7 +49,7 @@ export default function MyBookings({ initial }: { initial: Data | null }) {
   }
   async function logout() {
     await api('/my/logout', { body: {} }).catch(() => undefined);
-    setData(null); setSent(false); setPhone(''); setCode(''); setDevCode('');
+    setData(null); setSent(false); setPhone(''); setCode(''); setDevCode(''); router.refresh();
   }
 
   const header = (

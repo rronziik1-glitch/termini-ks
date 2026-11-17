@@ -1,5 +1,6 @@
 // v6 Super Admin panel (§8.5): overview, every business (read-only view, suspend), audit log, Faqja Gati pages.
 import type { Metadata } from 'next';
+import AccountBar from '@/components/AccountBar';
 import Link from 'next/link';
 import { cookies } from 'next/headers';
 import SuperAdmin from '@/components/SuperAdmin';
@@ -30,6 +31,6 @@ export default async function AdminPage({ searchParams }: { searchParams: Promis
   }
   const jar = await cookies();
   if (!adminUnlocked(jar.get(SESSION_COOKIE)?.value, jar.get(ADMIN_COOKIE)?.value)) return <AdminUnlock />;
-  return <SuperAdmin hasBusiness={!!business} priceCents={config.pagePriceCents()} faqjaGati={faqjaGatiOn()} adminName={user!.name || displayPhone(user!.phone)}
-    initialTab={typeof q.tab === 'string' ? q.tab : ''} initialBiz={typeof q.biznes === 'string' ? q.biznes : ''} />;
+  return <><AccountBar where="admin" /><SuperAdmin hasBusiness={!!business} priceCents={config.pagePriceCents()} faqjaGati={faqjaGatiOn()} adminName={user!.name || displayPhone(user!.phone)}
+    initialTab={typeof q.tab === 'string' ? q.tab : ''} initialBiz={typeof q.biznes === 'string' ? q.biznes : ''} /></>;
 }

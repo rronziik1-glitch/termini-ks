@@ -1,5 +1,6 @@
 // Booking confirmation and the customer's permanent view of the booking (01-product-design.md §3.2).
 import type { Metadata } from 'next';
+import AccountBar from '@/components/AccountBar';
 import Link from 'next/link';
 import { notFound } from 'next/navigation';
 import CancelBooking from '@/components/CancelBooking';
@@ -40,6 +41,7 @@ export default async function ConfirmationPage({ params }: Props) {
 
   return (
     <div className="page">
+      <AccountBar where="public" />
       <div className="app">
         <main className="app__pad stack stack--6" style={{ paddingTop: 56 }}>
           {confirmed && (

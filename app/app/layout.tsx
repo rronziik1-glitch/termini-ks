@@ -1,5 +1,6 @@
 // Owner app shell: needs a session and a business. Tab bar: Kalendari · Klientët · Shërbimet · Cilësimet.
 import type { Metadata } from 'next';
+import AccountBar from '@/components/AccountBar';
 import { redirect } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { Tabs } from '@/components/ui';
@@ -14,6 +15,7 @@ export default async function OwnerLayout({ children }: { children: ReactNode })
   if (!business) redirect(user.role === 'admin' ? '/admin' : '/fillo');
   return (
     <div className="page page--subtle">
+      <AccountBar where="app" />
       {children}
       <Tabs />
     </div>

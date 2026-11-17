@@ -1,5 +1,6 @@
 // "Gjej": businesses by city and category, sorted by the soonest free time (01-product-design.md §3.6).
 import type { Metadata } from 'next';
+import AccountBar from '@/components/AccountBar';
 import Link from 'next/link';
 import { Icon, Wordmark } from '@/components/ui';
 import { findBusinesses } from '@/lib/business';
@@ -26,6 +27,7 @@ export default async function FindPage({ searchParams }: { searchParams: Promise
 
   return (
     <div className="page page--subtle">
+      <AccountBar where="public" />
       <div className="app">
         <header className="topbar"><Link href="/" aria-label="Termini" className="grow"><Wordmark /></Link><Link className="btn btn--ghost btn--sm btn--auto" href="/hyr">{sq.home.login}</Link></header>
         <main className="app__pad stack stack--6" style={{ paddingTop: 16, paddingBottom: 40 }}>

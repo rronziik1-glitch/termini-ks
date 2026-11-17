@@ -1,5 +1,6 @@
 // v6 "Rezervimet e mia" for customers (no account): phone + login code → every booking made with that number.
 import type { Metadata } from 'next';
+import AccountBar from '@/components/AccountBar';
 import { cookies } from 'next/headers';
 import MyBookings from '@/components/MyBookings';
 import { CLIENT_COOKIE, clientBookings, clientPhone } from '@/lib/client-session';
@@ -11,5 +12,5 @@ export const metadata: Metadata = { title: sq.my.pageTitle, robots: { index: fal
 export default async function MyBookingsPage() {
   const phone = clientPhone((await cookies()).get(CLIENT_COOKIE)?.value);
   const initial = phone ? await clientBookings(phone) : null;
-  return <MyBookings initial={initial} />;
+  return <><AccountBar where="public" /><MyBookings initial={initial} /></>;
 }
