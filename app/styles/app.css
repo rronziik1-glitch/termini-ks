@@ -255,3 +255,16 @@ button:disabled { cursor: default; }
 .acct__link { display: inline-flex; align-items: center; min-height: 30px; padding: 0 10px; border-radius: var(--radius-full); background: var(--surface-2); color: var(--text); font-weight: 500; white-space: nowrap; }
 .acct__link:hover { background: var(--surface-3); }
 .mk > .acct { margin-bottom: 0; }
+
+/* v6 customer-first home */
+.mk-find { display: flex; flex-direction: column; gap: var(--space-5); padding-block: var(--space-10) var(--space-8); max-width: 46rem; }
+.mk-find__lead { font-size: 1.125rem; max-width: 36rem; }
+.searchbar--lg .input, .searchbar--lg .btn { min-height: 56px; }
+.chip__count { margin-left: 6px; font-variant-numeric: tabular-nums; opacity: 0.55; }
+.mk-found { padding-bottom: var(--space-14); }
+.found-grid { display: grid; gap: var(--space-3); }
+@media (min-width: 768px) { .found-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); } .mk-find { padding-block: var(--space-14) var(--space-10); } }
+@media (min-width: 1100px) { .found-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.found-grid .found { height: 100%; }
+.mk-nav .cluster { flex-wrap: nowrap; gap: 4px; }
+@media (max-width: 420px) { .mk-nav .btn--sm { padding-inline: 10px; font-size: 0.8125rem; } }

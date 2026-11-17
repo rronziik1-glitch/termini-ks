@@ -113,6 +113,10 @@ export const sq = {
     heroTitle: 'Më pak thirrje. Më shumë klientë.',
     heroText: 'Klientët e rezervojnë terminin vetë, në 20 sekonda. Ti e sheh ditën në telefon. Falas.',
     cta: 'Regjistro biznesin tënd falas', find: 'Gjej një termin', login: 'Hyr',
+    // v6 customer-first home
+    findTitle: 'Gjej dhe rezervo terminin tënd.', findText: 'Berberë, sallone, dentistë dhe më shumë. Shiko orët e lira dhe rezervo në 20 sekonda, pa thirrje dhe pa llogari.',
+    kinds: 'Llojet e bizneseve', freeTitle: 'Me orë të lira së shpejti', allTitle: 'Bizneset në Termini',
+    seeAll: (n: number) => `Shiko të gjitha (${n})`, forBusiness: 'Për biznese', myBookingsLink: 'Ke rezervuar më parë? Shiko rezervimet e tua',
     stepsTitle: 'Gati në 2 minuta',
     steps: [
       { n: '01', title: 'Shkruaj biznesin', text: 'Emri, shërbimet me çmime dhe orari. I kemi mbushur vetë të zakonshmet.' },

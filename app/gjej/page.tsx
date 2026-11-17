@@ -1,12 +1,12 @@
 // "Gjej": businesses by city and category, sorted by the soonest free time (01-product-design.md §3.6).
 import type { Metadata } from 'next';
 import AccountBar from '@/components/AccountBar';
+import FoundList from '@/components/FoundList';
 import Link from 'next/link';
 import { Icon, Wordmark } from '@/components/ui';
 import { findBusinesses } from '@/lib/business';
 import { db } from '@/lib/db';
 import { sq } from '@/lib/sq';
-import { DAYS_SHORT, diffDays, fmtDayMonth, fmtPrice, toLocal, weekdayOf } from '@/lib/time';
 
 export const dynamic = 'force-dynamic';
 export const metadata: Metadata = { title: sq.find.pageTitle, description: sq.find.text };
@@ -21,9 +21,7 @@ export default async function FindPage({ searchParams }: { searchParams: Promise
   const category = typeof q.lloji === 'string' && CATS.includes(q.lloji) ? q.lloji : '';
   const search = typeof q.q === 'string' ? q.q.trim().slice(0, 80) : '';
   const list = await findBusinesses(city || undefined, category || undefined, undefined, search);
-  const today = toLocal(new Date()).date;
   const href = (c: string, k: string, s0 = search) => { const p = new URLSearchParams(); if (s0) p.set('q', s0); if (c) p.set('qyteti', c); if (k) p.set('lloji', k); const s = p.toString(); return s ? `/gjej?${s}` : '/gjej'; };
-  const whenLabel = (date: string) => { const n = diffDays(today, date); return n === 0 ? sq.common.today : n === 1 ? sq.common.tomorrow : `${DAYS_SHORT[weekdayOf(date) - 1]} ${fmtDayMonth(date)}`; };
 
   return (
     <div className="page page--subtle">
@@ -75,23 +73,7 @@ export default async function FindPage({ searchParams }: { searchParams: Promise
               </section>
             )
           ) : (
-            <ul className="stack stack--3">
-              {list.map((b) => (
-                <li key={b.slug}>
-                  <Link className="found" href={`/b/${b.slug}?nga=gjej${b.nextDate ? `&dita=${b.nextDate}` : ''}`}>
-                    <span className="avatar avatar--lg avatar--ink" aria-hidden="true">{b.photoUrl ? <img src={b.photoUrl} alt="" /> : b.name.charAt(0).toUpperCase()}</span>
-                    <span className="row__main">
-                      <span className="row__title">{b.name}</span>
-                      <span className="row__meta">{sq.categoriesShort[b.category] || sq.common.other} · {b.city}{b.priceFromCents !== null ? ` · ${fmtPrice(b.priceFromCents, true)}` : ''}</span>
-                      {b.matchedService && <span className="row__meta found__match"><Icon name="scissors" size="xs" />{b.matchedService}</span>}
-                    </span>
-                    <span className="found__next">
-                      {b.nextDate ? <><span>{t.nextFree}</span><b>{whenLabel(b.nextDate)} {b.nextTime}</b></> : <span>{b.paused ? t.paused : t.noFree}</span>}
-                    </span>
-                  </Link>
-                </li>
-              ))}
-            </ul>
+            <FoundList list={list} />
           )}
 
           {list.length > 0 && <p className="t-small t-3 t-center">{sq.brand.haveBusiness} <Link className="link" href="/fillo">{sq.brand.getLink}</Link></p>}
