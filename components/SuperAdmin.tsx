@@ -4,6 +4,7 @@
 // tab only while Faqja Gati is switched on. Same design system as the owner app (tokens, cards, rows, badges, sheets).
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import { FgPagesTab } from '@/components/Admin';
+import AdminListings from '@/components/AdminListings';
 import { Field, Icon, Sheet, Wordmark, api, toast, toastError } from '@/components/ui';
 import { sq } from '@/lib/sq';
 import { DAYS_SHORT, fmtDayMonth, fmtDuration, fmtPrice, toLocal } from '@/lib/time';
@@ -28,7 +29,7 @@ type BRow = { id: string; date: string; time: string; service: string; priceCent
 type Detail = {
   business: {
     id: string; slug: string; name: string; category: string; city: string; address: string; description: string; phone: string; instagram: string; url: string;
-    createdAt: string; onboarded: boolean; paused: boolean; listed: boolean; approval: boolean; suspended: { at: string; reason: string } | null;
+    createdAt: string; onboarded: boolean; paused: boolean; listed: boolean; approval: boolean; demo?: boolean; suspended: { at: string; reason: string } | null;
     rules: { slotStepMin: number; minNoticeMin: number; maxAdvanceDays: number; cancelCutoffMin: number };
   };
   owner: { name: string; phone: string; lastLoginAt: string | null; createdAt: string } | null;
@@ -77,7 +78,7 @@ function BizBadges({ b }: { b: { suspended: unknown; paused: boolean; onboarded:
 
 /* ==================================================================================== panel */
 export default function SuperAdmin({ hasBusiness, priceCents, faqjaGati, adminName, initialTab = '', initialBiz = '' }: { hasBusiness: boolean; priceCents: number; faqjaGati: boolean; adminName: string; initialTab?: string; initialBiz?: string }) {
-  const tabs = faqjaGati ? ['overview', 'businesses', 'audit', 'pages'] : ['overview', 'businesses', 'audit'];
+  const tabs = faqjaGati ? ['overview', 'businesses', 'listings', 'audit', 'pages'] : ['overview', 'businesses', 'listings', 'audit'];
   const [tab, setTab] = useState(initialBiz ? 'businesses' : tabs.includes(initialTab) ? initialTab : 'overview');
   const [openId, setOpenId] = useState(initialBiz);
 
@@ -121,6 +122,7 @@ export default function SuperAdmin({ hasBusiness, priceCents, faqjaGati, adminNa
           {openId ? <BusinessDetail id={openId} onBack={() => go('businesses')} />
             : tab === 'overview' ? <OverviewTab onOpen={(id) => go('businesses', id)} onList={() => go('businesses')} />
             : tab === 'businesses' ? <BusinessesTab onOpen={(id) => go('businesses', id)} />
+            : tab === 'listings' ? <AdminListings />
             : tab === 'audit' ? <AuditTab onOpen={(id) => go('businesses', id)} />
             : <FgPagesTab priceCents={priceCents} />}
         </main>
@@ -323,6 +325,10 @@ function BusinessDetail({ id, onBack }: { id: string; onBack: () => void }) {
   async function unsuspend() {
     try { await api(`/admin/businesses/${id}/unsuspend`, { body: {} }); toast(t.unsuspendedToast); load(); } catch (e) { toastError(e); }
   }
+  // v7: hide a test business from the public lists (its own link keeps working)
+  async function setDemo(demo: boolean) {
+    try { await api(`/admin/businesses/${id}/demo`, { body: { demo } }); toast(demo ? sq.g.demoOn : sq.g.demoOff); load(); } catch (e) { toastError(e); }
+  }
 
   const upcomingByDay = useMemo(() => {
     const out: { date: string; rows: BRow[] }[] = [];
@@ -343,11 +349,12 @@ function BusinessDetail({ id, onBack }: { id: string; onBack: () => void }) {
           <div className="stack stack--2">
             <h2 className="t-h2">{b.name}</h2>
             <p className="t-small t-2">{sq.categories[b.category] || b.category} · {b.city}{b.address ? ` · ${b.address}` : ''}</p>
-            <div className="sa-cell-badges"><BizBadges b={{ ...b, suspended: b.suspended }} /></div>
+            <div className="sa-cell-badges"><BizBadges b={{ ...b, suspended: b.suspended }} />{b.demo && <span className="badge">{sq.g.demo}</span>}</div>
           </div>
           <div className="sa-actions">
             <a className="btn btn--secondary btn--sm" href={b.url} target="_blank" rel="noopener noreferrer"><Icon name="external" size="sm" />{t.openPublic}</a>
             {d.owner && <a className="btn btn--whatsapp btn--sm" href={waLink(d.owner.phone)} target="_blank" rel="noopener noreferrer"><Icon name="whatsapp" />{t.waOwner}</a>}
+            <button className="btn btn--secondary btn--sm" onClick={() => setDemo(!b.demo)}>{b.demo ? sq.g.unDemo : sq.g.makeDemo}</button>
             {b.suspended
               ? <button className="btn btn--primary btn--sm" onClick={unsuspend}>{t.unsuspend}</button>
               : <button className="btn btn--danger btn--sm" onClick={() => setSuspending(true)}>{t.suspend}</button>}

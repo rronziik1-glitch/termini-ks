@@ -19,7 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   if ((process.env.SITE_PASSWORD || '').trim()) return out.slice(0, 1);
   try {
     const [businesses, pages] = await Promise.all([
-      db.business.findMany({ where: { listedInFind: true, suspendedAt: null, onboardedAt: { not: null } }, select: { slug: true, updatedAt: true }, orderBy: { updatedAt: 'desc' }, take: 5000 }),
+      db.business.findMany({ where: { listedInFind: true, suspendedAt: null, isDemo: false, onboardedAt: { not: null } }, select: { slug: true, updatedAt: true }, orderBy: { updatedAt: 'desc' }, take: 5000 }),
       db.page.findMany({ where: { status: 'live', subdomain: { not: null } }, select: { subdomain: true, updatedAt: true }, orderBy: { updatedAt: 'desc' }, take: 5000 }),
     ]);
     for (const b of businesses) out.push({ url: bookingUrl(b.slug, base), lastModified: b.updatedAt, changeFrequency: 'weekly', priority: 0.7 });

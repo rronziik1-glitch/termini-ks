@@ -7,6 +7,7 @@ import { randomId } from '../lib/config';
 import { db } from '../lib/db';
 import { createPage, markPaid, runGeneration } from '../lib/pages';
 import { CATEGORY_PRESETS } from '../lib/presets';
+import { bundledListings, importListings } from '../lib/listings';
 import { addDays, localToUtc, toLocal, weekdayOf } from '../lib/time';
 
 const ADMIN = '+38349000000';
@@ -57,6 +58,13 @@ async function main() {
   }
   // 2. Example businesses: only for local development. On PostgreSQL (production) they are skipped
   //    unless SEED_DEMO=1 is set on purpose.
+  // v7: real businesses that are not on Termini yet (OpenStreetMap, best 100 by default, LISTINGS_LIMIT to change,
+  //     LISTINGS_SEED=0 to skip). Safe to run on every deploy: matched on the OSM id, removed/claimed ones stay as they are.
+  if (process.env.LISTINGS_SEED !== '0') {
+    const added = await importListings(bundledListings());
+    console.log(`Listings: ${added} new (OpenStreetMap).`);
+  }
+
   if (/^postgres(ql)?:\/\//.test(process.env.DATABASE_URL || '') && process.env.SEED_DEMO !== '1') {
     console.log('Category presets saved. Example businesses skipped on PostgreSQL (set SEED_DEMO=1 to add them).');
     return;

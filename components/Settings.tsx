@@ -349,7 +349,12 @@ function HoursView() {
 /* ================================================================================ rezervimet */
 function RulesView({ data }: { data: SettingsData }) {
   const b = data.business;
-  const [v, setV] = useState({ maxAdvanceDays: b.maxAdvanceDays, minNoticeMin: b.minNoticeMin, cancelCutoffMin: b.cancelCutoffMin, slotStepMin: b.slotStepMin, listedInFind: b.listedInFind });
+  const [v, setV] = useState({ maxAdvanceDays: b.maxAdvanceDays, minNoticeMin: b.minNoticeMin, cancelCutoffMin: b.cancelCutoffMin, slotStepMin: b.slotStepMin, listedInFind: b.listedInFind,
+    autoReminders: b.autoReminders, winbackOn: b.winbackOn, reviewAskOn: b.reviewAskOn });
+  const [gUrl, setGUrl] = useState(b.googleReviewUrl);
+  async function saveGoogle() {
+    try { await api('/business', { method: 'PATCH', body: { googleReviewUrl: gUrl } }); toast(sq.common.saved); } catch (e) { toastError(e); }
+  }
 
   async function set<K extends keyof typeof v>(k: K, value: (typeof v)[K]) {
     const before = v[k];
@@ -391,6 +396,24 @@ function RulesView({ data }: { data: SettingsData }) {
             <span className="row__main"><span className="row__title row__title--plain" id="find-l">{t.listed}</span><span className="row__meta">{t.listedMeta}</span></span>
             <Switch checked={v.listedInFind} onChange={(x) => set('listedInFind', x)} labelledBy="find-l" />
           </div>
+        </div>
+        {/* v7 automatic messages */}
+        <div className="stack stack--2">
+          <p className="label-caps">{sq.g.autoTitle}</p>
+          <div className="list--card">
+            {(['autoReminders', 'winbackOn', 'reviewAskOn'] as const).map((k) => (
+              <div key={k} className="row">
+                <span className="row__main"><span className="row__title row__title--plain" id={`${k}-l`}>{sq.g[k]}</span><span className="row__meta">{sq.g[`${k}Meta`]}</span></span>
+                <Switch checked={v[k]} onChange={(x) => set(k, x)} labelledBy={`${k}-l`} />
+              </div>
+            ))}
+          </div>
+          <Field label={sq.g.googleReviewUrl} htmlFor="g-url" hint={sq.g.googleReviewUrlHint}>
+            <div className="cluster">
+              <input className="input" id="g-url" inputMode="url" autoCapitalize="none" placeholder="https://g.page/r/…/review" value={gUrl} maxLength={300} onChange={(e) => setGUrl(e.target.value)} />
+              <button className="btn btn--secondary btn--auto" onClick={saveGoogle}>{sq.common.save}</button>
+            </div>
+          </Field>
         </div>
       </main>
     </div>

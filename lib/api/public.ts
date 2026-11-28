@@ -57,7 +57,7 @@ route('POST', '/public/businesses/:slug/bookings', 'public', async (c) => {
   const body = await c.body<Record<string, string>>();
   const booking = await createPublicBooking(b, {
     serviceId: body.service_id, staffId: body.staff_id || null, date: body.date, time: body.time,
-    name: body.name, phone: body.phone, note: body.note, source: body.source, website: body.website, ip: c.ip,
+    name: body.name, phone: body.phone, note: body.note, source: body.source, website: body.website, ip: c.ip, remindMe: (body as Record<string, unknown>).remind_me === true,
   });
   return { token: booking.token };
 });

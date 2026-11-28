@@ -28,7 +28,7 @@ route('POST', '/business', 'user', async (c) => {
   const body = await c.body<Record<string, unknown>>();
   const b = await createBusiness(c.me, {
     name: body.name as string, category: body.category as string, city: body.city as string, slug: body.slug as string,
-    services: body.services as ServiceInput[], hours: body.hours as HoursDoc, ownerName: body.owner_name as string,
+    services: body.services as ServiceInput[], hours: body.hours as HoursDoc, ownerName: body.owner_name as string, listing: typeof body.listing === 'string' ? body.listing : undefined,
   });
   return { slug: b.slug, url: bookingUrl(b.slug, c.origin) };
 });
@@ -54,6 +54,13 @@ route('PATCH', '/business', 'owner', async (c) => {
   if (typeof body.bookingsPaused === 'boolean') data.bookingsPaused = body.bookingsPaused;
   if (typeof body.listedInFind === 'boolean') data.listedInFind = body.listedInFind;
   if (typeof body.requireApproval === 'boolean') data.requireApproval = body.requireApproval;
+  // v7 automatic messages
+  for (const k of ['autoReminders', 'winbackOn', 'reviewAskOn'] as const) if (typeof body[k] === 'boolean') data[k] = body[k];
+  if (typeof body.googleReviewUrl === 'string') {
+    const u = body.googleReviewUrl.trim().slice(0, 300);
+    if (u && !/^https:\/\/(g\.page|search\.google\.com|www\.google\.[a-z.]+|maps\.app\.goo\.gl|goo\.gl|maps\.google\.[a-z.]+)\//i.test(u)) throw bad();
+    data.googleReviewUrl = u;
+  }
   if (typeof body.lat === 'number' && typeof body.lng === 'number') { data.lat = body.lat; data.lng = body.lng; }
   const b = await db.business.update({ where: { id: c.biz.id }, data });
   return { ok: true, name: b.name };

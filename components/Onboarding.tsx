@@ -26,8 +26,8 @@ const presetDays = (p: Preset): Day[] => [1, 2, 3, 4, 5, 6, 7].map((weekday) => 
   return { weekday, open: !!h, start: h?.start || '09:00', end: h?.end || '14:00' };
 });
 
-export default function Onboarding({ linkPrefix, user, prefill }: {
-  linkPrefix: string; user: { name: string; phone: string } | null; prefill: { name: string; city: string; category: string };
+export default function Onboarding({ linkPrefix, user, prefill, listing }: {
+  linkPrefix: string; user: { name: string; phone: string } | null; prefill: { name: string; city: string; category: string }; listing?: string;
 }) {
   const [step, setStep] = useState(1);
   const [back, setBack] = useState(false);
@@ -113,7 +113,7 @@ export default function Onboarding({ linkPrefix, user, prefill }: {
   async function createBusiness() {
     const r = await api<{ slug: string; url: string }>('/business', {
       body: {
-        name, category, city, slug, owner_name: ownerName,
+        name, category, city, slug, owner_name: ownerName, listing,
         services: services.filter((s) => s.name.trim()).map((s) => ({ name: s.name, durationMin: s.durationMin, price: s.price, priceFrom: s.priceFrom, active: s.active })),
         hours: { days, pause: { on: false, start: '13:00', end: '13:30' } },
       },

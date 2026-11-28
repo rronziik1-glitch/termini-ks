@@ -3,6 +3,8 @@
 import Link from 'next/link';
 import AccountBar from '@/components/AccountBar';
 import FoundList from '@/components/FoundList';
+import ListingList from '@/components/ListingList';
+import { findListings } from '@/lib/listings';
 import { Icon, Reveal, Wordmark } from '@/components/ui';
 import { findBusinesses } from '@/lib/business';
 import { db } from '@/lib/db';
@@ -15,10 +17,11 @@ const t = sq.home;
 const SHOW = 6;
 
 export default async function Home() {
-  const [{ user, business }, found, kinds] = await Promise.all([
+  const [{ user, business }, found, kinds, listings] = await Promise.all([
     getSession(),
     findBusinesses(),
-    db.business.groupBy({ by: ['category'], where: { listedInFind: true, suspendedAt: null, onboardedAt: { not: null } }, _count: true }),
+    db.business.groupBy({ by: ['category'], where: { listedInFind: true, suspendedAt: null, isDemo: false, onboardedAt: { not: null } }, _count: true }),
+    findListings({ take: 6 }),
   ]);
   const appHref = business ? '/app' : user?.role === 'admin' ? '/admin' : '/hyr';
   const cats = kinds.sort((a, b) => b._count - a._count);
@@ -67,7 +70,9 @@ export default async function Home() {
             <h2 className="t-h2" id="free-h">{withFree.length ? t.freeTitle : t.allTitle}</h2>
             {found.length > 0 && <Link className="link t-small" href="/gjej">{t.seeAll(found.length)}</Link>}
           </div>
-          {list.length === 0 ? (
+          {list.length === 0 && listings.length > 0 ? (
+            <ListingList list={listings} grid />
+          ) : list.length === 0 ? (
             <div className="card empty">
               <p className="empty__title">{sq.find.emptyAll}</p>
               <Link className="btn btn--primary btn--auto" href="/fillo">{sq.find.addYours}</Link>
@@ -76,6 +81,7 @@ export default async function Home() {
             <>
               <FoundList list={list} grid />
               {found.length > list.length && <Link className="btn btn--secondary" href="/gjej">{t.seeAll(found.length)}<Icon name="chevron-right" size="sm" /></Link>}
+              {list.length < SHOW && listings.length > 0 && <><h3 className="t-h3">{sq.g.moreHere}</h3><ListingList list={listings.slice(0, SHOW - list.length)} grid /></>}
             </>
           )}
         </section>
@@ -106,6 +112,7 @@ export default async function Home() {
               <Link className="btn mk-cta" href={business ? '/app' : '/fillo'}>{business ? sq.onboarding.toCalendar : t.cta}</Link>
               {!user && <Link className="btn btn--secondary" href="/hyr">{t.login}</Link>}
             </div>
+            <p className="t-small" style={{ opacity: 0.8 }}>{sq.g.pricing}</p>
           </div>
           <h3 className="t-h2 reveal" style={{ marginTop: 48 }}>{t.stepsTitle}</h3>
           <ol className="mk-steps">

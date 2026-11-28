@@ -3,7 +3,7 @@
 export const SITE_COOKIE = 't_site';
 export const SITE_COOKIE_DAYS = 30;
 /** Paths that must work without the password: Paysera's server calls the callback, the form unlocks the site. */
-export const SITE_OPEN_PATHS = ['/api/payments/paysera/callback', '/site-password'];
+export const SITE_OPEN_PATHS = ['/api/payments/paysera/callback', '/site-password', '/api/cron/messages'];
 
 export const sitePassword = () => (process.env.SITE_PASSWORD || '').trim();
 

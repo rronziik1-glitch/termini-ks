@@ -8,5 +8,11 @@
       "v*": false,
       "all-folders": false
     }
-  }
+  },
+  "crons": [
+    {
+      "path": "/api/cron/messages",
+      "schedule": "0 6 * * *"
+    }
+  ]
 }

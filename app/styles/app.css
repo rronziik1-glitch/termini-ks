@@ -268,3 +268,19 @@ button:disabled { cursor: default; }
 .found-grid .found { height: 100%; }
 .mk-nav .cluster { flex-wrap: nowrap; gap: 4px; }
 @media (max-width: 420px) { .mk-nav .btn--sm { padding-inline: 10px; font-size: 0.8125rem; } }
+
+/* v7: real businesses not on Termini yet (unclaimed listings) */
+.found--listing { border-style: dashed; background: var(--surface-2, var(--surface)); }
+.found--listing .avatar { background: var(--surface-3, var(--border)); color: var(--text-2); }
+/* v7 review stars */
+.stars { display: flex; gap: var(--space-2); justify-content: center; }
+.stars button { width: 52px; height: 52px; border-radius: 50%; border: 1px solid var(--border); background: var(--surface); font-size: 1.5rem; line-height: 1; }
+.stars button[aria-pressed="true"] { background: var(--accent); color: var(--on-accent); border-color: transparent; }
+/* v7 Arka */
+.arka-num { font-size: 1.75rem; font-weight: 700; letter-spacing: -0.02em; }
+.arka-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); }
+.arka-grid > div { padding: var(--space-3); border-radius: var(--radius-md, 14px); background: var(--surface-2, var(--surface)); }
+.paybtns { display: flex; gap: 6px; }
+.paybtns .chip { height: 36px; }
+.story-prev { width: 100%; max-width: 270px; aspect-ratio: 9 / 16; border-radius: 18px; border: 1px solid var(--border); object-fit: cover; background: var(--surface-2, var(--surface)); }
+@media print { .tabs, .account-bar, .no-print { display: none !important; } .page { background: #fff !important; } }

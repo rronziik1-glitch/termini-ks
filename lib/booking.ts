@@ -41,7 +41,7 @@ export const NEW_NUMBER_WINDOW_MS = 30 * 60e3;
 
 export type PublicBookingInput = {
   serviceId: string; staffId?: string | null; date: string; time: string; name: string; phone: string;
-  note?: string; source?: string; ip?: string; website?: string; now?: Date; skipRateLimit?: boolean;
+  note?: string; source?: string; ip?: string; remindMe?: boolean; website?: string; now?: Date; skipRateLimit?: boolean;
 };
 
 /** Customer booking from the public link. Throws AppError with an Albanian message. */
@@ -63,7 +63,7 @@ export async function createPublicBooking(business: Business, input: PublicBooki
   if (!isDate(input.date) || !isTime(input.time)) throw new AppError('bad_request', 400, sq.errors.bad_request);
   const service = await db.service.findFirst({ where: { id: input.serviceId, businessId: business.id, active: true, deleted: false } });
   if (!service) throw new AppError('slot_taken', 409, sq.errors.slot_taken);
-  const source = ['link', 'page', 'find'].includes(input.source || '') ? input.source! : 'link';
+  const source = ['link', 'page', 'find', 'kthim'].includes(input.source || '') ? input.source! : 'link';
 
   return withLock(`biz:${business.id}`, () =>
     db.$transaction(async (tx) => {
@@ -91,9 +91,14 @@ export async function createPublicBooking(business: Business, input: PublicBooki
       const load = (id: string) => ctx.bookings.filter((b) => b.staffId === id).length;
       const staffId = [...slot.staffIds].sort((a, b) => load(a) - load(b))[0];
 
+      // v7: "remind me when it is time again" is only ever switched ON by the customer here (never silently off).
+      const consent = input.remindMe ? { marketingOk: true } : {};
       const customer = existing
-        ? await tx.customer.update({ where: { id: existing.id }, data: { name } })
-        : await tx.customer.create({ data: { businessId: business.id, phone, name } });
+        ? await tx.customer.update({ where: { id: existing.id }, data: { name, ...consent } })
+        : await tx.customer.create({ data: { businessId: business.id, phone, name, ...consent } });
+      // v7: booked within 21 days after a "bring them back" message (or from its link) = counted for Termini.
+      const fromWinback = source === 'kthim' || !!(existing?.winbackSentAt && now.getTime() - existing.winbackSentAt.getTime() < 21 * 864e5
+        && (!existing.lastVisitAt || existing.winbackSentAt > existing.lastVisitAt));
       const startsAt = localToUtc(input.date, input.time, business.timezone);
       const booking = await tx.booking.create({
         data: {
@@ -101,7 +106,7 @@ export async function createPublicBooking(business: Business, input: PublicBooki
           startsAt, endsAt: new Date(startsAt.getTime() + service.durationMin * 60000),
           source, serviceName: service.name, priceCents: service.priceCents,
           customerNote: (input.note || '').trim().slice(0, 300), token: randomId(22), createdIpHash: iph,
-          status: pending ? 'pending' : 'confirmed', createdAt: now,
+          status: pending ? 'pending' : 'confirmed', createdAt: now, fromWinback,
           pendingUntil: pending ? holdUntil(pending, startsAt, now) : null,
         },
       });

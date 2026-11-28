@@ -5,6 +5,7 @@ import { AppError, db } from './db';
 import { freeStarts, isClosed, loadCtx } from './availability';
 import { normalizePhone } from './phone';
 import { presetFor } from './presets';
+import { claimListing } from './listings';
 import { freeSlug, isValidSlug, slugify } from './slug';
 import { sq } from './sq';
 import { addDays, hmToMin, isTime, toLocal } from './time';
@@ -92,7 +93,7 @@ export async function slugCheck(name: string, city: string, wanted?: string) {
 /* ---- onboarding ---------------------------------------------------------------- */
 export type CreateBusinessInput = {
   name?: string; category?: string; city?: string; slug?: string; phone?: string; address?: string;
-  services?: ServiceInput[]; hours?: HoursDoc; ownerName?: string;
+  services?: ServiceInput[]; hours?: HoursDoc; ownerName?: string; listing?: string;
 };
 
 export async function createBusiness(user: User, input: CreateBusinessInput): Promise<Business> {
@@ -120,6 +121,8 @@ export async function createBusiness(user: User, input: CreateBusinessInput): Pr
     if (input.ownerName && !user.name) await tx.user.update({ where: { id: user.id }, data: { name: ownerName } });
     // A Faqja Gati page made with the same phone number gets its booking button linked.
     await tx.page.updateMany({ where: { businessId: null, OR: [{ ownerUserId: user.id }, { contactPhone: phone }] }, data: { businessId: business.id, ownerUserId: user.id } });
+    // v7: "Merre falas" from an unclaimed listing (linked at once only when the verified phone is the listing's phone).
+    if (input.listing) await claimListing(tx, input.listing, business.id, user.phone);
     return business;
   });
 }
@@ -161,7 +164,7 @@ export async function findBusinesses(city?: string, category?: string, nowArg?: 
 
 async function findBusinessesNow(city: string | undefined, category: string | undefined, now: Date, words: string[] = []): Promise<FoundBusiness[]> {
   const all = await db.business.findMany({
-    where: { listedInFind: true, suspendedAt: null, onboardedAt: { not: null }, ...(city ? { city } : {}), ...(category ? { category } : {}) },
+    where: { listedInFind: true, suspendedAt: null, isDemo: false, onboardedAt: { not: null }, ...(city ? { city } : {}), ...(category ? { category } : {}) },
     include: { services: { where: { active: true, deleted: false }, orderBy: { sort: 'asc' } } },
     orderBy: { createdAt: 'asc' },
     take: words.length ? 2000 : FIND_MAX,

@@ -90,6 +90,12 @@ model Business {
   requireApproval Boolean   @default(false) // v6: every online booking waits for Konfirmo / Refuzo
   suspendedAt     DateTime? // v6: paused by the super admin (hidden from the public; the owner cannot undo it)
   suspendedReason String    @default("")
+  isDemo          Boolean   @default(false) // v7: test/demo business, hidden from the public lists (link still works)
+  autoReminders   Boolean   @default(true) // v7: reminder the day before, prepared by Termini
+  winbackOn       Boolean   @default(true) // v7: "bring them back" message when a regular is late
+  reviewAskOn     Boolean   @default(true) // v7: ask for a review after the visit
+  googleReviewUrl String    @default("") // v7: the business's Google review link
+  listingId       String? // v7: the unclaimed listing this business claimed
   onboardedAt     DateTime?
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
@@ -195,6 +201,8 @@ model Customer {
   noShowCount Int       @default(0)
   lastVisitAt DateTime?
   blocked     Boolean   @default(false)
+  marketingOk   Boolean   @default(false) // v7: agreed to "remind me when it is time again"
+  winbackSentAt DateTime? // v7: last "bring them back" message
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @updatedAt
 
@@ -221,6 +229,10 @@ model Booking {
   token          String    @unique
   cancelledAt    DateTime?
   reminderSentAt DateTime?
+  reminder24At   DateTime? // v7: day-before reminder prepared or sent
+  reviewAskedAt  DateTime? // v7: review request prepared or sent
+  fromWinback    Boolean   @default(false) // v7: booked after a "bring them back" message
+  paidMethod     String    @default("") // v7 money book: cash | card | "" (not marked)
   createdIpHash  String    @default("")
   createdAt      DateTime  @default(now())
   updatedAt      DateTime  @updatedAt
@@ -357,4 +369,92 @@ model AuditLog {
   updatedAt  DateTime @updatedAt
 
   @@index([createdAt])
+}
+
+// ---- v7 ---------------------------------------------------------------------------------------------------------
+// Unclaimed listing: a real business that is not on Termini yet. Public facts only (name, type, city, address,
+// phone, position), from OpenStreetMap (ODbL, credited on the page) or typed in by the admin.
+model Listing {
+  id                String    @id @default(cuid())
+  slug              String    @unique
+  name              String
+  category          String
+  city              String
+  address           String    @default("")
+  phone             String    @default("") // E.164 or empty
+  lat               Float?
+  lng               Float?
+  source            String    @default("manual") // osm | manual
+  sourceId          String?   @unique // e.g. osm:node/123
+  status            String    @default("active") // active | claimed | removed
+  claimedBusinessId String?
+  claimRequestPhone String    @default("") // someone tried to claim it with another phone number: admin checks
+  requestsCount     Int       @default(0) // "I want to book here" taps
+  lastRequestAt     DateTime?
+  contactedAt       DateTime? // admin messaged the business about the requests
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  requests ListingRequest[]
+
+  @@index([status, city, category])
+}
+
+model ListingRequest {
+  id        String   @id @default(cuid())
+  listingId String
+  name      String
+  phone     String
+  note      String   @default("")
+  ipHash    String   @default("")
+  createdAt DateTime @default(now())
+
+  listing Listing @relation(fields: [listingId], references: [id], onDelete: Cascade)
+
+  @@index([listingId, createdAt])
+}
+
+// A message Termini prepares for the owner's clients: day-before reminder, "bring them back", review request.
+// status: queued (waiting for the owner to tap "send" in WhatsApp) | sent | skipped | failed.
+model MessageLog {
+  id         String    @id @default(cuid())
+  businessId String
+  customerId String?
+  bookingId  String?
+  kind       String // reminder24 | winback | review
+  channel    String    @default("link") // link | whatsapp
+  status     String    @default("queued")
+  text       String    @default("")
+  sentAt     DateTime?
+  createdAt  DateTime  @default(now())
+  updatedAt  DateTime  @updatedAt
+
+  @@index([businessId, status, createdAt])
+}
+
+// Private feedback after a visit (the review page). Only the owner sees it.
+model Feedback {
+  id         String   @id @default(cuid())
+  businessId String
+  bookingId  String   @unique
+  rating     Int
+  comment    String   @default("")
+  createdAt  DateTime @default(now())
+
+  @@index([businessId, createdAt])
+}
+
+// Money book: an expense the owner typed in (rent, products, electricity), optional receipt photo.
+model Expense {
+  id          String   @id @default(cuid())
+  businessId  String
+  date        String // local date YYYY-MM-DD
+  amountCents Int
+  category    String   @default("tjeter") // qira | produkte | rryma | paga | tjeter
+  note        String   @default("")
+  receiptKey  String   @default("")
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([businessId, date])
 }

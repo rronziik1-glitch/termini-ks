@@ -34,7 +34,7 @@ export default async function BookingPage({ params, searchParams }: Props) {
   const today = toLocal(now, b.timezone).date;
   const state = openState(await loadCtx(b, today, 8), now);
   const openText = state.open ? sq.booking.openUntil(state.until!) : state.opensAt ? sq.booking.closedOpens(state.opensWhen!, state.opensAt) : sq.booking.closedNow;
-  const from = query.nga === 'faqja' ? 'page' : query.nga === 'gjej' ? 'find' : 'link';
+  const from = query.nga === 'faqja' ? 'page' : query.nga === 'gjej' ? 'find' : query.nga === 'kthim' ? 'kthim' : 'link';
   const phone = displayPhone(b.phone);
 
   return (

@@ -150,7 +150,7 @@ route('GET', '/admin/businesses/:id', 'admin', async (c) => {
     business: {
       id: b.id, slug: b.slug, name: b.name, category: b.category, city: b.city, address: b.address, description: b.description,
       phone: displayPhone(b.phone), instagram: b.instagram, url: bookingUrl(b.slug, c.origin), createdAt: b.createdAt.toISOString(),
-      onboarded: !!b.onboardedAt, paused: b.bookingsPaused, listed: b.listedInFind, approval: b.requireApproval,
+      onboarded: !!b.onboardedAt, paused: b.bookingsPaused, listed: b.listedInFind, approval: b.requireApproval, demo: b.isDemo,
       suspended: b.suspendedAt ? { at: b.suspendedAt.toISOString(), reason: b.suspendedReason } : null,
       rules: { slotStepMin: b.slotStepMin, minNoticeMin: b.minNoticeMin, maxAdvanceDays: b.maxAdvanceDays, cancelCutoffMin: b.cancelCutoffMin },
     },

@@ -2,6 +2,8 @@
 import type { Metadata } from 'next';
 import AccountBar from '@/components/AccountBar';
 import FoundList from '@/components/FoundList';
+import ListingList from '@/components/ListingList';
+import { findListings } from '@/lib/listings';
 import Link from 'next/link';
 import { Icon, Wordmark } from '@/components/ui';
 import { findBusinesses } from '@/lib/business';
@@ -15,12 +17,15 @@ const CATS = ['berber', 'salon', 'dentist', 'klinike', 'bujtine', 'dasma', 'auto
 
 export default async function FindPage({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const q = await searchParams;
-  const used = (await db.business.findMany({ where: { listedInFind: true, suspendedAt: null }, select: { city: true }, distinct: ['city'] })).map((b) => b.city);
+  const used = (await db.business.findMany({ where: { listedInFind: true, suspendedAt: null, isDemo: false }, select: { city: true }, distinct: ['city'] })).map((b) => b.city);
   const cities = [...sq.cities.filter((c) => c !== sq.common.other), ...used.filter((c) => !sq.cities.includes(c))];
   const city = typeof q.qyteti === 'string' && cities.includes(q.qyteti) ? q.qyteti : '';
   const category = typeof q.lloji === 'string' && CATS.includes(q.lloji) ? q.lloji : '';
   const search = typeof q.q === 'string' ? q.q.trim().slice(0, 80) : '';
-  const list = await findBusinesses(city || undefined, category || undefined, undefined, search);
+  const [list, listings] = await Promise.all([
+    findBusinesses(city || undefined, category || undefined, undefined, search),
+    findListings({ city: city || undefined, category: category || undefined, q: search }),
+  ]);
   const href = (c: string, k: string, s0 = search) => { const p = new URLSearchParams(); if (s0) p.set('q', s0); if (c) p.set('qyteti', c); if (k) p.set('lloji', k); const s = p.toString(); return s ? `/gjej?${s}` : '/gjej'; };
 
   return (
@@ -59,7 +64,7 @@ export default async function FindPage({ searchParams }: { searchParams: Promise
           </div>
 
           {search && list.length > 0 && <p className="t-small t-2" aria-live="polite">{t.results(list.length, search)}</p>}
-          {list.length === 0 ? (
+          {list.length === 0 && listings.length > 0 ? null : list.length === 0 ? (
             search ? (
               <section className="card empty" aria-live="polite">
                 <p className="empty__title">{t.noResults(search)}</p>
@@ -68,7 +73,8 @@ export default async function FindPage({ searchParams }: { searchParams: Promise
               </section>
             ) : (
               <section className="card empty">
-                <p className="empty__title">{city ? t.empty(city) : t.emptyAll}</p>
+                <p className="empty__title">{city ? sq.g.soonCity(city) : t.emptyAll}</p>
+                {city && <p className="t-small t-2">{sq.g.soonCityText}</p>}
                 <Link className="btn btn--primary" href="/fillo">{t.addYours}</Link>
               </section>
             )
@@ -76,7 +82,14 @@ export default async function FindPage({ searchParams }: { searchParams: Promise
             <FoundList list={list} />
           )}
 
-          {list.length > 0 && <p className="t-small t-3 t-center">{sq.brand.haveBusiness} <Link className="link" href="/fillo">{sq.brand.getLink}</Link></p>}
+          {listings.length > 0 && (
+            <section className="stack stack--3" aria-labelledby="more-h">
+              {list.length > 0 && <h2 className="t-h3" id="more-h">{sq.g.moreHere}</h2>}
+              <ListingList list={listings} />
+            </section>
+          )}
+
+          {(list.length > 0 || listings.length > 0) && <p className="t-small t-3 t-center">{sq.brand.haveBusiness} <Link className="link" href="/fillo">{sq.brand.getLink}</Link></p>}
         </main>
       </div>
     </div>

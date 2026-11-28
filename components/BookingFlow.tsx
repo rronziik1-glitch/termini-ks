@@ -34,6 +34,7 @@ export default function BookingFlow({ biz, services, staff, today, source, initi
   const [phone, setPhone] = useState('');
   const [note, setNote] = useState('');
   const [website, setWebsite] = useState('');
+  const [remindMe, setRemindMe] = useState(false);   // v7: "bring them back" consent, off by default
   const [errors, setErrors] = useState<{ name?: string; phone?: string; form?: string }>({});
   const [busy, setBusy] = useState(false);
   const heading = useRef<HTMLHeadingElement>(null);
@@ -99,7 +100,7 @@ export default function BookingFlow({ biz, services, staff, today, source, initi
     if (!service || !date || !time) return go(2);
     setBusy(true);
     try {
-      const r = await api<{ token: string }>(`${base}/bookings`, { body: { service_id: service.id, staff_id: staffId, date, time, name, phone, note, source, website } });
+      const r = await api<{ token: string }>(`${base}/bookings`, { body: { service_id: service.id, staff_id: staffId, date, time, name, phone, note, source, website, remind_me: remindMe } });
       try { localStorage.setItem(REMEMBER, JSON.stringify({ name: name.trim(), phone: phone.trim() })); } catch { /* private mode */ }
       router.push(`/b/${biz.slug}/t/${r.token}`);
     } catch (e) {
@@ -262,12 +263,13 @@ export default function BookingFlow({ biz, services, staff, today, source, initi
                   <Field label={t.name} htmlFor="name" error={errors.name}>
                     <input className="input" id="name" name="name" autoComplete="name" placeholder={t.namePh} value={name} onChange={(e) => setName(e.target.value)} aria-invalid={!!errors.name || undefined} />
                   </Field>
-                  <Field label={t.phone} htmlFor="phone" hint={t.phoneHint} error={errors.phone}>
+                  <Field label={t.phone} htmlFor="phone" hint={sq.g.phoneHint} error={errors.phone}>
                     <PhoneInput id="phone" value={phone} onChange={setPhone} placeholder={t.phonePh} invalid={!!errors.phone} />
                   </Field>
                   <Field label={t.note(biz.name)} small={sq.common.optional} htmlFor="note">
                     <textarea className="input" id="note" name="note" rows={2} maxLength={300} placeholder={t.notePh} value={note} onChange={(e) => setNote(e.target.value)} />
                   </Field>
+                  <label className="check"><input type="checkbox" checked={remindMe} onChange={(e) => setRemindMe(e.target.checked)} />{sq.g.winbackConsent}</label>
                   <input className="sr" tabIndex={-1} autoComplete="off" name="website" aria-hidden="true" value={website} onChange={(e) => setWebsite(e.target.value)} />
                   {errors.form && <p className="note note--danger" role="alert">{errors.form}</p>}
                 </div>

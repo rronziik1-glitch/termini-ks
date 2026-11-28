@@ -281,7 +281,7 @@ button.row:active, a.row:active { background: var(--surface-2); }
 .dot--danger { background: var(--danger); }
 
 .tabs { position: fixed; left: 0; right: 0; bottom: 0; z-index: var(--z-bar); background: color-mix(in srgb, var(--surface) 92%, transparent); -webkit-backdrop-filter: blur(16px); backdrop-filter: blur(16px); box-shadow: var(--shadow-bar); }
-.tabs__in { display: grid; grid-template-columns: repeat(4, 1fr); max-width: var(--page-max); margin-inline: auto; padding-bottom: env(safe-area-inset-bottom); }
+.tabs__in { display: grid; grid-template-columns: repeat(5, 1fr); max-width: var(--page-max); margin-inline: auto; padding-bottom: env(safe-area-inset-bottom); }
 .tab { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; height: 64px; font: var(--text-caption); color: var(--text-3); transition: color var(--dur-fast); }
 .tab.is-active { color: var(--text); }
 .tab.is-active::before { content: ""; position: absolute; top: 5px; width: 4px; height: 4px; border-radius: 50%; background: var(--accent-text); }
